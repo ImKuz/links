@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package CatalogEntities;
+
+message Catalog {
+    repeated CatalogItem items = 1;
+}
+
+message CatalogItem {
+    oneof kind {
+        CatalogSnippet snippet = 1;
+        CatalogGroup group = 2;
+        CatalogLink link = 3;
+    };
+}
+
+message CatalogGroup {
+    string id = 2;
+    string name = 3;
+    repeated CatalogItem items = 4;
+}
+
+message CatalogSnippet {
+    string id = 2;
+    string name = 3;
+    string content = 4;
+}
+
+message CatalogLink {
+    string id = 2;
+    string name = 3;
+    string link = 4;
+}
