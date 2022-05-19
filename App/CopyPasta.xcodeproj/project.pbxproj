@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7456A1BA283530EC00C2DF3A /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7456A1B8283530EC00C2DF3A /* CoreData.xcdatamodeld */; };
 		745F5DD12831581E00CD9E9B /* AddItemFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 745F5DD02831581E00CD9E9B /* AddItemFeature */; };
 		74EEC7B9282FB41C0013CC3F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */; };
 		74EEC7C2282FB41D0013CC3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C1282FB41D0013CC3F /* Assets.xcassets */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7456A1B9283530EC00C2DF3A /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
 		74EEC7B5282FB41C0013CC3F /* CopyPasta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CopyPasta.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74EEC7C1282FB41D0013CC3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 		74EEC7B7282FB41C0013CC3F /* CopyPasta */ = {
 			isa = PBXGroup;
 			children = (
+				7456A1B8283530EC00C2DF3A /* CoreData.xcdatamodeld */,
 				74EEC7CE282FB4D00013CC3F /* Config */,
 				74EEC7CD282FB4BD0013CC3F /* Resources */,
 				74EEC8CE282FE4570013CC3F /* DI */,
@@ -196,6 +199,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7456A1BA283530EC00C2DF3A /* CoreData.xcdatamodeld in Sources */,
 				74EEC8D8282FE5860013CC3F /* AppAssemblerFactory.swift in Sources */,
 				74EEC8CA282FE2670013CC3F /* ServicesAssembly.swift in Sources */,
 				74EEC7B9282FB41C0013CC3F /* AppDelegate.swift in Sources */,
@@ -457,6 +461,19 @@
 			productName = CatalogFeature;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		7456A1B8283530EC00C2DF3A /* CoreData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				7456A1B9283530EC00C2DF3A /* CoreData.xcdatamodel */,
+			);
+			currentVersion = 7456A1B9283530EC00C2DF3A /* CoreData.xcdatamodel */;
+			path = CoreData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 74EEC7AD282FB41C0013CC3F /* Project object */;
 }

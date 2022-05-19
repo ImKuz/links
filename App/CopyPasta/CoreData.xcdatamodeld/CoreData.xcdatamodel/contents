@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19461" systemVersion="21A344" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CatalogItemEntity" representedClassName="CatalogItemEntity" syncable="YES">
+        <attribute name="content" attributeType="String"/>
+        <attribute name="contentType" attributeType="String"/>
+        <attribute name="index" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="itemId" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="remoteServerId" optional="YES" attributeType="String"/>
+        <attribute name="storeId" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="CatalogItemEntity" positionX="-63" positionY="-18" width="128" height="149"/>
+    </elements>
+</model>

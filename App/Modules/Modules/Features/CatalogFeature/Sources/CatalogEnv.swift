@@ -72,7 +72,7 @@ final class CatalogEnvImpl: CatalogEnv {
 
         return interface
             .onFinishPublisher
-            .eraseToEffect { .dismissPresentedView }
+            .eraseToEffect { .dismissAddItemForm }
     }
 
     func dismissPresetnedView() -> Effect<Void, Never> {

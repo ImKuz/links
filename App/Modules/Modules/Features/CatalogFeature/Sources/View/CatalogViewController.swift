@@ -46,7 +46,7 @@ final class CatalogViewController: UICollectionViewController {
             action: #selector(addButtonTap)
         )
 
-        viewStore.send(.viewDidLoad)
+        viewStore.send(.updateData)
     }
 
     // MARK: - State

@@ -22,7 +22,9 @@ public struct CatalogFeatureAssembly: Assembly {
 
         // MARK: - Local data source
         container.register(CatalogFeatureInterface.self, name: "local") { resolver in
-            let source = CatalogSourceMock()
+            let databaseService = resolver.resolve(DatabaseService.self)!
+            let source = DatabaseCatalogSource(databaseService: databaseService)
+
             let navigationController = UINavigationController()
             let router = container.resolve(Router.self, argument: navigationController)!
 

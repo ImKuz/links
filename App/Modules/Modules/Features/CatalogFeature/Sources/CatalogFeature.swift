@@ -27,14 +27,13 @@ struct CatalogState: Equatable {
 // MARK: - Action
 
 enum CatalogAction: Equatable {
-    case none
-    case viewDidLoad
+    case updateData
     case addItemTap
     case itemsUpdated(Result<IdentifiedArrayOf<CatalogItem>, AppError>)
     case moveItem(from: Int, to: Int)
     case rowAction(id: CatalogItem.ID, action: CatalogRowAction)
     case titleMessage(text: String)
-    case dismissPresentedView
+    case dismissAddItemForm
 }
 
 // MARK: - Enviroment

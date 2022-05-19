@@ -62,6 +62,7 @@ let addItemReducer = Reducer<AddItemState, AddItemAction, AddItemEnv> { state, a
         return env
             .done(state: state)
             .eraseToEffect()
+            .receive(on: DispatchQueue.main)
             .catchToEffect { _ in
                 // TODO: Error handling
                 .onCancel
