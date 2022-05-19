@@ -85,7 +85,8 @@ let package = Package(
             name: "SharedInterfaces",
             dependencies: [
                 "ToolKit",
-                "Models"
+                "Models",
+                .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
             ],
             path: "Modules/SharedInterfaces/Sources"
         ),
