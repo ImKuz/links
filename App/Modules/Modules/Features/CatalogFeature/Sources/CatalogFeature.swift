@@ -3,7 +3,6 @@ import Combine
 import IdentifiedCollections
 import ToolKit
 import Foundation
-import SharedEnv
 import Models
 
 // MARK: - State
@@ -51,4 +50,4 @@ protocol CatalogEnv: AnyObject {
 
 // MARK: - Reducer
 
-typealias CatalogReducerType = Reducer<CatalogState, CatalogAction, SystemEnv<CatalogEnv>>
+typealias CatalogReducerType = Reducer<CatalogState, CatalogAction, CatalogEnv>

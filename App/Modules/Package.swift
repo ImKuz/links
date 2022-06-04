@@ -9,42 +9,14 @@ let package = Package(
         .macOS(.v11)
     ],
     products: [
-        .library(
-            name: "ToolKit",
-            targets: ["ToolKit"]
-        ),
-        .library(
-            name: "SharedInterfaces",
-            targets: ["SharedInterfaces"]
-        ),
-        .library(
-            name: "SharedEnv",
-            targets: ["SharedEnv"]
-        ),
-        .library(
-            name: "Models",
-            targets: ["Models"]
-        ),
-        .library(
-            name: "Database",
-            targets: ["Database"]
-        ),
-        .library(
-            name: "Contracts",
-            targets: ["Contracts"]
-        ),
-        .library(
-            name: "RootFeature",
-            targets: ["RootFeature"]
-        ),
-        .library(
-            name: "CatalogFeature",
-            targets: ["CatalogFeature"]
-        ),
-        .library(
-            name: "AddItemFeature",
-            targets: ["AddItemFeature"]
-        ),
+        .library(name: "ToolKit", targets: ["ToolKit"]),
+        .library(name: "SharedInterfaces", targets: ["SharedInterfaces"]),
+        .library(name: "Models", targets: ["Models"]),
+        .library(name: "Database", targets: ["Database"]),
+        .library(name: "Contracts", targets: ["Contracts"]),
+        .library(name: "RootFeature", targets: ["RootFeature"]),
+        .library(name: "CatalogFeature", targets: ["CatalogFeature"]),
+        .library(name: "AddItemFeature", targets: ["AddItemFeature"]),
     ],
     dependencies: [
         .package(
@@ -92,14 +64,6 @@ let package = Package(
         ),
 
         .target(
-            name: "SharedEnv",
-            dependencies: [
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
-            ],
-            path: "Modules/SharedEnv/Sources"
-        ),
-
-        .target(
             name: "Models",
             path: "Modules/Models/Sources"
         ),
@@ -124,7 +88,6 @@ let package = Package(
             name: "RootFeature",
             dependencies: [
                 "ToolKit",
-                "SharedEnv",
                 "SharedInterfaces",
                 "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -142,7 +105,6 @@ let package = Package(
             name: "CatalogFeature",
             dependencies: [
                 "ToolKit",
-                "SharedEnv",
                 "Contracts",
                 "SharedInterfaces",
                 "Database",
@@ -163,7 +125,6 @@ let package = Package(
             name: "AddItemFeature",
             dependencies: [
                 "ToolKit",
-                "SharedEnv",
                 "SharedInterfaces",
                 "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

@@ -15,12 +15,12 @@ struct AddItemView: View {
                     HStack {
                         Button("Cancel") { viewStore.send(.onCancel) }
                             .buttonStyle(.borderless)
-                            .controlSize(.small)
+                            .controlSize(.regular)
                             .tint(.accentColor)
                         Spacer()
                         Button("Done") { viewStore.send(.onDone) }
                             .buttonStyle(.borderless)
-                            .controlSize(.small)
+                            .controlSize(.regular)
                             .tint(.accentColor)
                             .disabled(!viewStore.state.isFormValid)
                     }

@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-composable-architecture",
         "state": {
           "branch": "main",
-          "revision": "5fd736945c708da18ab672a6dde25259f4e7e42b",
+          "revision": "db890996189ca27da9e56f4cc82a70057819429a",
           "version": null
         }
       },
@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-identified-collections",
         "state": {
           "branch": null,
-          "revision": "680bf440178a78a627b1c2c64c0855f6523ad5b9",
-          "version": "0.3.2"
+          "revision": "2d6b7ffcc67afd9077fac5e5a29bcd6d39b71076",
+          "version": "0.4.0"
         }
       },
       {

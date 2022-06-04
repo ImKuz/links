@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import Database
 import Swinject
-import SharedEnv
 import ToolKit
 import Models
 import SharedInterfaces
@@ -38,7 +37,7 @@ public struct CatalogFeatureAssembly: Assembly {
             let store = Store(
                 initialState: .initial(title: "Local"),
                 reducer: CatalogReducerFactory().make(),
-                environment: SystemEnv.make(environment: environment)
+                environment: environment
             )
 
             let viewController = CatalogViewController(store: store)

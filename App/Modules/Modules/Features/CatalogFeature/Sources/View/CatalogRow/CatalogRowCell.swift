@@ -10,7 +10,7 @@ final class CatalogRowCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
 
-        label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         label.textColor = .label
         label.numberOfLines = 1
 
@@ -20,9 +20,9 @@ final class CatalogRowCell: UICollectionViewCell {
     private let contentLabel: UILabel = {
         let label = UILabel()
 
-        label.font = UIFont.systemFont(ofSize: 12, weight: .light)
+        label.font = UIFont.systemFont(ofSize: 15, weight: .light)
         label.textColor = .placeholderText
-        label.numberOfLines = 1
+        label.numberOfLines = 2
 
         return label
     }()
@@ -102,7 +102,9 @@ final class CatalogRowCell: UICollectionViewCell {
             x: titleLabel.frame.minX,
             y: titleLabel.frame.maxY,
             width: labelWidth,
-            height: contentLabel.sizeThatFits(contentFrame.size).height
+            height: contentLabel.sizeThatFits(
+                CGSize(width: labelWidth, height: .zero)
+            ).height
         )
 
         showMoreButton.frame = CGRect(

@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import ToolKit
 import Foundation
-import SharedEnv
 import Models
 
 // MARK: - State
@@ -25,4 +24,4 @@ struct RootEnv {
 
 // MARK: - Reducer
 
-typealias RootReducerType = Reducer<RootState, RootAction, SystemEnv<RootEnv>>
+typealias RootReducerType = Reducer<RootState, RootAction, RootEnv>

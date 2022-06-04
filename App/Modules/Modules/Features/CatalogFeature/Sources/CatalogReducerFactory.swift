@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import IdentifiedCollections
-import SharedEnv
 import Combine
 
 struct CatalogReducerFactory {
@@ -20,13 +19,11 @@ struct CatalogReducerFactory {
                 switch action {
                 case .updateData:
                     return env
-                        .environment
                         .read()
-                        .receive(on: env.mainQueue())
+                        .receive(on: DispatchQueue.main)
                         .catchToEffect(CatalogAction.itemsUpdated)
                 case .addItemTap:
                     return env
-                        .environment
                         .showForm()
                         .cancellable(id: ID.showForm, cancelInFlight: true)
                 case let .itemsUpdated(.success(items)):
@@ -36,7 +33,6 @@ struct CatalogReducerFactory {
                     return .none
                 case let .moveItem(from, to):
                     return env
-                        .environment
                         .move(from, to)
                         .fireAndForget()
                 case let .titleMessage(text):
@@ -49,7 +45,6 @@ struct CatalogReducerFactory {
                         }
                 case .dismissAddItemForm:
                     return env
-                        .environment
                         .dismissPresetnedView()
                         .eraseToEffect { .updateData }
                 case let .rowAction(id, action):
@@ -71,7 +66,7 @@ struct CatalogReducerFactory {
         state: inout CatalogState,
         itemId: String,
         action: CatalogRowAction,
-        env: SystemEnv<CatalogEnv>
+        env: CatalogEnv
     ) -> Effect<CatalogAction, Never> {
         guard let index = state.items.index(id: itemId) else { return .none }
 
@@ -80,7 +75,6 @@ struct CatalogReducerFactory {
             let content = state.items[index].content
 
             return env
-                .environment
                 .handleContent(content)
                 .compactMap { [content] in
                     switch content {
@@ -95,9 +89,8 @@ struct CatalogReducerFactory {
             let temp = state.items.remove(at: index)
 
             return env
-                .environment
                 .delete(temp)
-                .receive(on: env.mainQueue())
+                .receive(on: DispatchQueue.main)
                 .fireAndForget()
         }
     }

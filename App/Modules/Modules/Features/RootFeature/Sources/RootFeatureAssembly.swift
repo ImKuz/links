@@ -1,5 +1,4 @@
 import Swinject
-import SharedEnv
 import SharedInterfaces
 import ComposableArchitecture
 import ToolKit
@@ -21,7 +20,7 @@ public struct RootFeatureAssembly: Assembly {
         let store: Store<RootState, RootAction> = .init(
             initialState: .init(remoteSourceData: .default, tabs: tabs),
             reducer: RootReducerFactory.make(),
-            environment: SystemEnv.make(environment: RootEnv())
+            environment: RootEnv()
         )
 
         let view = RootView(
