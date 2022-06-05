@@ -19,6 +19,7 @@ let package = Package(
         .library(name: "RootFeature", targets: ["RootFeature"]),
         .library(name: "CatalogFeature", targets: ["CatalogFeature"]),
         .library(name: "AddItemFeature", targets: ["AddItemFeature"]),
+        .library(name: "RemoteFeature", targets: ["RemoteFeature"]),
     ],
     dependencies: [
         .package(
@@ -131,7 +132,7 @@ let package = Package(
                 "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
-                .product(name: "Swinject", package: "Swinject")
+                .product(name: "Swinject", package: "Swinject"),
             ],
             path: "Modules/Features/CatalogFeature/Sources"
         ),
@@ -148,9 +149,21 @@ let package = Package(
                 "SharedInterfaces",
                 "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "Swinject", package: "Swinject")
+                .product(name: "Swinject", package: "Swinject"),
             ],
             path: "Modules/Features/AddItemFeature/Sources"
         ),
+
+        .target(
+            name: "RemoteFeature",
+            dependencies: [
+                "ToolKit",
+                "SharedInterfaces",
+                "Models",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Swinject", package: "Swinject"),
+            ],
+            path: "Modules/Features/RemoteFeature/Sources"
+        )
     ]
 )

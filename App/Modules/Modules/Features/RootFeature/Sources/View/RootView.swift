@@ -16,7 +16,6 @@ struct RootView: View {
                 ForEach(viewStore.tabs) { tab in
                     tabViewsProvider
                         .view(for: tab.type)?
-                        .ignoresSafeArea()
                         .background(Color(UIColor.secondarySystemBackground))
                         .tabItem {
                             Label(tab.name, systemImage: tab.iconName)

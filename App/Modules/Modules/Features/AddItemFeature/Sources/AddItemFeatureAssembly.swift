@@ -7,13 +7,7 @@ import SwiftUI
 
 public struct AddItemFeatureAssembly: Assembly {
 
-    private let container: Container
-
-    public init(container: Container) {
-        self.container = container
-    }
-
-    // MARK: - Public methods
+    public init() {}
 
     public func assemble(container: Container) {
 

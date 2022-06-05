@@ -40,3 +40,12 @@ public struct AddItemFeatureInterface: FeatureInterface {
         self.onFinishPublisher = onFinishPublisher
     }
 }
+
+public struct RemoteFeatureInterface: FeatureInterface {
+
+    public var view: AnyView
+
+    public init(view: AnyView) {
+        self.view = view
+    }
+}

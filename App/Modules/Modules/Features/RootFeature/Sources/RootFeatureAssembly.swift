@@ -6,15 +6,12 @@ import SwiftUI
 
 public struct RootFeatureAssembly: Assembly {
 
-    private let container: Container
-
-    public init(container: Container) {
-        self.container = container
-    }
+    public init() {}
 
     public func assemble(container: Container) {
         let tabs = [
-            Tab(type: .local, name: "Local", iconName: "list.dash")
+            Tab(type: .local, name: "Local", iconName: "list.dash"),
+            Tab(type: .remote, name: "Remote", iconName: "globe"),
         ]
 
         let store: Store<RootState, RootAction> = .init(

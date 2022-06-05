@@ -25,7 +25,7 @@ final class RootTabViewsProviderImpl: RootTabViewsProvider {
         case .local:
             return container.resolve(CatalogFeatureInterface.self, name: "local")!.view
         case .remote:
-            fatalError("Not implemented")
+            return container.resolve(RemoteFeatureInterface.self)!.view
         }
     }
 }

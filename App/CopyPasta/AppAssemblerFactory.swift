@@ -4,6 +4,7 @@ import CatalogFeature
 import AddItemFeature
 import IPAddressProvider
 import CatalogServer
+import RemoteFeature
 
 struct AppAssemblerFactory {
 
@@ -29,9 +30,10 @@ struct AppAssemblerFactory {
 
             // MARK: - Features
 
-            RootFeatureAssembly(container: container),
-            CatalogFeatureAssembly(container: container),
-            AddItemFeatureAssembly(container: container),
+            RootFeatureAssembly(),
+            CatalogFeatureAssembly(),
+            AddItemFeatureAssembly(),
+            RemoteFeatureAssembly(),
         ])
     }
 }
