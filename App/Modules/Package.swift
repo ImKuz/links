@@ -14,6 +14,8 @@ let package = Package(
         .library(name: "Models", targets: ["Models"]),
         .library(name: "Database", targets: ["Database"]),
         .library(name: "Contracts", targets: ["Contracts"]),
+        .library(name: "IPAddressProvider", targets: ["IPAddressProvider"]),
+        .library(name: "CatalogServer", targets: ["CatalogServer"]),
         .library(name: "RootFeature", targets: ["RootFeature"]),
         .library(name: "CatalogFeature", targets: ["CatalogFeature"]),
         .library(name: "AddItemFeature", targets: ["AddItemFeature"]),
@@ -80,6 +82,24 @@ let package = Package(
                 .product(name: "GRPC", package: "grpc-swift")
             ],
             path: "Modules/Contracts/Sources"
+        ),
+
+        .target(
+            name: "IPAddressProvider",
+            dependencies: ["Swinject"],
+            path: "Modules/IPAddressProvider/Sources"
+        ),
+
+        .target(
+            name: "CatalogServer",
+            dependencies: [
+                "Swinject",
+                "ToolKit",
+                "Models",
+                "Contracts",
+                "IPAddressProvider",
+            ],
+            path: "Modules/CatalogServer/Sources"
         ),
 
         // MARK: - Features

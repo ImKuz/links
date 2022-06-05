@@ -2,6 +2,8 @@ import Swinject
 import RootFeature
 import CatalogFeature
 import AddItemFeature
+import IPAddressProvider
+import CatalogServer
 
 struct AppAssemblerFactory {
 
@@ -22,6 +24,8 @@ struct AppAssemblerFactory {
             // MARK: - Services
 
             ServicesAssembly(),
+            IPAddressProviderAssembly(),
+            CatalogServerAssembly(),
 
             // MARK: - Features
 

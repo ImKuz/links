@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		7456A1BA283530EC00C2DF3A /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7456A1B8283530EC00C2DF3A /* CoreData.xcdatamodeld */; };
 		745F5DD12831581E00CD9E9B /* AddItemFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 745F5DD02831581E00CD9E9B /* AddItemFeature */; };
+		746A4077284BD9DE00EF88D7 /* IPAddressProvider in Frameworks */ = {isa = PBXBuildFile; productRef = 746A4076284BD9DE00EF88D7 /* IPAddressProvider */; };
+		746A4079284CA5CB00EF88D7 /* CatalogServer in Frameworks */ = {isa = PBXBuildFile; productRef = 746A4078284CA5CB00EF88D7 /* CatalogServer */; };
 		74EEC7B9282FB41C0013CC3F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */; };
 		74EEC7C2282FB41D0013CC3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C1282FB41D0013CC3F /* Assets.xcassets */; };
 		74EEC7C5282FB41D0013CC3F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C3282FB41D0013CC3F /* LaunchScreen.storyboard */; };
@@ -24,6 +26,7 @@
 
 /* Begin PBXFileReference section */
 		7456A1B9283530EC00C2DF3A /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
+		746A4075284BD66200EF88D7 /* CopyPasta-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CopyPasta-Bridging-Header.h"; sourceTree = "<group>"; };
 		74EEC7B5282FB41C0013CC3F /* CopyPasta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CopyPasta.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74EEC7C1282FB41D0013CC3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -40,9 +43,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				746A4079284CA5CB00EF88D7 /* CatalogServer in Frameworks */,
 				74EEC8D4282FE4DC0013CC3F /* ToolKit in Frameworks */,
 				74EEC8CD282FE29C0013CC3F /* Swinject in Frameworks */,
 				74EEC8D2282FE4D40013CC3F /* Database in Frameworks */,
+				746A4077284BD9DE00EF88D7 /* IPAddressProvider in Frameworks */,
 				745F5DD12831581E00CD9E9B /* AddItemFeature in Frameworks */,
 				74EEC8DC2830F5960013CC3F /* CatalogFeature in Frameworks */,
 				74EEC8D6282FE4DF0013CC3F /* SharedInterfaces in Frameworks */,
@@ -80,6 +85,7 @@
 				74EEC8CE282FE4570013CC3F /* DI */,
 				74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */,
 				74EEC8D7282FE5860013CC3F /* AppAssemblerFactory.swift */,
+				746A4075284BD66200EF88D7 /* CopyPasta-Bridging-Header.h */,
 			);
 			path = CopyPasta;
 			sourceTree = "<group>";
@@ -141,6 +147,8 @@
 				74EEC8D9282FE6250013CC3F /* RootFeature */,
 				74EEC8DB2830F5960013CC3F /* CatalogFeature */,
 				745F5DD02831581E00CD9E9B /* AddItemFeature */,
+				746A4076284BD9DE00EF88D7 /* IPAddressProvider */,
+				746A4078284CA5CB00EF88D7 /* CatalogServer */,
 			);
 			productName = CopyPasta;
 			productReference = 74EEC7B5282FB41C0013CC3F /* CopyPasta.app */;
@@ -277,6 +285,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "CopyPasta/CopyPasta-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -331,6 +340,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "CopyPasta/CopyPasta-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -434,6 +444,14 @@
 		745F5DD02831581E00CD9E9B /* AddItemFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AddItemFeature;
+		};
+		746A4076284BD9DE00EF88D7 /* IPAddressProvider */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = IPAddressProvider;
+		};
+		746A4078284CA5CB00EF88D7 /* CatalogServer */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CatalogServer;
 		};
 		74EEC8CC282FE29C0013CC3F /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;

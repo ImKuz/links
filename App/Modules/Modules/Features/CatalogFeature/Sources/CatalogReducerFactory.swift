@@ -34,6 +34,7 @@ struct CatalogReducerFactory {
                 case let .moveItem(from, to):
                     return env
                         .move(from, to)
+                        .receive(on: DispatchQueue.main)
                         .fireAndForget()
                 case let .titleMessage(text):
                     state.titleMessage = text
