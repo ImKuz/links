@@ -6,18 +6,17 @@ import Models
 // MARK: - State
 
 struct RemoteState: Equatable {
-    @BindableState var host = ""
-    @BindableState var port = "8090"
-    @BindableState var isAlertShown = false
-    @BindableState var isRememberSwitchOn = false
+    var host = ""
+    var port = "8090"
+    var isRememberSwitchOn = false
 }
 
 // MARK: - Action
 
-enum RemoteAction: BindableAction, Equatable {
-    case binding(BindingAction<RemoteState>)
+enum RemoteAction: Equatable {
     case connectTap
     case hostTap
+    case toggleSwitch(isOn: Bool)
 }
 
 // MARK: - Enviroment
@@ -30,12 +29,12 @@ protocol RemoteEnv {
 
 let remoteReducer = Reducer<RemoteState, RemoteAction, RemoteEnv> { state, action, env in
     switch action {
-    case .binding:
-        return .none
     case .connectTap:
-        state.isAlertShown.toggle()
         return .none
     case .hostTap:
+        return .none
+    case let .toggleSwitch(isOn):
+        state.isRememberSwitchOn = isOn
         return .none
     }
 }

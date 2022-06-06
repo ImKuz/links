@@ -31,10 +31,16 @@ struct RemoteView: View {
 
                     Spacer()
 
-                    Toggle("Remember choice", isOn: viewStore.binding(\.$isRememberSwitchOn))
-                        .foregroundColor(Color.black.opacity(0.8))
-                        .frame(minWidth: 0, maxWidth: 250)
-                        .padding()
+                    Toggle(
+                        "Remember choice",
+                        isOn: viewStore.binding(
+                            get: { $0.isRememberSwitchOn },
+                            send: { .toggleSwitch(isOn: $0) }
+                        )
+                    )
+                    .foregroundColor(Color.black.opacity(0.8))
+                    .frame(minWidth: 0, maxWidth: 250)
+                    .padding()
 
                 }
                 Spacer(minLength: 24)
