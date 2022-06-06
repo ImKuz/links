@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import SwiftUI
-import AddItemFeature
 
 struct RemoteView: View {
 

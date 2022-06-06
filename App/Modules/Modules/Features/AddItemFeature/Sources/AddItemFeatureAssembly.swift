@@ -24,7 +24,7 @@ public struct AddItemFeatureAssembly: Assembly {
 
             return AddItemFeatureInterface(
                 view: view,
-                onFinishPublisher: environment.onFinishSubject.print().eraseToAnyPublisher()
+                onFinishPublisher: environment.onFinishSubject.eraseToAnyPublisher()
             )
         }
 

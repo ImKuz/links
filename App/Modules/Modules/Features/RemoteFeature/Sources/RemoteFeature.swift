@@ -6,8 +6,6 @@ import Models
 // MARK: - State
 
 struct RemoteState: Equatable {
-    var host = ""
-    var port = "8090"
     var isRememberSwitchOn = false
 }
 
