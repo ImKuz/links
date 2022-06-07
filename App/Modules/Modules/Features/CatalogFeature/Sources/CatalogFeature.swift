@@ -4,30 +4,66 @@ import IdentifiedCollections
 import ToolKit
 import Foundation
 import Models
+import UIKit
 
 // MARK: - State
 
 struct CatalogState: Equatable {
 
+    let mode: Mode
+
     var title: String
     var titleMessage: String? = nil
     var items: IdentifiedArrayOf<CatalogItem>
 
-    init(items: IdentifiedArrayOf<CatalogItem>, title: String) {
+    var leftButton: ButtonConfig? = nil
+    var rightButton: ButtonConfig? = nil
+
+    init(
+        mode: Mode,
+        items: IdentifiedArrayOf<CatalogItem>,
+        title: String
+    ) {
+        self.mode = mode
         self.title = title
         self.items = items
     }
 
-    static func initial(title: String) -> Self {
-        Self(items: [], title: title)
+    static func == (lhs: CatalogState, rhs: CatalogState) -> Bool {
+        [
+            lhs.mode == rhs.mode,
+            lhs.title == rhs.title,
+            lhs.titleMessage == rhs.titleMessage,
+            lhs.items == rhs.items
+        ].allSatisfy { $0 }
+    }
+
+    static func initial(mode: Mode, title: String) -> Self {
+        Self(
+            mode: mode,
+            items: [],
+            title: title
+        )
+    }
+
+    struct ButtonConfig: Equatable {
+        let title: String?
+        let systemImageName: String?
+    }
+
+    enum Mode: Equatable {
+        case local(isAddEnabled: Bool)
+        case remote
     }
 }
 
 // MARK: - Action
 
 enum CatalogAction: Equatable {
+    case viewDidLoad
     case updateData
-    case addItemTap
+    case leftButtonTap
+    case rightButtonTap
     case itemsUpdated(Result<IdentifiedArrayOf<CatalogItem>, AppError>)
     case moveItem(from: Int, to: Int)
     case rowAction(id: CatalogItem.ID, action: CatalogRowAction)

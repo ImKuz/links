@@ -32,21 +32,14 @@ final class CatalogViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBinding()
-
         collectionView.backgroundColor = .secondarySystemBackground
         collectionView.register(
             CatalogRowCell.self,
             forCellWithReuseIdentifier: CatalogRowCell.reuseId
         )
 
-        navigationItem.rightBarButtonItem = .init(
-            image: .init(systemName: "plus"),
-            style: .plain,
-            target: self,
-            action: #selector(addButtonTap)
-        )
 
-        viewStore.send(.updateData)
+        viewStore.send(.viewDidLoad)
     }
 
     // MARK: - State
@@ -75,6 +68,55 @@ final class CatalogViewController: UICollectionViewController {
                 weakSelf?.title = title
             }
             .store(in: &cancellables)
+
+        viewStore.publisher
+            .leftButton
+            .sink { config in
+                weakSelf?.setupLeftButton(config)
+            }
+            .store(in: &cancellables)
+
+        viewStore.publisher
+            .rightButton
+            .sink { config in
+                weakSelf?.setupRightButton(config)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func setupLeftButton(_ config: CatalogState.ButtonConfig?) {
+        guard let config = config else { return }
+        navigationItem.leftBarButtonItem = makeBarButton(
+            config: config,
+            action: .init { [weak self] _ in
+                self?.viewStore.send(.leftButtonTap)
+            }
+        )
+    }
+
+    private func setupRightButton(_ config: CatalogState.ButtonConfig?) {
+        guard let config = config else { return }
+        navigationItem.rightBarButtonItem = makeBarButton(
+            config: config,
+            action: .init { [weak self] _ in
+                self?.viewStore.send(.rightButtonTap)
+            }
+        )
+    }
+
+    private func makeBarButton(config: CatalogState.ButtonConfig, action: UIAction) -> UIBarButtonItem {
+        var image: UIImage?
+
+        if let imageName = config.systemImageName {
+            image = UIImage(systemName: imageName)
+        }
+
+        return .init(
+            title: config.title,
+            image: image,
+            primaryAction: action,
+            menu: nil
+        )
     }
 
     private func apllyDiff(newItems: IdentifiedArrayOf<CatalogItem>) {
@@ -172,7 +214,12 @@ final class CatalogViewController: UICollectionViewController {
     // MARK: - Selectors
 
     @objc
-    private func addButtonTap() {
-        viewStore.send(.addItemTap)
+    private func leftButtonTap() {
+        viewStore.send(.leftButtonTap)
+    }
+
+    @objc
+    private func rightButtonTap() {
+        viewStore.send(.rightButtonTap)
     }
 }

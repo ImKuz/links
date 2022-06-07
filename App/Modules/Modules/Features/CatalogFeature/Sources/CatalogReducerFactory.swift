@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import IdentifiedCollections
 import Combine
+import UIKit
 
 struct CatalogReducerFactory {
 
@@ -17,15 +18,44 @@ struct CatalogReducerFactory {
             ),
             Reducer { state, action, env in
                 switch action {
+                case .viewDidLoad:
+
+                    switch state.mode {
+                    case .local(let isAddEnabled):
+                        if isAddEnabled {
+                            state.rightButton = .init(title: nil, systemImageName: "plus")
+                        }
+                    case .remote:
+                        state.rightButton = .init(title: nil, systemImageName: "arrow.clockwise")
+                        state.leftButton = .init(title: "Disconnect", systemImageName: "xmark")
+                    }
+
+                    return Effect(value: .updateData)
                 case .updateData:
                     return env
                         .read()
                         .receive(on: DispatchQueue.main)
                         .catchToEffect(CatalogAction.itemsUpdated)
-                case .addItemTap:
-                    return env
-                        .showForm()
-                        .cancellable(id: ID.showForm, cancelInFlight: true)
+                case .leftButtonTap:
+                    switch state.mode {
+                    case .remote:
+                        return .none
+                    default:
+                        return .none
+                    }
+                case .rightButtonTap:
+                    switch state.mode {
+                    case .remote:
+                        return .none
+                    case .local(let isAddEnabled):
+                        if isAddEnabled {
+                            return env
+                                .showForm()
+                                .cancellable(id: ID.showForm, cancelInFlight: true)
+                        } else {
+                            return .none
+                        }
+                    }
                 case let .itemsUpdated(.success(items)):
                     state.items = items
                 case let .itemsUpdated(.failure(error)):

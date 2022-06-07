@@ -39,6 +39,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     private func configureRootNavigationController() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .secondarySystemBackground
+
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+
         guard let rootViewController = rootViewController else { return }
 
         rootViewController.navigationBar.isHidden = true

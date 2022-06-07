@@ -29,7 +29,10 @@ public struct CatalogFeatureAssembly: Assembly {
             )
 
             let store = Store(
-                initialState: .initial(title: "Local"),
+                initialState: .initial(
+                    mode: .local(isAddEnabled: true),
+                    title: "Local"
+                ),
                 reducer: CatalogReducerFactory().make(),
                 environment: environment
             )
