@@ -20,7 +20,8 @@ enum RemoteAction: Equatable {
 // MARK: - Enviroment
 
 protocol RemoteEnv {
-
+    func showServerView(isAnimated: Bool)
+    func showConnectForm() -> Effect<(String, Int), Never>
 }
 
 // MARK: - Reducer
@@ -28,8 +29,11 @@ protocol RemoteEnv {
 let remoteReducer = Reducer<RemoteState, RemoteAction, RemoteEnv> { state, action, env in
     switch action {
     case .connectTap:
-        return .none
+        return env
+            .showConnectForm()
+            .eraseToEffect { _ in .hostTap }
     case .hostTap:
+        env.showServerView(isAnimated: true)
         return .none
     case let .toggleSwitch(isOn):
         state.isRememberSwitchOn = isOn

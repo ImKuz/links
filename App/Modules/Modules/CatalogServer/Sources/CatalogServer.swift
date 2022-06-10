@@ -8,9 +8,9 @@ import Database
 import Foundation
 import IPAddressProvider
 
-public protocol CatalogServer {
+public protocol CatalogServer: AnyObject {
 
-    func start() -> AnyPublisher<(String, Int)?, AppError>
+    func start(port: Int) -> AnyPublisher<(String, Int)?, AppError>
     func stop() -> AnyPublisher<Void, AppError>
 }
 
@@ -38,7 +38,7 @@ final class CatalogServerImpl {
 
 extension CatalogServerImpl: CatalogServer {
 
-    func start() -> AnyPublisher<(String, Int)?, AppError> {
+    func start(port: Int) -> AnyPublisher<(String, Int)?, AppError> {
         Deferred {
             Future<(String, Int)?, AppError> { [weak self] promise in
                 guard let strongSelf = self else { return }
@@ -47,10 +47,9 @@ extension CatalogServerImpl: CatalogServer {
                 let server = Server
                     .insecure(group: group)
                     .withServiceProviders([strongSelf.provider])
-                    .bind(host: "0.0.0.0", port: 8090)
+                    .bind(host: "0.0.0.0", port: port)
 
-
-                server.whenFailure { _ in
+                server.whenFailure { error in
                     promise(.failure(.common(description: "Unable to start server")))
                 }
 

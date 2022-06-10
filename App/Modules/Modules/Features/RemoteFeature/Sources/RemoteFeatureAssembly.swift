@@ -4,6 +4,7 @@ import SharedInterfaces
 import UIKit
 import SwiftUI
 import ToolKit
+import CatalogServer
 
 public struct RemoteFeatureAssembly: Assembly {
 
@@ -14,7 +15,11 @@ public struct RemoteFeatureAssembly: Assembly {
 
             let navigationController = UINavigationController()
             let router = RouterImpl(navigationController: navigationController)
-            let enviroment = RemoteEnvImpl(router: router)
+
+            let enviroment = RemoteEnvImpl(
+                router: router,
+                catalogServer: container.resolve(CatalogServer.self)!
+            )
 
             let store = Store(
                 initialState: .init(),
@@ -23,9 +28,10 @@ public struct RemoteFeatureAssembly: Assembly {
             )
 
             let view = RemoteView(store: store)
-            let anyView = AnyView(view)
-
             router.pushToView(view: view, isAnimated: false)
+            let navigationHolder = UINavigationControllerHolder(navigationController: navigationController)
+            let anyView = AnyView(navigationHolder)
+
             return .init(view: anyView)
         }
     }

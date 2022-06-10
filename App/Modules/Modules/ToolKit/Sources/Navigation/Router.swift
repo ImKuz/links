@@ -15,7 +15,15 @@ public protocol Router: AnyObject {
         isAnimated: Bool
     )
 
+    func presentView(
+        viewController: UIViewController,
+        transitionStyle: UIModalTransitionStyle,
+        presentStyle: UIModalPresentationStyle,
+        isAnimated: Bool
+    )
+
     func pushToView<T: View>(view: T, isAnimated: Bool)
+    func pushToView(viewController: UIViewController, isAnimated: Bool)
 
     func dismiss(isAnimated: Bool, completion: (() -> Void)?)
 
@@ -28,6 +36,8 @@ public protocol Router: AnyObject {
     )
 
     func popToRootView(isAnimated: Bool)
+
+    func presentAlert(controller: UIAlertController, isAnimated: Bool)
 }
 
 public extension Router {
@@ -46,8 +56,26 @@ public extension Router {
         )
     }
 
+    func presentView(
+        viewController: UIViewController,
+        transitionStyle: UIModalTransitionStyle = .coverVertical,
+        presentStyle: UIModalPresentationStyle = .automatic,
+        isAnimated: Bool = true
+    ) {
+        presentView(
+            viewController: viewController,
+            transitionStyle: transitionStyle,
+            presentStyle: presentStyle,
+            isAnimated: isAnimated
+        )
+    }
+
     func pushToView<T: View>(view: T, isAnimated: Bool = true) {
         pushToView(view: view, isAnimated: isAnimated)
+    }
+
+    func pushToView(viewController: UIViewController, isAnimated: Bool = true) {
+        pushToView(viewController: viewController, isAnimated: isAnimated)
     }
 
     func dismiss(isAnimated: Bool = true, completion: (() -> Void)? = nil) {
@@ -72,5 +100,9 @@ public extension Router {
 
     func popToRootView(isAnimated: Bool = true) {
         popToRootView(isAnimated: isAnimated)
+    }
+
+    func presentAlert(controller: UIAlertController, isAnimated: Bool = true) {
+        presentAlert(controller: controller, isAnimated: isAnimated)
     }
 }

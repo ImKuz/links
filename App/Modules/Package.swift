@@ -160,6 +160,7 @@ let package = Package(
                 "ToolKit",
                 "SharedInterfaces",
                 "Models",
+                "CatalogServer",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Swinject", package: "Swinject"),
             ],

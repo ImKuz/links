@@ -16,13 +16,25 @@ public final class RouterImpl: Router {
         presentStyle: UIModalPresentationStyle,
         isAnimated: Bool
     ) {
-        let controller = UIHostingController(rootView: view)
+        presentView(
+            viewController: UIHostingController(rootView: view),
+            transitionStyle: transitionStyle,
+            presentStyle: presentStyle,
+            isAnimated: isAnimated
+        )
+    }
 
-        controller.modalTransitionStyle = transitionStyle
-        controller.modalPresentationStyle = presentStyle
+    public func presentView(
+        viewController: UIViewController,
+        transitionStyle: UIModalTransitionStyle,
+        presentStyle: UIModalPresentationStyle,
+        isAnimated: Bool
+    ) {
+        viewController.modalTransitionStyle = transitionStyle
+        viewController.modalPresentationStyle = presentStyle
 
         navigationController.present(
-            controller,
+            viewController,
             animated: isAnimated,
             completion: nil
         )
@@ -34,6 +46,10 @@ public final class RouterImpl: Router {
                 UIHostingController(rootView: view),
                 animated: isAnimated
             )
+    }
+
+    public func pushToView(viewController: UIViewController, isAnimated: Bool) {
+        navigationController.pushViewController(viewController, animated: isAnimated)
     }
 
     public func dismiss(isAnimated: Bool, completion: (() -> ())?) {
@@ -69,5 +85,9 @@ public final class RouterImpl: Router {
     public func popToRootView(isAnimated: Bool) {
         navigationController
             .popToRootViewController(animated: isAnimated)
+    }
+
+    public func presentAlert(controller: UIAlertController, isAnimated: Bool = true) {
+        navigationController.present(controller, animated: isAnimated)
     }
 }
