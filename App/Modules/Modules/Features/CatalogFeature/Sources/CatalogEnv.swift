@@ -15,6 +15,10 @@ final class CatalogEnvImpl: CatalogEnv {
     private let router: Router
     private var cancellables = [AnyCancellable]()
 
+    var permissions: CatalogDataSourcePermissions {
+        catalogSource.permissions
+    }
+
     init(
         container: Container,
         catalogSource: CatalogSource,

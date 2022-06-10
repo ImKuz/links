@@ -52,8 +52,7 @@ struct CatalogState: Equatable {
     }
 
     enum Mode: Equatable {
-        case local(isAddEnabled: Bool)
-        case remote
+        case local, remote
     }
 }
 
@@ -74,6 +73,8 @@ enum CatalogAction: Equatable {
 // MARK: - Enviroment
 
 protocol CatalogEnv: AnyObject {
+    var permissions: CatalogDataSourcePermissions { get }
+
     func read() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError>
     func delete(_ item: CatalogItem) -> Effect<Void, AppError>
     func move(_ from: Int, _ to: Int) -> Effect<Void, AppError>

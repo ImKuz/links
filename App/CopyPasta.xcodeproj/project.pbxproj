@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		740E1B062852F76800700ABA /* CatalogClient in Frameworks */ = {isa = PBXBuildFile; productRef = 740E1B052852F76800700ABA /* CatalogClient */; };
 		7456A1BA283530EC00C2DF3A /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7456A1B8283530EC00C2DF3A /* CoreData.xcdatamodeld */; };
 		745F5DD12831581E00CD9E9B /* AddItemFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 745F5DD02831581E00CD9E9B /* AddItemFeature */; };
 		746A4077284BD9DE00EF88D7 /* IPAddressProvider in Frameworks */ = {isa = PBXBuildFile; productRef = 746A4076284BD9DE00EF88D7 /* IPAddressProvider */; };
@@ -46,6 +47,7 @@
 			files = (
 				746A4079284CA5CB00EF88D7 /* CatalogServer in Frameworks */,
 				746A407B284D102100EF88D7 /* RemoteFeature in Frameworks */,
+				740E1B062852F76800700ABA /* CatalogClient in Frameworks */,
 				74EEC8D4282FE4DC0013CC3F /* ToolKit in Frameworks */,
 				74EEC8CD282FE29C0013CC3F /* Swinject in Frameworks */,
 				74EEC8D2282FE4D40013CC3F /* Database in Frameworks */,
@@ -152,6 +154,7 @@
 				746A4076284BD9DE00EF88D7 /* IPAddressProvider */,
 				746A4078284CA5CB00EF88D7 /* CatalogServer */,
 				746A407A284D102100EF88D7 /* RemoteFeature */,
+				740E1B052852F76800700ABA /* CatalogClient */,
 			);
 			productName = CopyPasta;
 			productReference = 74EEC7B5282FB41C0013CC3F /* CopyPasta.app */;
@@ -444,6 +447,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		740E1B052852F76800700ABA /* CatalogClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CatalogClient;
+		};
 		745F5DD02831581E00CD9E9B /* AddItemFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AddItemFeature;

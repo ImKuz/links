@@ -20,6 +20,7 @@ let package = Package(
         .library(name: "CatalogFeature", targets: ["CatalogFeature"]),
         .library(name: "AddItemFeature", targets: ["AddItemFeature"]),
         .library(name: "RemoteFeature", targets: ["RemoteFeature"]),
+        .library(name: "CatalogClient", targets: ["CatalogClient"]),
     ],
     dependencies: [
         .package(
@@ -101,6 +102,17 @@ let package = Package(
                 "IPAddressProvider",
             ],
             path: "Modules/CatalogServer/Sources"
+        ),
+
+        .target(
+            name: "CatalogClient",
+            dependencies: [
+                "Swinject",
+                "ToolKit",
+                "Models",
+                "Contracts",
+            ],
+            path: "Modules/CatalogClient/Sources"
         ),
 
         // MARK: - Features

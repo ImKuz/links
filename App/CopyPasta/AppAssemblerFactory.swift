@@ -5,6 +5,7 @@ import AddItemFeature
 import IPAddressProvider
 import CatalogServer
 import RemoteFeature
+import CatalogClient
 
 struct AppAssemblerFactory {
 
@@ -27,6 +28,7 @@ struct AppAssemblerFactory {
             ServicesAssembly(),
             IPAddressProviderAssembly(),
             CatalogServerAssembly(),
+            CatalogClientAssembly(),
 
             // MARK: - Features
 

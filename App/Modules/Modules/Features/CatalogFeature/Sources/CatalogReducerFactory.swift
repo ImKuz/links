@@ -21,8 +21,8 @@ struct CatalogReducerFactory {
                 case .viewDidLoad:
 
                     switch state.mode {
-                    case .local(let isAddEnabled):
-                        if isAddEnabled {
+                    case .local:
+                        if env.permissions.contains(.write) {
                             state.rightButton = .init(title: nil, systemImageName: "plus")
                         }
                     case .remote:
@@ -47,8 +47,8 @@ struct CatalogReducerFactory {
                     switch state.mode {
                     case .remote:
                         return .none
-                    case .local(let isAddEnabled):
-                        if isAddEnabled {
+                    case .local:
+                        if env.permissions.contains(.write) {
                             return env
                                 .showForm()
                                 .cancellable(id: ID.showForm, cancelInFlight: true)

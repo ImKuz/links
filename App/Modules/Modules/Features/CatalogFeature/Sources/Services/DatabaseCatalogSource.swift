@@ -8,8 +8,7 @@ import SharedInterfaces
 
 final class DatabaseCatalogSource: CatalogSource {
 
-    let itemsPublisher: AnyPublisher<[Models.CatalogItem], AppError>
-    let isMoveSupported = true
+    let permissions: CatalogDataSourcePermissions = .all
 
     private let itemsSubject: CurrentValueSubject<IdentifiedArrayOf<Models.CatalogItem>, AppError>
     private let databaseService: DatabaseService
@@ -19,10 +18,6 @@ final class DatabaseCatalogSource: CatalogSource {
     init(databaseService: DatabaseService) {
         self.databaseService = databaseService
         itemsSubject = .init([])
-        itemsPublisher = itemsSubject
-            .dropFirst()
-            .map { $0.elements }
-            .eraseToAnyPublisher()
     }
 
     // MARK: - CatalogSource
