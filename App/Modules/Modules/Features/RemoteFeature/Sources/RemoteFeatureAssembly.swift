@@ -18,7 +18,8 @@ public struct RemoteFeatureAssembly: Assembly {
 
             let enviroment = RemoteEnvImpl(
                 router: router,
-                catalogServer: container.resolve(CatalogServer.self)!
+                catalogServer: container.resolve(CatalogServer.self)!,
+                container: container
             )
 
             let store = Store(

@@ -10,57 +10,82 @@ import CatalogClient
 
 public struct CatalogFeatureAssembly: Assembly {
 
+    enum CatalogKind: String, CaseIterable {
+        case local
+        case remote
+    }
+
     public init() {}
 
     public func assemble(container: Container) {
-        registerLocalCatalog(container: container)
-        registerRemoteCatalog(container: container)
-    }
-
-    private func registerLocalCatalog(container: Container) {
-        container.register(CatalogFeatureInterface.self, name: "local") { resolver in
-            let databaseService = resolver.resolve(DatabaseService.self)!
-            let source = DatabaseCatalogSource(databaseService: databaseService)
-
-            return createModule(
-                container: container,
-                source: source,
-                title: "Local",
-                isLocal: true
-            )
+        for kind in CatalogKind.allCases {
+            registerCatalog(kind: kind, container: container)
         }
     }
 
-    private func registerRemoteCatalog(container: Container) {
-        let remoteDataSourceFactory: (Resolver, String, Int) -> CatalogFeatureInterface = { resolver, host, port in
-            let client = resolver.resolve(CatalogClient.self, arguments: host, port)!
-            let source = RemoteCatalogSource()
-            source.set(client: client)
+    private func registerCatalog(kind: CatalogKind, container: Container) {
+        let factory: (Resolver, CatalogFeatureInterface.Input) -> CatalogFeatureInterface = { resolver, input in
+            let source = Self.dataSource(
+                resolver: resolver,
+                input: input,
+                kind: kind
+            )
+
+            let title: String = {
+                switch kind {
+                case .local:
+                    return "Local"
+                case .remote:
+                    return "Remote"
+                }
+            }()
+
+            let isLocal = kind == .local
 
             return createModule(
                 container: container,
                 source: source,
-                title: "Remote",
-                isLocal: false
+                router: input.router,
+                title: title,
+                isLocal: isLocal
             )
         }
 
         container.register(
             CatalogFeatureInterface.self,
-            name: "remote",
-            factory: remoteDataSourceFactory
+            name: kind.rawValue,
+            factory: factory
         )
+    }
+
+    private static func dataSource(
+        resolver: Resolver,
+        input: CatalogFeatureInterface.Input,
+        kind: CatalogKind
+    ) -> CatalogSource {
+        switch kind {
+        case .local:
+            let databaseService = resolver.resolve(DatabaseService.self)!
+            return DatabaseCatalogSource(databaseService: databaseService)
+        case .remote:
+            guard let creds = input.credentials else {
+                fatalError("Attempt to create remote CatalogSource without credentials!")
+            }
+
+            let client = resolver.resolve(CatalogClient.self, arguments: creds.host, creds.port)!
+            let source = RemoteCatalogSource()
+            source.set(client: client)
+            return source
+        }
     }
 
     private func createModule(
         container: Container,
         source: CatalogSource,
+        router: Router,
         title: String,
         isLocal: Bool
     ) -> CatalogFeatureInterface {
-        let navigationController = UINavigationController()
-        let router = container.resolve(Router.self, argument: navigationController)!
-
         let environment = CatalogEnvImpl(
             container: container,
             catalogSource: source,
@@ -77,12 +102,7 @@ public struct CatalogFeatureAssembly: Assembly {
         )
 
         let viewController = CatalogViewController(store: store)
-        navigationController.pushViewController(viewController, animated: false)
 
-        let view = AnyView(
-            UINavigationControllerHolder(navigationController: navigationController)
-        )
-
-        return CatalogFeatureInterface(view: view)
+        return CatalogFeatureInterface(viewController: viewController)
     }
 }

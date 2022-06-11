@@ -21,6 +21,7 @@ enum RemoteAction: Equatable {
 
 protocol RemoteEnv {
     func showServerView(isAnimated: Bool)
+    func showCatalog(host: String, port: Int) -> Effect<Void, Never>
     func showConnectForm() -> Effect<(String, Int), Never>
 }
 
@@ -31,7 +32,10 @@ let remoteReducer = Reducer<RemoteState, RemoteAction, RemoteEnv> { state, actio
     case .connectTap:
         return env
             .showConnectForm()
-            .eraseToEffect { _ in .hostTap }
+            .flatMap { host, port in
+                env.showCatalog(host: host, port: port)
+            }
+            .fireAndForget()
     case .hostTap:
         env.showServerView(isAnimated: true)
         return .none

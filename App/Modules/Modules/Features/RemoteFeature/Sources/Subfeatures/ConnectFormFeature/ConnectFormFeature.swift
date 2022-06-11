@@ -8,7 +8,7 @@ import Models
 struct ConnectFormState: Equatable {
     @BindableState var host: String = ""
     @BindableState var port: String = ""
-    var isFormValid = false
+    @BindableState var isFormValid = false
 }
 
 // MARK: - Action
@@ -52,4 +52,4 @@ let connectFormReducer = Reducer<ConnectFormState, ConnectFormAction, ConnectFor
         env.onCancel?()
         return .none
     }
-}
+}.binding()

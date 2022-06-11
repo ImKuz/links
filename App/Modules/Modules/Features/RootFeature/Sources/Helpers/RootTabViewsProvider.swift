@@ -2,6 +2,8 @@ import SharedInterfaces
 import SwiftUI
 import Swinject
 import Models
+import UIKit
+import ToolKit
 
 protocol RootTabViewsProvider {
 
@@ -23,7 +25,18 @@ final class RootTabViewsProviderImpl: RootTabViewsProvider {
         case .favorites:
             fatalError("Not implemented")
         case .local:
-            return container.resolve(CatalogFeatureInterface.self, name: "local")!.view
+            let navigationController = UINavigationController()
+            let router = container.resolve(Router.self, argument: navigationController)!
+            let input = CatalogFeatureInterface.Input(router: router, credentials: nil)
+
+            let catalogView = container.resolve(
+                CatalogFeatureInterface.self,
+                name: "local",
+                argument: input
+            )!.viewController
+
+            navigationController.pushViewController(catalogView, animated: false)
+            return AnyView(UINavigationControllerHolder(navigationController: navigationController))
         case .remote:
             return container.resolve(RemoteFeatureInterface.self)!.view
         }

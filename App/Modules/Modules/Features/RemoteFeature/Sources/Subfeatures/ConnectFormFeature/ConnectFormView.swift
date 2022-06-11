@@ -16,6 +16,7 @@ struct ConnectFormView: View {
                             .tint(.accentColor)
                         Spacer()
                         Button("Done") { viewStore.send(.doneTap) }
+                            .disabled(!viewStore.state.isFormValid)
                             .buttonStyle(.borderless)
                             .controlSize(.regular)
                             .tint(.accentColor)

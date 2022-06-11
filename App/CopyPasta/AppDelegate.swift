@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configureRootNavigationController()
 
         rootRouter = container.resolve(Router.self, argument: navigationController)
+        registerRootRouter()
         let rootViewInterface = container.resolve(RootFeatureInterface.self)
 
         guard let view = rootViewInterface?.view else {
@@ -36,6 +37,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         return true
+    }
+
+    private func registerRootRouter() {
+        guard let rootRouter = rootRouter else { return }
+
+        container.register(Router.self, name: "root") { _ in
+            rootRouter
+        }
     }
 
     private func configureRootNavigationController() {

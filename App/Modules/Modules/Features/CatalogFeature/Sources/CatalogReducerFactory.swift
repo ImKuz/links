@@ -46,7 +46,10 @@ struct CatalogReducerFactory {
                 case .rightButtonTap:
                     switch state.mode {
                     case .remote:
-                        return .none
+                        return env
+                            .read()
+                            .receive(on: DispatchQueue.main)
+                            .catchToEffect(CatalogAction.itemsUpdated)
                     case .local:
                         if env.permissions.contains(.write) {
                             return env

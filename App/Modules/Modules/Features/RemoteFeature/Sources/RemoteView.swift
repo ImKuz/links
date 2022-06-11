@@ -37,7 +37,6 @@ struct RemoteView: View {
                             send: { .toggleSwitch(isOn: $0) }
                         )
                     )
-                    .foregroundColor(Color.black.opacity(0.8))
                     .frame(minWidth: 0, maxWidth: 250)
                     .padding()
 
