@@ -61,11 +61,12 @@ final class DatabaseCatalogSource: CatalogSource {
             .flatMap { items -> Future<Void, AppError> in
                 Future { [weak self] promise in
                     self?.databaseService.writeAsync { context in
-                        var items = items
+                        var newItems = items
 
-                        items.move(fromOffsets: .init(integer: from), toOffset: to)
+                        let item = newItems.remove(at: from)
+                        newItems.insert(item, at: to)
 
-                        try context.updateIndices(items: &items, offset: min(from, to))
+                        try context.updateIndices(items: &newItems, offset: min(from, to))
                         try context.save()
                     } completion: {
                         self?.updateItems()
@@ -155,7 +156,7 @@ private extension Database.Context {
             items[id: item.id]?.index = Int16(index)
         }
 
-        try update(Array(slice))
+        try update(Array(items))
         try save()
     }
 
