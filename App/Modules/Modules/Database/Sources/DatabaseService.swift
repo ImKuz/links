@@ -1,7 +1,10 @@
 import CoreData
 import Foundation
+import Combine
 
 public protocol DatabaseService {
+
+    var contentUpdatePublisher: AnyPublisher<Void, Never> { get }
 
     func writeSync(_ operation: @escaping (Context) throws -> Void) throws
 
@@ -37,6 +40,15 @@ final public class DatabaseServiceImpl: DatabaseService {
     // MARK: - Private properties
 
     private let storage: CoreDataStorage
+    private let contentUpdateSubject = PassthroughSubject<Void, Never>()
+
+    // MARK: - Public properties
+
+    public var contentUpdatePublisher: AnyPublisher<Void, Never> {
+        contentUpdateSubject
+            .share()
+            .eraseToAnyPublisher()
+    }
 
     // MARK: - Lifecycle
 
@@ -72,6 +84,7 @@ final public class DatabaseServiceImpl: DatabaseService {
     /// Synchronously writes data on disc. Errors thrown in Context will be rethrown in this method.
     public func writeSync(_ operation: @escaping (Context) throws -> Void) throws {
         try storage.writeSync(operation: operation)
+        contentUpdateSubject.send()
     }
 
     /// Asynchronously writes data on disc. Errors thrown in Context will not be rethrown in this method.
@@ -79,7 +92,10 @@ final public class DatabaseServiceImpl: DatabaseService {
         _ operation: @escaping (Context) throws -> Void,
         completion: ((Result<Void, Error>) -> Void)?
     ) {
-        storage.writeAsync(operation: operation, completion: completion)
+        storage.writeAsync(operation: operation) { [weak self] in
+            self?.contentUpdateSubject.send()
+            completion($0)
+        }
     }
 
     /// Fetches `PersistableEntity` array using fetch parameters defined in `FetchRequest`
