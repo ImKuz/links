@@ -34,5 +34,5 @@ message Link {
 }
 
 service Source {
-    rpc fetch(Empty) returns (Catalog);
+    rpc fetch(Empty) returns (stream Catalog);
 }

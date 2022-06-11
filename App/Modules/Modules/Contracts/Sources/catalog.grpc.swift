@@ -32,8 +32,9 @@ public protocol Catalog_SourceClientProtocol: GRPCClient {
 
   func fetch(
     _ request: Catalog_Empty,
-    callOptions: CallOptions?
-  ) -> UnaryCall<Catalog_Empty, Catalog_Catalog>
+    callOptions: CallOptions?,
+    handler: @escaping (Catalog_Catalog) -> Void
+  ) -> ServerStreamingCall<Catalog_Empty, Catalog_Catalog>
 }
 
 extension Catalog_SourceClientProtocol {
@@ -41,21 +42,24 @@ extension Catalog_SourceClientProtocol {
     return "Catalog.Source"
   }
 
-  /// Unary call to fetch
+  /// Server streaming call to fetch
   ///
   /// - Parameters:
   ///   - request: Request to send to fetch.
   ///   - callOptions: Call options.
-  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  ///   - handler: A closure called when each response is received from the server.
+  /// - Returns: A `ServerStreamingCall` with futures for the metadata and status.
   public func fetch(
     _ request: Catalog_Empty,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<Catalog_Empty, Catalog_Catalog> {
-    return self.makeUnaryCall(
+    callOptions: CallOptions? = nil,
+    handler: @escaping (Catalog_Catalog) -> Void
+  ) -> ServerStreamingCall<Catalog_Empty, Catalog_Catalog> {
+    return self.makeServerStreamingCall(
       path: "/Catalog.Source/fetch",
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
-      interceptors: self.interceptors?.makefetchInterceptors() ?? []
+      interceptors: self.interceptors?.makefetchInterceptors() ?? [],
+      handler: handler
     )
   }
 }
@@ -92,7 +96,7 @@ public final class Catalog_SourceClient: Catalog_SourceClientProtocol {
 public protocol Catalog_SourceProvider: CallHandlerProvider {
   var interceptors: Catalog_SourceServerInterceptorFactoryProtocol? { get }
 
-  func fetch(request: Catalog_Empty, context: StatusOnlyCallContext) -> EventLoopFuture<Catalog_Catalog>
+  func fetch(request: Catalog_Empty, context: StreamingResponseCallContext<Catalog_Catalog>) -> EventLoopFuture<GRPCStatus>
 }
 
 extension Catalog_SourceProvider {
@@ -106,7 +110,7 @@ extension Catalog_SourceProvider {
   ) -> GRPCServerHandlerProtocol? {
     switch name {
     case "fetch":
-      return UnaryServerHandler(
+      return ServerStreamingServerHandler(
         context: context,
         requestDeserializer: ProtobufDeserializer<Catalog_Empty>(),
         responseSerializer: ProtobufSerializer<Catalog_Catalog>(),
