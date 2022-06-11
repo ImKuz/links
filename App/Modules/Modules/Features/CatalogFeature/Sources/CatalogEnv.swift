@@ -33,7 +33,7 @@ final class CatalogEnvImpl: CatalogEnv {
 
     func read() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError> {
         catalogSource
-            .read()
+            .subscribe()
             .eraseToEffect()
     }
 

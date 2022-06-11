@@ -14,7 +14,7 @@ final class RemoteCatalogSource: CatalogSource {
         self.client = client
     }
 
-    func read() -> AnyPublisher<IdentifiedArrayOf<CatalogItem>, AppError> {
+    func subscribe() -> AnyPublisher<IdentifiedArrayOf<CatalogItem>, AppError> {
         guard let client = client else {
             return Fail(error: AppError.common(description: "Client is not instantiated")).eraseToAnyPublisher()
         }

@@ -22,7 +22,7 @@ final class DatabaseCatalogSource: CatalogSource {
 
     // MARK: - CatalogSource
 
-    func read() -> AnyPublisher<IdentifiedArrayOf<Models.CatalogItem>, AppError> {
+    func subscribe() -> AnyPublisher<IdentifiedArrayOf<Models.CatalogItem>, AppError> {
         fetchOrGetCurrentItems()
             .map { items in
                 let mappedItems = items.map { $0.convertToModel() }
