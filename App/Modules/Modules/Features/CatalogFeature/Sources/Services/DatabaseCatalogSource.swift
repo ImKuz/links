@@ -10,24 +10,26 @@ final class DatabaseCatalogSource: CatalogSource {
 
     let permissions: CatalogDataSourcePermissions = .all
 
-    private let itemsSubject: CurrentValueSubject<IdentifiedArrayOf<Models.CatalogItem>, AppError>
+    private var itemsSubject = PassthroughSubject<IdentifiedArrayOf<Database.CatalogItem>, AppError>()
     private let databaseService: DatabaseService
     private let cancellables = [AnyCancellable]()
-    private var items: IdentifiedArrayOf<Database.CatalogItem>?
 
     init(databaseService: DatabaseService) {
         self.databaseService = databaseService
-        itemsSubject = .init([])
     }
 
     // MARK: - CatalogSource
 
     func subscribe() -> AnyPublisher<IdentifiedArrayOf<Models.CatalogItem>, AppError> {
-        fetchOrGetCurrentItems()
+        defer { updateItems() }
+        itemsSubject = .init()
+
+        return itemsSubject
             .map { items in
                 let mappedItems = items.map { $0.convertToModel() }
                 return IdentifiedArrayOf<Models.CatalogItem>(uniqueElements: mappedItems)
             }
+            .share()
             .eraseToAnyPublisher()
     }
 
@@ -45,6 +47,7 @@ final class DatabaseCatalogSource: CatalogSource {
                 try context.updateIndices(from: Int(item.index))
                 try context.save()
             } completion: {
+                self?.updateItems()
                 Self.completion(promise: promise, result: $0)
             }
         }
@@ -52,8 +55,10 @@ final class DatabaseCatalogSource: CatalogSource {
     }
 
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError> {
-        fetchOrGetCurrentItems()
-            .flatMap { items in
+        fetchItems()
+            .map { IdentifiedArray(uniqueElements: $0) }
+            .mapError { _ in AppError.businessLogic("Unable to fethc items from the database") }
+            .flatMap { items -> Future<Void, AppError> in
                 Future { [weak self] promise in
                     self?.databaseService.writeAsync { context in
                         var items = items
@@ -63,6 +68,7 @@ final class DatabaseCatalogSource: CatalogSource {
                         try context.updateIndices(items: &items, offset: min(from, to))
                         try context.save()
                     } completion: {
+                        self?.updateItems()
                         Self.completion(promise: promise, result: $0)
                     }
                 }
@@ -77,6 +83,7 @@ final class DatabaseCatalogSource: CatalogSource {
                 try context.updateIndices(from: 0)
                 try context.save()
             } completion: {
+                self?.updateItems()
                 Self.completion(promise: promise, result: $0)
             }
         }
@@ -85,28 +92,33 @@ final class DatabaseCatalogSource: CatalogSource {
 
     // MARK: - Private methods
 
-    private func fetchOrGetCurrentItems() -> AnyPublisher<IdentifiedArrayOf<Database.CatalogItem>, AppError> {
-        if let items = items {
-            return Just(items)
-                .setFailureType(to: AppError.self)
-                .eraseToAnyPublisher()
-        }
+    private func fetchItems() -> AnyPublisher<[Database.CatalogItem], Error> {
+        Future { [weak self] promise in
+            self?.fetchItems { promise($0) }
+        }.eraseToAnyPublisher()
+    }
 
-        return Future { [weak self] promise in
-            self?.databaseService.fetchAsync(
-                Database.CatalogItem.self,
-                request: .init(sortDescriptor: .init(key: "index", ascending: true))
-            ) { result in
-                switch result {
-                case let .success(fetchedItems):
-                    let array = IdentifiedArrayOf<Database.CatalogItem>(uniqueElements: fetchedItems)
-                    promise(.success(array))
-                case let .failure(error):
-                    promise(.failure(AppError.common(description: error.localizedDescription)))
-                }
+    private func fetchItems(completion: @escaping (Result<[Database.CatalogItem], Error>) -> Void) {
+        databaseService.fetchAsync(
+            Database.CatalogItem.self,
+            request: .init(sortDescriptor: .init(key: "index", ascending: true)),
+            completion: completion
+        )
+    }
+
+    private func updateItems(completion: (() -> ())? = nil) {
+        fetchItems { [weak self] result in
+            defer { completion?() }
+
+            switch result {
+            case let .success(fetchedItems):
+                let array = IdentifiedArrayOf<Database.CatalogItem>(uniqueElements: fetchedItems)
+                self?.itemsSubject.send(array)
+            case .failure:
+                let error = AppError.common(description: "Unable to update items")
+                self?.itemsSubject.send(completion: .failure(error))
             }
         }
-        .eraseToAnyPublisher()
     }
 
     private static func completion(
@@ -119,19 +131,6 @@ final class DatabaseCatalogSource: CatalogSource {
             promise(.failure(.common(description: "UnableToAdd")))
         case .success:
             promise(.success(()))
-        }
-    }
-
-    private func updateItems() {
-        databaseService.fetchAsync(
-            Database.CatalogItem.self,
-            request: .init(
-                sortDescriptor: .init(key: "index", ascending: true)
-            )
-        ) { [weak itemsSubject] result in
-            guard case let .success(items) = result else { return }
-            let rows = items.map { $0.convertToModel() }
-            itemsSubject?.send(.init(uniqueElements: rows))
         }
     }
 }
