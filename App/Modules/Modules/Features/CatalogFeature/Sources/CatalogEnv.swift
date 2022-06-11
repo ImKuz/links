@@ -31,9 +31,10 @@ final class CatalogEnvImpl: CatalogEnv {
         self.router = router
     }
 
-    func read() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError> {
+    func subscribe() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError> {
         catalogSource
             .subscribe()
+            .removeDuplicates()
             .eraseToEffect()
     }
 
@@ -76,6 +77,28 @@ final class CatalogEnvImpl: CatalogEnv {
         return interface
             .onFinishPublisher
             .eraseToEffect { .dismissAddItemForm }
+    }
+
+    func showErrorAlert(error: AppError) -> Effect<Void, Never> {
+        Future { [weak router] promise in
+            let alertVC = UIAlertController(
+                title: "Error has occured",
+                message: error.description,
+                preferredStyle: .alert
+            )
+
+            alertVC.addAction(
+                .init(title: "Try again", style: .default) { _ in
+                    promise(.success(()))
+                }
+            )
+
+            alertVC.addAction(
+                .init(title: "Dismiss", style: .cancel, handler: nil)
+            )
+
+            router?.presentAlert(controller: alertVC)
+        }.eraseToEffect()
     }
 
     func dismissPresetnedView() -> Effect<Void, Never> {

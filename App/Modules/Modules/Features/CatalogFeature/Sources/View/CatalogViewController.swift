@@ -120,6 +120,8 @@ final class CatalogViewController: UICollectionViewController {
     }
 
     private func apllyDiff(newItems: IdentifiedArrayOf<CatalogItem>) {
+        guard newItems != currentItems else { return }
+        
         let diff = newItems.difference(from: currentItems)
 
         var removeIndexPaths = [IndexPath]()

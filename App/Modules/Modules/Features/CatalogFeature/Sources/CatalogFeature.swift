@@ -60,7 +60,7 @@ struct CatalogState: Equatable {
 
 enum CatalogAction: Equatable {
     case viewDidLoad
-    case updateData
+    case suscribeToUpdates
     case leftButtonTap
     case rightButtonTap
     case itemsUpdated(Result<IdentifiedArrayOf<CatalogItem>, AppError>)
@@ -75,13 +75,14 @@ enum CatalogAction: Equatable {
 protocol CatalogEnv: AnyObject {
     var permissions: CatalogDataSourcePermissions { get }
 
-    func read() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError>
+    func subscribe() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError>
     func delete(_ item: CatalogItem) -> Effect<Void, AppError>
     func move(_ from: Int, _ to: Int) -> Effect<Void, AppError>
     func add(_ item: CatalogItem) -> Effect<Void, AppError>
 
     func handleContent(_ content: CatalogItemContent) -> Effect<Void, Never>
     func showForm() -> Effect<CatalogAction, Never>
+    func showErrorAlert(error: AppError) -> Effect<Void, Never>
     func dismissPresetnedView() -> Effect<Void, Never>
 }
 

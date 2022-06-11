@@ -7,6 +7,7 @@ struct CatalogReducerFactory {
 
     private enum ID {
         static let showForm = "showForm"
+        static let updates = "updates"
     }
 
     func make() -> CatalogReducerType {
@@ -30,12 +31,13 @@ struct CatalogReducerFactory {
                         state.leftButton = .init(title: "Disconnect", systemImageName: "xmark")
                     }
 
-                    return Effect(value: .updateData)
-                case .updateData:
+                    return Effect(value: .suscribeToUpdates)
+                case .suscribeToUpdates:
                     return env
-                        .read()
+                        .subscribe()
                         .receive(on: DispatchQueue.main)
                         .catchToEffect(CatalogAction.itemsUpdated)
+                        .cancellable(id: ID.updates)
                 case .leftButtonTap:
                     switch state.mode {
                     case .remote:
@@ -46,10 +48,7 @@ struct CatalogReducerFactory {
                 case .rightButtonTap:
                     switch state.mode {
                     case .remote:
-                        return env
-                            .read()
-                            .receive(on: DispatchQueue.main)
-                            .catchToEffect(CatalogAction.itemsUpdated)
+                        return .none
                     case .local:
                         if env.permissions.contains(.write) {
                             return env
@@ -62,8 +61,9 @@ struct CatalogReducerFactory {
                 case let .itemsUpdated(.success(items)):
                     state.items = items
                 case let .itemsUpdated(.failure(error)):
-                    print(error)
-                    return .none
+                    return env
+                        .showErrorAlert(error: error)
+                        .eraseToEffect { CatalogAction.suscribeToUpdates }
                 case let .moveItem(from, to):
                     return env
                         .move(from, to)
@@ -80,7 +80,7 @@ struct CatalogReducerFactory {
                 case .dismissAddItemForm:
                     return env
                         .dismissPresetnedView()
-                        .eraseToEffect { .updateData }
+                        .fireAndForget()
                 case let .rowAction(id, action):
                     return handleRowAction(
                         state: &state,
