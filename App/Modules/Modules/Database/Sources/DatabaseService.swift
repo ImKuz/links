@@ -94,7 +94,7 @@ final public class DatabaseServiceImpl: DatabaseService {
     ) {
         storage.writeAsync(operation: operation) { [weak self] in
             self?.contentUpdateSubject.send()
-            completion($0)
+            completion?($0)
         }
     }
 

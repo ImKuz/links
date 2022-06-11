@@ -18,43 +18,83 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
 
     // MARK: - Private properties
 
-    private var fetchCancellable: AnyCancellable?
+    private var cancellables = [AnyCancellable]()
+    private let updateEventsPublisher: AnyPublisher<Void, Never>
+    private var catalogSubject = PassthroughSubject<Catalog_Catalog, AppError>()
+    private var contexts = [StreamingResponseCallContext<Catalog_Catalog>]()
+
+    // MARK: - Init
+
+    init(updateEventsPublisher: AnyPublisher<Void, Never>) {
+        self.updateEventsPublisher = updateEventsPublisher
+        setupUpdatesBinding()
+    }
+
+    deinit {
+        cancel()
+    }
 
     // MARK: - Internal methods
 
     func cancel() {
-        fetchCancellable?.cancel()
-        fetchCancellable = nil
+        contexts.forEach {
+            $0.statusPromise.completeWith(.success(.ok))
+        }
+        contexts = []
     }
 
     // MARK: - Catalog_SourceProvider
 
-    func fetch(request: Catalog_Empty, context: StatusOnlyCallContext) -> EventLoopFuture<Catalog_Catalog> {
-        guard let delegate = delegate else {
-            return context
-                .eventLoop
-                .makeFailedFuture(
-                    AppError.common(description: "Unable to fetch data")
-                )
-        }
+    func fetch(
+        request: Catalog_Empty,
+        context: StreamingResponseCallContext<Catalog_Catalog>
+    ) -> EventLoopFuture<GRPCStatus> {
+        contexts.append(context)
+        return context.eventLoop.makePromise(of: GRPCStatus.self).futureResult
+    }
 
-        let promise = context.eventLoop.makePromise(of: Catalog_Catalog.self)
+    // MARK: - Private methods
 
-        fetchCancellable = delegate
-            .providerRequestsData()
+    private func setupUpdatesBinding() {
+        updateEventsPublisher
+            .setFailureType(to: AppError.self)
+            .flatMap { [weak delegate] _ -> AnyPublisher<[Models.CatalogItem], AppError> in
+                guard let delegate = delegate else { return Empty().eraseToAnyPublisher() }
+                return delegate.providerRequestsData()
+            }
             .sink(
-                receiveCompletion: {
-                    if case let .failure(error) = $0 {
-                        promise.completeWith(.failure(error))
+                receiveCompletion: { [weak self] completion in
+                    if case let .failure(error) = completion {
+                        self?.catalogSubject.send(completion: .failure(error))
                     }
                 },
-                receiveValue: {
+                receiveValue: { [weak self] in
                     let catalog = Self.mapItems($0)
-                    promise.completeWith(.success(catalog))
+                    self?.catalogSubject.send(catalog)
                 }
             )
+            .store(in: &cancellables)
 
-        return promise.futureResult
+        catalogSubject
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    guard let self = self else { return }
+                    defer { self.contexts = [] }
+
+                    if case .failure = completion {
+                        self.contexts.forEach {
+                            $0.statusPromise.completeWith(.failure(GRPCStatus.processingError))
+                        }
+                    }
+                },
+                receiveValue: { [weak self] catalog in
+                    guard let self = self else { return }
+                    self.contexts.forEach {
+                        _ = $0.sendResponse(catalog)
+                    }
+                }
+            )
+            .store(in: &cancellables)
     }
 
     private static func mapItems(_ items: [CatalogItem]) -> Catalog_Catalog {

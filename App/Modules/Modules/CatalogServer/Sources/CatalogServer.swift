@@ -29,7 +29,7 @@ final class CatalogServerImpl {
     ) {
         self.database = database
         self.ipAddressProvider = ipAddressProvider
-        self.provider = CatalogSourceProvider()
+        self.provider = CatalogSourceProvider(updateEventsPublisher: database.contentUpdatePublisher)
         provider.delegate = self
     }
 }
