@@ -157,6 +157,7 @@ private extension Database.Context {
         }
 
         try update(Array(slice))
+        try save()
     }
 
     func updateIndices(from offset: Int) throws {
