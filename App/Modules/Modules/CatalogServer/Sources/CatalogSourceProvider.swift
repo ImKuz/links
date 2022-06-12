@@ -50,10 +50,28 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
         context: StreamingResponseCallContext<Catalog_Catalog>
     ) -> EventLoopFuture<GRPCStatus> {
         contexts.append(context)
+        fillContextWithInitialData(context: context)
         return context.eventLoop.makePromise(of: GRPCStatus.self).futureResult
     }
 
     // MARK: - Private methods
+
+    private func fillContextWithInitialData(
+        context: StreamingResponseCallContext<Catalog_Catalog>
+    ) {
+        getCurrentItems()
+            .sink(
+                receiveCompletion: { [weak context] completion in
+                    if case .failure = completion {
+                        context?.statusPromise.completeWith(.failure(GRPCStatus.processingError))
+                    }
+                },
+                receiveValue: { [weak context] in
+                    _ = context?.sendResponse($0)
+                }
+            )
+            .store(in: &cancellables)
+    }
 
     private func setupUpdatesBinding() {
         updateEventsPublisher
@@ -95,6 +113,15 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
                 }
             )
             .store(in: &cancellables)
+    }
+
+    private func getCurrentItems() -> AnyPublisher<Catalog_Catalog, AppError> {
+        guard let delegate = delegate else { return Empty().eraseToAnyPublisher() }
+
+        return delegate
+            .providerRequestsData()
+            .map { Self.mapItems($0) }
+            .eraseToAnyPublisher()
     }
 
     private static func mapItems(_ items: [CatalogItem]) -> Catalog_Catalog {

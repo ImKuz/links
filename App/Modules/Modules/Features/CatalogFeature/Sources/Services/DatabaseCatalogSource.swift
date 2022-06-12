@@ -149,9 +149,16 @@ private extension Database.Context {
     }
 
     func updateIndices(items: inout IdentifiedArrayOf<Database.CatalogItem>, offset: Int = 0) throws {
-        let slice = items[offset..<items.endIndex]
+        guard !items.isEmpty else { return }
+        var sliceItems = [Database.CatalogItem]()
 
-        slice.forEach { item in
+        if items.count == 1, let first = items.first {
+            sliceItems = [first]
+        } else {
+            sliceItems = Array(items[offset..<items.endIndex])
+        }
+
+        sliceItems.forEach { item in
             let index = items.index(id: item.id)!
             items[id: item.id]?.index = Int16(index)
         }
