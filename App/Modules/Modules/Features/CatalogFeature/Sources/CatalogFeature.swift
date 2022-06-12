@@ -8,8 +8,8 @@ import UIKit
 
 // MARK: - State
 
-struct CatalogState: Equatable {
-
+struct CatalogState: Equatable, Identifiable {
+    let id = UUID()
     let mode: Mode
 
     var title: String
@@ -34,7 +34,9 @@ struct CatalogState: Equatable {
             lhs.mode == rhs.mode,
             lhs.title == rhs.title,
             lhs.titleMessage == rhs.titleMessage,
-            lhs.items == rhs.items
+            lhs.items == rhs.items,
+            lhs.rightButton == rhs.rightButton,
+            lhs.leftButton == rhs.leftButton
         ].allSatisfy { $0 }
     }
 
@@ -60,6 +62,7 @@ struct CatalogState: Equatable {
 
 enum CatalogAction: Equatable {
     case viewDidLoad
+    case viewWillAppear
     case suscribeToUpdates
     case leftButtonTap
     case rightButtonTap

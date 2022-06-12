@@ -20,7 +20,8 @@ struct CatalogReducerFactory {
             Reducer { state, action, env in
                 switch action {
                 case .viewDidLoad:
-
+                    return Effect(value: .suscribeToUpdates)
+                case .viewWillAppear:
                     switch state.mode {
                     case .local:
                         if env.permissions.contains(.write) {
@@ -30,8 +31,7 @@ struct CatalogReducerFactory {
                         state.rightButton = .init(title: nil, systemImageName: "arrow.clockwise")
                         state.leftButton = .init(title: "Disconnect", systemImageName: "xmark")
                     }
-
-                    return Effect(value: .suscribeToUpdates)
+                    return .none
                 case .suscribeToUpdates:
                     return env
                         .subscribe()

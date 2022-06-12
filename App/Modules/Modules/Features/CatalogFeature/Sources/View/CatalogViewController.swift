@@ -38,8 +38,12 @@ final class CatalogViewController: UICollectionViewController {
             forCellWithReuseIdentifier: CatalogRowCell.reuseId
         )
 
-
         viewStore.send(.viewDidLoad)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewStore.send(.viewWillAppear)
     }
 
     // MARK: - State
