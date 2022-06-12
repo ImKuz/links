@@ -20,7 +20,7 @@ final class RemoteCatalogSource: CatalogSource {
         }
 
         return client
-            .fetch()
+            .subscribe()
             .map { IdentifiedArrayOf(uniqueElements: $0) }
             .eraseToAnyPublisher()
     }

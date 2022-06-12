@@ -3,7 +3,7 @@ import Combine
 import ToolKit
 
 public protocol CatalogClient {
-    func fetch() -> AnyPublisher<[CatalogItem], AppError>
+    func subscribe() -> AnyPublisher<[CatalogItem], AppError>
 }
 
 final class CatalogClientImpl: CatalogClient {
@@ -26,11 +26,11 @@ final class CatalogClientImpl: CatalogClient {
         provider.disconnect()
     }
 
-    func fetch() -> AnyPublisher<[CatalogItem], AppError> {
+    func subscribe() -> AnyPublisher<[CatalogItem], AppError> {
         configureIfNeeded(host: host, port: port)
 
         return self.provider
-            .fetch()
+            .subscribe()
             .mapError { error in
                 print(error)
                 return .businessLogic("Unable to fetch items")

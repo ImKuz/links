@@ -10,13 +10,16 @@ protocol CatalogItemsProvider {
 
     func configure(host: String, port: Int)
     func disconnect()
-    func fetch() -> AnyPublisher<[CatalogItem], Error>
+    func subscribe() -> AnyPublisher<[CatalogItem], Error>
 }
 
 final class CatalogItemsProviderImpl: CatalogItemsProvider {
 
     private var client: Catalog_SourceClientProtocol?
     private var clientConnection: ClientConnection?
+    private var itemsSubject = PassthroughSubject<[CatalogItem], Error>()
+    private var call: ServerStreamingCall<Catalog_Empty, Catalog_Catalog>?
+    private var cancellables = [AnyCancellable]()
 
     func configure(host: String, port: Int) {
         guard clientConnection == nil else { return }
@@ -25,6 +28,13 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider {
 
         let channel = ClientConnection
             .insecure(group: group)
+            .withKeepalive(
+                .init(
+                    interval: .seconds(120),
+                    timeout: .seconds(60),
+                    permitWithoutCalls: true
+                )
+            )
             .connect(host: host, port: port)
 
         clientConnection = channel
@@ -35,25 +45,23 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider {
         _ = clientConnection?.close()
     }
 
-    func fetch() -> AnyPublisher<[CatalogItem], Error> {
+    func subscribe() -> AnyPublisher<[CatalogItem], Error> {
         guard let client = client else {
             return Fail(error: AppError.common(description: "Client is not configured")).eraseToAnyPublisher()
         }
 
-        return Deferred {
-            Future { [client] promise in
-                let call = client.fetch(.init(), callOptions: .none)
+        call = client.fetch(.init(), callOptions: .none) { [weak self] catalog in
+            let items = Self.mapCatalog(catalog)
+            self?.itemsSubject.send(items)
+        }
 
-                call.response.whenFailure {
-                    promise(.failure($0))
-                }
+        call?.status.whenFailure { [weak self] in
+            self?.itemsSubject.send(completion: .failure($0))
+        }
 
-                call.response.whenSuccess { catalog in
-                    let items = Self.mapCatalog(catalog)
-                    promise(.success(items))
-                }
-            }.eraseToAnyPublisher()
-        }.eraseToAnyPublisher()
+        return itemsSubject
+            .share()
+            .eraseToAnyPublisher()
     }
 
     private static func mapCatalog(_ catalog: Catalog_Catalog) -> [CatalogItem] {
