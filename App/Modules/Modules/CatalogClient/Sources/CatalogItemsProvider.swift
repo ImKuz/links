@@ -10,14 +10,14 @@ protocol CatalogItemsProvider {
 
     func configure(host: String, port: Int)
     func disconnect()
-    func subscribe() -> AnyPublisher<[CatalogItem], Error>
+    func subscribe() -> AnyPublisher<[CatalogItem], AppError>
 }
 
 final class CatalogItemsProviderImpl: CatalogItemsProvider {
 
     private var client: Catalog_SourceClientProtocol?
     private var clientConnection: ClientConnection?
-    private var itemsSubject = PassthroughSubject<[CatalogItem], Error>()
+    private var itemsSubject = PassthroughSubject<[CatalogItem], AppError>()
     private var call: ServerStreamingCall<Catalog_Empty, Catalog_Catalog>?
     private var cancellables = [AnyCancellable]()
 
@@ -45,7 +45,7 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider {
         _ = clientConnection?.close()
     }
 
-    func subscribe() -> AnyPublisher<[CatalogItem], Error> {
+    func subscribe() -> AnyPublisher<[CatalogItem], AppError> {
         guard let client = client else {
             return Fail(error: AppError.common(description: "Client is not configured")).eraseToAnyPublisher()
         }
@@ -55,13 +55,50 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider {
             self?.itemsSubject.send(items)
         }
 
+        call?.status.whenComplete { [weak self] in
+            switch $0 {
+            case .failure(let error):
+                let mappedError = Self.mapError(error)
+                self?.itemsSubject.send(completion: .failure(mappedError))
+            case .success(let status):
+                let mappedError = Self.mapError(status)
+                self?.itemsSubject.send(completion: .failure(mappedError))
+            }
+        }
+
         call?.status.whenFailure { [weak self] in
-            self?.itemsSubject.send(completion: .failure($0))
+            let mappedError = Self.mapError($0)
+            self?.itemsSubject.send(completion: .failure(mappedError))
         }
 
         return itemsSubject
             .share()
             .eraseToAnyPublisher()
+    }
+
+    private static func mapError(_ error: Error) -> AppError {
+        if let status = error as? GRPCStatus {
+            return mapGRPCStatus(status)
+        } else if let error = error as? AppError {
+            return error
+        } else {
+            return .common(description: "Something went wrong")
+        }
+    }
+
+    private static func mapGRPCStatus(_ status: GRPCStatus) -> AppError {
+        switch status.code {
+        case .internalError:
+            return .businessLogic("Server internal error has occured")
+        case .cancelled:
+            return .businessLogic("Connection has been cancelled")
+        case .aborted:
+            return .businessLogic("Connection has been aborted")
+        case .unavailable:
+            return .businessLogic("Server is not avaliable")
+        default:
+            return .businessLogic("Something went wrong")
+        }
     }
 
     private static func mapCatalog(_ catalog: Catalog_Catalog) -> [CatalogItem] {

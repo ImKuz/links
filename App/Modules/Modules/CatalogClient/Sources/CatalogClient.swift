@@ -28,14 +28,7 @@ final class CatalogClientImpl: CatalogClient {
 
     func subscribe() -> AnyPublisher<[CatalogItem], AppError> {
         configureIfNeeded(host: host, port: port)
-
-        return self.provider
-            .subscribe()
-            .mapError { error in
-                print(error)
-                return .businessLogic("Unable to fetch items")
-            }
-            .eraseToAnyPublisher()
+        return self.provider.subscribe()
     }
 
     func configureIfNeeded(host: String, port: Int) {
