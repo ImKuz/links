@@ -14,6 +14,7 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
     // MARK: - Properties
 
     var interceptors: Catalog_SourceServerInterceptorFactoryProtocol?
+
     weak var delegate: CatalogSourceProviderDelegate?
 
     // MARK: - Private properties
@@ -76,24 +77,11 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
     private func setupUpdatesBinding() {
         updateEventsPublisher
             .setFailureType(to: AppError.self)
-            .flatMap { [weak delegate] _ -> AnyPublisher<[Models.CatalogItem], AppError> in
-                guard let delegate = delegate else { return Empty().eraseToAnyPublisher() }
+            .flatMap { [weak self] _ -> AnyPublisher<[Models.CatalogItem], AppError> in
+                guard let delegate = self?.delegate else { return Empty().eraseToAnyPublisher() }
                 return delegate.providerRequestsData()
             }
-            .sink(
-                receiveCompletion: { [weak self] completion in
-                    if case let .failure(error) = completion {
-                        self?.catalogSubject.send(completion: .failure(error))
-                    }
-                },
-                receiveValue: { [weak self] in
-                    let catalog = Self.mapItems($0)
-                    self?.catalogSubject.send(catalog)
-                }
-            )
-            .store(in: &cancellables)
-
-        catalogSubject
+            .map { Self.mapItems($0) }
             .sink(
                 receiveCompletion: { [weak self] completion in
                     guard let self = self else { return }

@@ -14,6 +14,7 @@ final class ServicesAssembly: Assembly {
         container.register(DatabaseService.self) { _ in
             try! DatabaseServiceImpl()
         }
+        .inObjectScope(.container)
     }
 
     private func assembleTransientDependencies(container: Container) {

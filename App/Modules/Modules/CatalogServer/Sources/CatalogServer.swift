@@ -17,11 +17,11 @@ public protocol CatalogServer: AnyObject {
 final class CatalogServerImpl {
 
     private let database: DatabaseService
-    private let provider: CatalogSourceProvider
     private let ipAddressProvider: IPAddressProvider
 
     private var server: EventLoopFuture<Server>?
     private var group: MultiThreadedEventLoopGroup?
+    private let contentUpdateSubject = PassthroughSubject<Void, Never>()
 
     init(
         database: DatabaseService,
@@ -29,8 +29,6 @@ final class CatalogServerImpl {
     ) {
         self.database = database
         self.ipAddressProvider = ipAddressProvider
-        self.provider = CatalogSourceProvider(updateEventsPublisher: database.contentUpdatePublisher)
-        provider.delegate = self
     }
 }
 
@@ -43,10 +41,22 @@ extension CatalogServerImpl: CatalogServer {
             Future<(String, Int)?, AppError> { [weak self] promise in
                 guard let strongSelf = self else { return }
                 let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+                let provider = CatalogSourceProvider(
+                    updateEventsPublisher: strongSelf.database.contentUpdatePublisher
+                )
+                
+                provider.delegate = strongSelf
 
                 let server = Server
                     .insecure(group: group)
-                    .withServiceProviders([strongSelf.provider])
+                    .withServiceProviders([provider])
+                    .withKeepalive(
+                        .init(
+                            interval: .seconds(120),
+                            timeout: .seconds(60),
+                            permitWithoutCalls: true
+                        )
+                    )
                     .bind(host: "0.0.0.0", port: port)
 
                 server.whenFailure { error in
@@ -90,24 +100,22 @@ extension CatalogServerImpl: CatalogServer {
 extension CatalogServerImpl: CatalogSourceProviderDelegate {
 
     func providerRequestsData() -> AnyPublisher<[Models.CatalogItem], AppError> {
-        Deferred {
-            Future<[Models.CatalogItem], AppError> { [weak self] promise in
-                guard let self = self else { return }
+        Future<[Models.CatalogItem], AppError> { [weak self] promise in
+            guard let self = self else { return }
 
-                let request = FetchRequest(
-                    sortDescriptor: .init(key: "index", ascending: true)
-                )
+            let request = FetchRequest(
+                sortDescriptor: .init(key: "index", ascending: true)
+            )
 
-                self.database.fetchAsync(Database.CatalogItem.self, request: request) {
-                    switch $0 {
-                    case let .success(items):
-                        let mappedItems = items.map { $0.convertToModel() }
-                        promise(.success(mappedItems))
-                    case .failure:
-                        promise(.failure(.common(description: "Unable to fetch items from database")))
-                    }
+            self.database.fetchAsync(Database.CatalogItem.self, request: request) {
+                switch $0 {
+                case let .success(items):
+                    let mappedItems = items.map { $0.convertToModel() }
+                    promise(.success(mappedItems))
+                case .failure:
+                    promise(.failure(.common(description: "Unable to fetch items from database")))
                 }
-            }.eraseToAnyPublisher()
+            }
         }.eraseToAnyPublisher()
     }
 }

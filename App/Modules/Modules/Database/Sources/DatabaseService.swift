@@ -2,7 +2,7 @@ import CoreData
 import Foundation
 import Combine
 
-public protocol DatabaseService {
+public protocol DatabaseService: AnyObject {
 
     var contentUpdatePublisher: AnyPublisher<Void, Never> { get }
 
