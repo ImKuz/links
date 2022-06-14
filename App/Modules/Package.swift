@@ -10,11 +10,6 @@ let content: [(Product, [Target])] = [
                 name: "ToolKit",
                 path: "Modules/ToolKit/Sources"
             ),
-            .testTarget(
-                name: "ToolKitTests",
-                dependencies: ["ToolKit"],
-                path: "Modules/ToolKit/Tests"
-            ),
         ]
     ),
     (
@@ -140,11 +135,6 @@ let content: [(Product, [Target])] = [
                 ],
                 path: "Modules/Features/RootFeature/Sources"
             ),
-            .testTarget(
-                name: "RootFeatureTests",
-                dependencies: ["RootFeature"],
-                path: "Modules/Features/RootFeature/Tests"
-            ),
         ]
     ),
     (
@@ -163,11 +153,6 @@ let content: [(Product, [Target])] = [
                     .product(name: "Swinject", package: "Swinject"),
                 ],
                 path: "Modules/Features/CatalogFeature/Sources"
-            ),
-            .testTarget(
-                name: "CatalogFeatureTests",
-                dependencies: ["CatalogFeature"],
-                path: "Modules/Features/CatalogFeature/Tests"
             ),
         ]
     ),
