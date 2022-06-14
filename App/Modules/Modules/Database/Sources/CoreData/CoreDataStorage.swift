@@ -1,29 +1,57 @@
 import CoreData
 import Foundation
+import Combine
 
 final class CoreDataStorage {
+
+    private enum Spec {
+        static let storeSubpath = "persistentStore"
+    }
+
+    // MARK: - Private properties
 
     private let container: NSPersistentContainer
     private let migrator = CoreDataMigrator()
     private var isLoaded = false
 
     private let backgroundQueue = DispatchQueue(
-        label: "tech.polysander.CopyPasta.db-back-q",
+        label: "com.copy-pasta.db-back-q",
         qos: .background,
         attributes: .concurrent
     )
 
     private var readContext: NSManagedObjectContext { container.viewContext }
+    
     private lazy var writeContext: NSManagedObjectContext = {
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
         return context
     }()
 
-    // MARK: - Lifecycle
+    // MARK: - Init
 
-    init(storeURL: URL) throws {
-        container = try PersistentStoreFactory.create(path: storeURL)
+    init(fileManager: FileManager) throws {
+        var isDirectory: ObjCBool = true
+
+        var storeUrl = try fileManager.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+
+        storeUrl.appendPathComponent(Spec.storeSubpath, isDirectory: true)
+
+        if !fileManager.fileExists(atPath: storeUrl.path, isDirectory: &isDirectory) {
+            try fileManager.createDirectory(
+                at: storeUrl,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
+        }
+
+        container = try PersistentStoreFactory.create(path: storeUrl)
+
         migrateStoreIfNeeded { [self] result in
             switch result {
             case .success:
@@ -32,97 +60,6 @@ final class CoreDataStorage {
             case .failure(let error):
                 assertionFailure(error.localizedDescription)
             }
-        }
-    }
-
-    // MARK: - Public methods
-
-    func writeSync(operation: @escaping (Context) throws -> Void) throws {
-        try checkLoadingState()
-        var writeError: Error?
-
-        try backgroundQueue.sync {
-            writeContext.performAndWait {
-                do {
-                    try operation(writeContext)
-                } catch {
-                    writeError = error
-                }
-            }
-
-            if let writeError = writeError {
-                throw writeError
-            }
-        }
-    }
-
-    func writeAsync(
-        operation: @escaping (Context) throws -> Void,
-        completion: ((Result<Void, Error>) -> Void)?
-    ) {
-        guard isLoaded else {
-            let error = DatabaseError(
-                code: .unableToWrite,
-                description: "Attemped to wirte while store is not loaded"
-            )
-
-            assertionFailure(error.description)
-            completion?(.failure(error))
-            return
-        }
-
-        backgroundQueue.async {
-            self.writeContext.perform { [self] in
-                do {
-                    try operation(writeContext)
-                    completion?(.success(()))
-                } catch {
-                    assertionFailure("Unable to write: \n \(error.localizedDescription)")
-                    completion?(.failure(error))
-                }
-            }
-        }
-    }
-
-    func fetchSync<Entity>(
-        _ type: Entity.Type,
-        inMainThread: Bool,
-        request: FetchRequest
-    ) throws -> [Entity] where Entity: PersistableEntity {
-        if inMainThread && !Thread.isMainThread {
-            let description = "Called main thread fetch in non-main thread"
-            assertionFailure(description)
-            throw DatabaseError(code: .common, description: description)
-        }
-
-        try checkLoadingState()
-
-        if inMainThread {
-            return try readContext.read(type: Entity.self, request: request)
-        } else {
-            return try backgroundQueue.sync {
-                try writeContext.read(type: Entity.self, request: request)
-            }
-        }
-    }
-
-    func fetchAsync<Entity>(
-        _ type: Entity.Type,
-        request: FetchRequest,
-        completion: ((Result<[Entity], Error>) -> Void)?
-    ) where Entity: PersistableEntity {
-        do {
-            try checkLoadingState()
-            return backgroundQueue.async {
-                do {
-                    let result = try self.writeContext.read(type: Entity.self, request: request)
-                    completion?(.success(result))
-                } catch {
-                    completion?(.failure(error))
-                }
-            }
-        } catch {
-            completion?(.failure(error))
         }
     }
 
@@ -166,5 +103,63 @@ final class CoreDataStorage {
         } else {
             completion(.success(()))
         }
+    }
+}
+
+// MARK: - Storage
+
+extension CoreDataStorage: Storage {
+
+    func write(operation: @escaping (Context) throws -> Void) -> AnyPublisher<Void, Error> {
+        guard isLoaded else {
+            let error = DatabaseError(
+                code: .unableToWrite,
+                description: "Attemped to wirte while store is not loaded"
+            )
+
+            assertionFailure(error.description)
+            return Fail(error: error).eraseToAnyPublisher()
+        }
+
+        return Deferred {
+            Future { [weak self] promise in
+                guard let self = self else { return }
+
+                self.writeContext.perform { [writeContext = self.writeContext] in
+                    do {
+                        try operation(writeContext)
+                        promise(.success(()))
+                    } catch {
+                        assertionFailure("Unable to write: \n \(error.localizedDescription)")
+                        promise(.failure(error))
+                    }
+                }
+            }
+            .eraseToAnyPublisher()
+        }
+        .subscribe(on: backgroundQueue)
+        .eraseToAnyPublisher()
+    }
+
+    func fetchAsync<Entity>(
+        _ type: Entity.Type,
+        request: FetchRequest
+    ) -> AnyPublisher<[Entity], Error>
+    where Entity: PersistableEntity {
+        Deferred {
+            Future { [weak self] promise in
+                guard let self = self else { return }
+
+                do {
+                    try self.checkLoadingState()
+                    let result = try self.writeContext.read(type: Entity.self, request: request)
+                    promise(.success(result))
+                } catch {
+                    promise(.failure(error))
+                }
+            }.eraseToAnyPublisher()
+        }
+        .subscribe(on: backgroundQueue)
+        .eraseToAnyPublisher()
     }
 }

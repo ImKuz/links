@@ -1,4 +1,5 @@
 import Swinject
+import Database
 import IPAddressProvider
 import CatalogServer
 import CatalogClient
@@ -23,6 +24,7 @@ public enum AppAssemblerFactory {
             // MARK: - Services
 
             ServicesAssembly(),
+            DatabaseServiceAssembly(),
             IPAddressProviderAssembly(),
             CatalogServerAssembly(),
             CatalogClientAssembly(),

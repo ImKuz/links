@@ -4,6 +4,30 @@ import PackageDescription
 
 let content: [(Product, [Target])] = [
     (
+        .library(name: "AppAssembler", targets: ["AppAssembler"]),
+        [
+            .target(
+                name: "AppAssembler",
+                dependencies: [
+                    "SharedInterfaces",
+                    "CatalogClient",
+                    "CatalogServer",
+                    "CatalogSource",
+                    "IPAddressProvider",
+                    "Database",
+                    "ToolKit",
+                    // Features
+                    "RootFeature",
+                    "CatalogFeature",
+                    "AddItemFeature",
+                    "RemoteFeature",
+                    .product(name: "Swinject", package: "Swinject"),
+                ],
+                path: "Modules/AppAssembler/Sources"
+            )
+        ]
+    ),
+    (
         .library(name: "ToolKit", targets: ["ToolKit"]),
         [
             .target(
@@ -40,7 +64,10 @@ let content: [(Product, [Target])] = [
         [
             .target(
                 name: "Database",
-                dependencies: ["ToolKit"],
+                dependencies: [
+                    "ToolKit",
+                    "Swinject"
+                ],
                 path: "Modules/Database/Sources"
             ),
         ]
@@ -190,30 +217,6 @@ let content: [(Product, [Target])] = [
             )
         ]
     ),
-    (
-        .library(name: "AppAssembler", targets: ["AppAssembler"]),
-        [
-            .target(
-                name: "AppAssembler",
-                dependencies: [
-                    "SharedInterfaces",
-                    "CatalogClient",
-                    "CatalogServer",
-                    "CatalogSource",
-                    "IPAddressProvider",
-                    "Database",
-                    "ToolKit",
-                    // Features
-                    "RootFeature",
-                    "CatalogFeature",
-                    "AddItemFeature",
-                    "RemoteFeature",
-                    .product(name: "Swinject", package: "Swinject"),
-                ],
-                path: "Modules/AppAssembler/Sources"
-            )
-        ]
-    )
 ]
 
 let package = Package(
