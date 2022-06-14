@@ -29,8 +29,6 @@ struct CatalogReducerFactory {
                         .catchToEffect(CatalogAction.itemsUpdated)
                         .cancellable(id: ID.updates)
                 case .addItem:
-                    guard env.permissions.contains(.write) else { return .none }
-
                     return env
                         .showForm()
                         .cancellable(id: ID.showForm, cancelInFlight: true)
@@ -75,7 +73,7 @@ struct CatalogReducerFactory {
     // MARK: - Row action
 
     private func setupState(state: inout CatalogState, env: CatalogEnv) {
-        state.canMoveItems = env.permissions.contains(.read)
+        state.canMoveItems = env.permissions.contains(.write)
 
         if env.permissions.contains(.write) {
             state.rightButton = .init(
@@ -87,7 +85,7 @@ struct CatalogReducerFactory {
 
         if state.hasCloseButton {
             state.leftButton = .init(
-                title: "Disconnect",
+                title: "Close",
                 systemImageName: "xmark",
                 action: .close
             )
