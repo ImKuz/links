@@ -3,7 +3,7 @@ import Database
 import ToolKit
 import UIKit
 
-final class ServicesAssembly: Assembly {
+struct ServicesAssembly: Assembly {
 
     func assemble(container: Container) {
         assembleTransientDependencies(container: container)

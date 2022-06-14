@@ -1,30 +1,25 @@
 import Swinject
-import RootFeature
-import CatalogFeature
-import AddItemFeature
 import IPAddressProvider
 import CatalogServer
-import RemoteFeature
 import CatalogClient
 import CatalogSource
 
-struct AppAssemblerFactory {
+import RootFeature
+import CatalogFeature
+import AddItemFeature
+import RemoteFeature
 
-    let container: Container
+public enum AppAssemblerFactory {
 
-    init(rootContainer: Container) {
-        self.container = rootContainer
-    }
-
-    func assembler() -> Assembler {
+    public static func make(container: Container) -> Assembler {
         let assmbler = Assembler(container: container)
         applyAssemblies(to: assmbler)
         return assmbler
     }
 
-    private func applyAssemblies(to assembler: Assembler) {
+    private static func applyAssemblies(to assembler: Assembler) {
         assembler.apply(assemblies: [
-            
+
             // MARK: - Services
 
             ServicesAssembly(),

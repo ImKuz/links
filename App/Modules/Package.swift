@@ -204,6 +204,30 @@ let content: [(Product, [Target])] = [
                 path: "Modules/Features/RemoteFeature/Sources"
             )
         ]
+    ),
+    (
+        .library(name: "AppAssembler", targets: ["AppAssembler"]),
+        [
+            .target(
+                name: "AppAssembler",
+                dependencies: [
+                    "SharedInterfaces",
+                    "CatalogClient",
+                    "CatalogServer",
+                    "CatalogSource",
+                    "IPAddressProvider",
+                    "Database",
+                    "ToolKit",
+                    // Features
+                    "RootFeature",
+                    "CatalogFeature",
+                    "AddItemFeature",
+                    "RemoteFeature",
+                    .product(name: "Swinject", package: "Swinject"),
+                ],
+                path: "Modules/AppAssembler/Sources"
+            )
+        ]
     )
 ]
 

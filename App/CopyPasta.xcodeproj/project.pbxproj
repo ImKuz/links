@@ -7,24 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		740E1B062852F76800700ABA /* CatalogClient in Frameworks */ = {isa = PBXBuildFile; productRef = 740E1B052852F76800700ABA /* CatalogClient */; };
 		7456A1BA283530EC00C2DF3A /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7456A1B8283530EC00C2DF3A /* CoreData.xcdatamodeld */; };
-		745F5DD12831581E00CD9E9B /* AddItemFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 745F5DD02831581E00CD9E9B /* AddItemFeature */; };
-		746A4077284BD9DE00EF88D7 /* IPAddressProvider in Frameworks */ = {isa = PBXBuildFile; productRef = 746A4076284BD9DE00EF88D7 /* IPAddressProvider */; };
-		746A4079284CA5CB00EF88D7 /* CatalogServer in Frameworks */ = {isa = PBXBuildFile; productRef = 746A4078284CA5CB00EF88D7 /* CatalogServer */; };
-		746A407B284D102100EF88D7 /* RemoteFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 746A407A284D102100EF88D7 /* RemoteFeature */; };
-		74EDDC062858AABC00A82606 /* CatalogSource in Frameworks */ = {isa = PBXBuildFile; productRef = 74EDDC052858AABC00A82606 /* CatalogSource */; };
+		74A1A59E2858E03A0079196B /* AppAssembler in Frameworks */ = {isa = PBXBuildFile; productRef = 74A1A59D2858E03A0079196B /* AppAssembler */; };
 		74EEC7B9282FB41C0013CC3F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */; };
 		74EEC7C2282FB41D0013CC3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C1282FB41D0013CC3F /* Assets.xcassets */; };
 		74EEC7C5282FB41D0013CC3F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C3282FB41D0013CC3F /* LaunchScreen.storyboard */; };
-		74EEC8CA282FE2670013CC3F /* ServicesAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74EEC8C9282FE2670013CC3F /* ServicesAssembly.swift */; };
 		74EEC8CD282FE29C0013CC3F /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8CC282FE29C0013CC3F /* Swinject */; };
-		74EEC8D2282FE4D40013CC3F /* Database in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8D1282FE4D40013CC3F /* Database */; };
 		74EEC8D4282FE4DC0013CC3F /* ToolKit in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8D3282FE4DC0013CC3F /* ToolKit */; };
 		74EEC8D6282FE4DF0013CC3F /* SharedInterfaces in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8D5282FE4DF0013CC3F /* SharedInterfaces */; };
-		74EEC8D8282FE5860013CC3F /* AppAssemblerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74EEC8D7282FE5860013CC3F /* AppAssemblerFactory.swift */; };
-		74EEC8DA282FE6250013CC3F /* RootFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8D9282FE6250013CC3F /* RootFeature */; };
-		74EEC8DC2830F5960013CC3F /* CatalogFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8DB2830F5960013CC3F /* CatalogFeature */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,8 +27,6 @@
 		74EEC7C6282FB41D0013CC3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		74EEC7CC282FB4220013CC3F /* CopyPasta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CopyPasta.entitlements; sourceTree = "<group>"; };
 		74EEC8C7282FB8310013CC3F /* Modules */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Modules; sourceTree = "<group>"; };
-		74EEC8C9282FE2670013CC3F /* ServicesAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesAssembly.swift; sourceTree = "<group>"; };
-		74EEC8D7282FE5860013CC3F /* AppAssemblerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAssemblerFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,18 +34,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				746A4079284CA5CB00EF88D7 /* CatalogServer in Frameworks */,
-				746A407B284D102100EF88D7 /* RemoteFeature in Frameworks */,
-				740E1B062852F76800700ABA /* CatalogClient in Frameworks */,
 				74EEC8D4282FE4DC0013CC3F /* ToolKit in Frameworks */,
 				74EEC8CD282FE29C0013CC3F /* Swinject in Frameworks */,
-				74EEC8D2282FE4D40013CC3F /* Database in Frameworks */,
-				746A4077284BD9DE00EF88D7 /* IPAddressProvider in Frameworks */,
-				745F5DD12831581E00CD9E9B /* AddItemFeature in Frameworks */,
-				74EEC8DC2830F5960013CC3F /* CatalogFeature in Frameworks */,
-				74EDDC062858AABC00A82606 /* CatalogSource in Frameworks */,
 				74EEC8D6282FE4DF0013CC3F /* SharedInterfaces in Frameworks */,
-				74EEC8DA282FE6250013CC3F /* RootFeature in Frameworks */,
+				74A1A59E2858E03A0079196B /* AppAssembler in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,9 +68,7 @@
 				7456A1B8283530EC00C2DF3A /* CoreData.xcdatamodeld */,
 				74EEC7CE282FB4D00013CC3F /* Config */,
 				74EEC7CD282FB4BD0013CC3F /* Resources */,
-				74EEC8CE282FE4570013CC3F /* DI */,
 				74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */,
-				74EEC8D7282FE5860013CC3F /* AppAssemblerFactory.swift */,
 				746A4075284BD66200EF88D7 /* CopyPasta-Bridging-Header.h */,
 			);
 			path = CopyPasta;
@@ -121,14 +99,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		74EEC8CE282FE4570013CC3F /* DI */ = {
-			isa = PBXGroup;
-			children = (
-				74EEC8C9282FE2670013CC3F /* ServicesAssembly.swift */,
-			);
-			path = DI;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -147,17 +117,9 @@
 			name = CopyPasta;
 			packageProductDependencies = (
 				74EEC8CC282FE29C0013CC3F /* Swinject */,
-				74EEC8D1282FE4D40013CC3F /* Database */,
 				74EEC8D3282FE4DC0013CC3F /* ToolKit */,
 				74EEC8D5282FE4DF0013CC3F /* SharedInterfaces */,
-				74EEC8D9282FE6250013CC3F /* RootFeature */,
-				74EEC8DB2830F5960013CC3F /* CatalogFeature */,
-				745F5DD02831581E00CD9E9B /* AddItemFeature */,
-				746A4076284BD9DE00EF88D7 /* IPAddressProvider */,
-				746A4078284CA5CB00EF88D7 /* CatalogServer */,
-				746A407A284D102100EF88D7 /* RemoteFeature */,
-				740E1B052852F76800700ABA /* CatalogClient */,
-				74EDDC052858AABC00A82606 /* CatalogSource */,
+				74A1A59D2858E03A0079196B /* AppAssembler */,
 			);
 			productName = CopyPasta;
 			productReference = 74EEC7B5282FB41C0013CC3F /* CopyPasta.app */;
@@ -217,8 +179,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7456A1BA283530EC00C2DF3A /* CoreData.xcdatamodeld in Sources */,
-				74EEC8D8282FE5860013CC3F /* AppAssemblerFactory.swift in Sources */,
-				74EEC8CA282FE2670013CC3F /* ServicesAssembly.swift in Sources */,
 				74EEC7B9282FB41C0013CC3F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -450,38 +410,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		740E1B052852F76800700ABA /* CatalogClient */ = {
+		74A1A59D2858E03A0079196B /* AppAssembler */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = CatalogClient;
-		};
-		745F5DD02831581E00CD9E9B /* AddItemFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AddItemFeature;
-		};
-		746A4076284BD9DE00EF88D7 /* IPAddressProvider */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = IPAddressProvider;
-		};
-		746A4078284CA5CB00EF88D7 /* CatalogServer */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CatalogServer;
-		};
-		746A407A284D102100EF88D7 /* RemoteFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = RemoteFeature;
-		};
-		74EDDC052858AABC00A82606 /* CatalogSource */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CatalogSource;
+			productName = AppAssembler;
 		};
 		74EEC8CC282FE29C0013CC3F /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 74EEC8CB282FE29C0013CC3F /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
-		};
-		74EEC8D1282FE4D40013CC3F /* Database */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Database;
 		};
 		74EEC8D3282FE4DC0013CC3F /* ToolKit */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -490,14 +426,6 @@
 		74EEC8D5282FE4DF0013CC3F /* SharedInterfaces */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedInterfaces;
-		};
-		74EEC8D9282FE6250013CC3F /* RootFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = RootFeature;
-		};
-		74EEC8DB2830F5960013CC3F /* CatalogFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CatalogFeature;
 		};
 /* End XCSwiftPackageProductDependency section */
 
