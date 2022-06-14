@@ -1,9 +1,9 @@
-import SharedInterfaces
 import IdentifiedCollections
 import ToolKit
 import Models
 import Combine
 import CatalogClient
+import SharedInterfaces
 
 final class RemoteCatalogSource: CatalogSource {
 

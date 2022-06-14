@@ -13,6 +13,7 @@
 		746A4077284BD9DE00EF88D7 /* IPAddressProvider in Frameworks */ = {isa = PBXBuildFile; productRef = 746A4076284BD9DE00EF88D7 /* IPAddressProvider */; };
 		746A4079284CA5CB00EF88D7 /* CatalogServer in Frameworks */ = {isa = PBXBuildFile; productRef = 746A4078284CA5CB00EF88D7 /* CatalogServer */; };
 		746A407B284D102100EF88D7 /* RemoteFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 746A407A284D102100EF88D7 /* RemoteFeature */; };
+		74EDDC062858AABC00A82606 /* CatalogSource in Frameworks */ = {isa = PBXBuildFile; productRef = 74EDDC052858AABC00A82606 /* CatalogSource */; };
 		74EEC7B9282FB41C0013CC3F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */; };
 		74EEC7C2282FB41D0013CC3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C1282FB41D0013CC3F /* Assets.xcassets */; };
 		74EEC7C5282FB41D0013CC3F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C3282FB41D0013CC3F /* LaunchScreen.storyboard */; };
@@ -54,6 +55,7 @@
 				746A4077284BD9DE00EF88D7 /* IPAddressProvider in Frameworks */,
 				745F5DD12831581E00CD9E9B /* AddItemFeature in Frameworks */,
 				74EEC8DC2830F5960013CC3F /* CatalogFeature in Frameworks */,
+				74EDDC062858AABC00A82606 /* CatalogSource in Frameworks */,
 				74EEC8D6282FE4DF0013CC3F /* SharedInterfaces in Frameworks */,
 				74EEC8DA282FE6250013CC3F /* RootFeature in Frameworks */,
 			);
@@ -155,6 +157,7 @@
 				746A4078284CA5CB00EF88D7 /* CatalogServer */,
 				746A407A284D102100EF88D7 /* RemoteFeature */,
 				740E1B052852F76800700ABA /* CatalogClient */,
+				74EDDC052858AABC00A82606 /* CatalogSource */,
 			);
 			productName = CopyPasta;
 			productReference = 74EEC7B5282FB41C0013CC3F /* CopyPasta.app */;
@@ -466,6 +469,10 @@
 		746A407A284D102100EF88D7 /* RemoteFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RemoteFeature;
+		};
+		74EDDC052858AABC00A82606 /* CatalogSource */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CatalogSource;
 		};
 		74EEC8CC282FE29C0013CC3F /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;

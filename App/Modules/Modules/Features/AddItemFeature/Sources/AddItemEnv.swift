@@ -3,6 +3,7 @@ import ComposableArchitecture
 import SharedInterfaces
 import ToolKit
 import Combine
+import CatalogSource
 
 final class AddItemEnvImpl: AddItemEnv {
 

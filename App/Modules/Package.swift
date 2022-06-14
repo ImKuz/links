@@ -83,6 +83,7 @@ let content: [(Product, [Target])] = [
                     "Models",
                     "Contracts",
                     "IPAddressProvider",
+                    .product(name: "GRPC", package: "grpc-swift")
                 ],
                 path: "Modules/CatalogServer/Sources"
             ),
@@ -100,6 +101,25 @@ let content: [(Product, [Target])] = [
                     "Contracts",
                 ],
                 path: "Modules/CatalogClient/Sources"
+            ),
+        ]
+    ),
+    (
+        .library(name: "CatalogSource", targets: ["CatalogSource"]),
+        [
+            .target(
+                name: "CatalogSource",
+                dependencies: [
+                    "Swinject",
+                    "ToolKit",
+                    "Models",
+                    "Contracts",
+                    "Database",
+                    "CatalogClient",
+                    "SharedInterfaces",
+                    .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
+                ],
+                path: "Modules/CatalogSource/Sources"
             ),
         ]
     ),
@@ -160,6 +180,7 @@ let content: [(Product, [Target])] = [
                     "ToolKit",
                     "SharedInterfaces",
                     "Models",
+                    "CatalogSource",
                     .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                     .product(name: "Swinject", package: "Swinject"),
                 ],

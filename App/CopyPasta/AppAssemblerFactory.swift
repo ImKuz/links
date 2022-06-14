@@ -6,6 +6,7 @@ import IPAddressProvider
 import CatalogServer
 import RemoteFeature
 import CatalogClient
+import CatalogSource
 
 struct AppAssemblerFactory {
 
@@ -23,12 +24,14 @@ struct AppAssemblerFactory {
 
     private func applyAssemblies(to assembler: Assembler) {
         assembler.apply(assemblies: [
+            
             // MARK: - Services
 
             ServicesAssembly(),
             IPAddressProviderAssembly(),
             CatalogServerAssembly(),
             CatalogClientAssembly(),
+            CatalogSourceAssembly(),
 
             // MARK: - Features
 

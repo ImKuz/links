@@ -6,7 +6,6 @@ import Models
 import SharedInterfaces
 import SwiftUI
 import UIKit
-import CatalogClient
 
 public struct CatalogFeatureAssembly: Assembly {
 
@@ -65,17 +64,17 @@ public struct CatalogFeatureAssembly: Assembly {
     ) -> CatalogSource {
         switch kind {
         case .local:
-            let databaseService = resolver.resolve(DatabaseService.self)!
-            return DatabaseCatalogSource(databaseService: databaseService)
+            return resolver.resolve(CatalogSource.self, name: "local")!
         case .remote:
             guard let creds = input.credentials else {
                 fatalError("Attempt to create remote CatalogSource without credentials!")
             }
 
-            let client = resolver.resolve(CatalogClient.self, arguments: creds.host, creds.port)!
-            let source = RemoteCatalogSource()
-            source.set(client: client)
-            return source
+            return resolver.resolve(
+                CatalogSource.self,
+                name: "remote",
+                arguments: creds.host, creds.port
+            )!
         }
     }
 
