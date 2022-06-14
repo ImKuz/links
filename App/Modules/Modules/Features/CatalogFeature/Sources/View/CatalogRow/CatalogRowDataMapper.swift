@@ -3,7 +3,10 @@ import Models
 
 enum CatalogRowDataMapper {
 
-    static func map(_ item: CatalogItem) -> CatalogRowState {
+    static func map(
+        item: CatalogItem,
+        actions: [CatalogState.RowMenuAction]
+    ) -> CatalogRowState {
         let content: String
         let icon: CatalogRowState.Icon
 
@@ -19,11 +22,8 @@ enum CatalogRowDataMapper {
         return .init(
             title: item.name,
             content: content,
-            icon: icon
+            icon: icon,
+            actions: actions
         )
-    }
-
-    static func map(_ items: IdentifiedArrayOf<CatalogItem>) -> [CatalogRowState] {
-        items.map(Self.map)
     }
 }

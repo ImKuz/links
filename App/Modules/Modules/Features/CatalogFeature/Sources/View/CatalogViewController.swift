@@ -9,15 +9,20 @@ final class CatalogViewController: UICollectionViewController {
 
     private let store: Store<CatalogState, CatalogAction>
     private let viewStore: ViewStore<CatalogState, CatalogAction>
+    private let rowMenuActionsProvider: CatalogRowMenuActionsProvider
 
     private var cancellables = [AnyCancellable]()
     private var currentItems = IdentifiedArrayOf<CatalogItem>()
 
     // MARK: - Init
 
-    init(store: Store<CatalogState, CatalogAction>) {
+    init(
+        store: Store<CatalogState, CatalogAction>,
+        rowMenuActionsProvider: CatalogRowMenuActionsProvider
+    ) {
         self.store = store
         self.viewStore = ViewStore(store)
+        self.rowMenuActionsProvider = rowMenuActionsProvider
         super.init(collectionViewLayout: .init())
         collectionView.setCollectionViewLayout(makeCollectionViewLayout(), animated: false)
         collectionView.dragInteractionEnabled = true
@@ -41,11 +46,6 @@ final class CatalogViewController: UICollectionViewController {
         viewStore.send(.viewDidLoad)
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        viewStore.send(.viewWillAppear)
-    }
-
     // MARK: - State
 
     private func setupBinding() {
@@ -53,6 +53,7 @@ final class CatalogViewController: UICollectionViewController {
 
         viewStore.publisher
             .items
+            .removeDuplicates()
             .sink { newItems in
                 weakSelf?.apllyDiff(newItems: newItems)
             }
@@ -90,25 +91,15 @@ final class CatalogViewController: UICollectionViewController {
 
     private func setupLeftButton(_ config: CatalogState.ButtonConfig?) {
         guard let config = config else { return }
-        navigationItem.leftBarButtonItem = makeBarButton(
-            config: config,
-            action: .init { [weak self] _ in
-                self?.viewStore.send(.leftButtonTap)
-            }
-        )
+        navigationItem.leftBarButtonItem = makeBarButton(config: config)
     }
 
     private func setupRightButton(_ config: CatalogState.ButtonConfig?) {
         guard let config = config else { return }
-        navigationItem.rightBarButtonItem = makeBarButton(
-            config: config,
-            action: .init { [weak self] _ in
-                self?.viewStore.send(.rightButtonTap)
-            }
-        )
+        navigationItem.rightBarButtonItem = makeBarButton(config: config)
     }
 
-    private func makeBarButton(config: CatalogState.ButtonConfig, action: UIAction) -> UIBarButtonItem {
+    private func makeBarButton(config: CatalogState.ButtonConfig) -> UIBarButtonItem {
         var image: UIImage?
 
         if let imageName = config.systemImageName {
@@ -118,7 +109,9 @@ final class CatalogViewController: UICollectionViewController {
         return .init(
             title: config.title,
             image: image,
-            primaryAction: action,
+            primaryAction: .init { [weak self] _ in
+                self?.viewStore.send(config.action)
+            },
             menu: nil
         )
     }
@@ -171,7 +164,8 @@ final class CatalogViewController: UICollectionViewController {
         guard let cell = cell else { fatalError("Unable to dequeue cell") }
 
         let item = currentItems[indexPath.row]
-        let state = CatalogRowDataMapper.map(item)
+        let actions = rowMenuActionsProvider.acitons(state: viewStore.state, indexPath: indexPath)
+        let state = CatalogRowDataMapper.map(item: item, actions: actions)
 
         cell.set(
             store: store.scope(
@@ -196,9 +190,16 @@ final class CatalogViewController: UICollectionViewController {
         viewStore.send(
             .rowAction(
                 id: item.id,
-                action: .onTap
+                action: .copy
             )
         )
+    }
+
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        canMoveItemAt indexPath: IndexPath
+    ) -> Bool {
+        viewStore.canMoveItems
     }
 
     override func collectionView(
@@ -215,17 +216,5 @@ final class CatalogViewController: UICollectionViewController {
                 to: destinationIndexPath.row
             )
         )
-    }
-
-    // MARK: - Selectors
-
-    @objc
-    private func leftButtonTap() {
-        viewStore.send(.leftButtonTap)
-    }
-
-    @objc
-    private func rightButtonTap() {
-        viewStore.send(.rightButtonTap)
     }
 }

@@ -4,7 +4,7 @@ import ToolKit
 
 // MARK: - State
 
-struct CatalogRowState: Hashable {
+struct CatalogRowState: Equatable {
 
     enum Icon: String {
         case link = "link"
@@ -14,13 +14,14 @@ struct CatalogRowState: Hashable {
     let title: String?
     let content: String?
     let icon: Icon
+    let actions: [CatalogState.RowMenuAction]
 }
 
 // MARK: - Action
 
 public enum CatalogRowAction: Equatable {
-    case onTap
-    case onDelete
+    case copy
+    case delete
 }
 
 // MARK: - Reducer

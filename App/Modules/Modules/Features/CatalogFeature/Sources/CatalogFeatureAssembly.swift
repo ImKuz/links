@@ -93,15 +93,18 @@ public struct CatalogFeatureAssembly: Assembly {
             router: router
         )
 
-        let mode: CatalogState.Mode = isLocal ? .local : .remote
-
         let store = Store(
-            initialState: .initial(mode: mode, title: title),
+            initialState: .initial(hasCloseButton: !isLocal, title: title),
             reducer: CatalogReducerFactory().make(),
             environment: environment
         )
 
-        let viewController = CatalogViewController(store: store)
+        let rowMenuActionsProvider = CatalogRowMenuActionsProviderImpl(env: environment)
+
+        let viewController = CatalogViewController(
+            store: store,
+            rowMenuActionsProvider: rowMenuActionsProvider
+        )
 
         return CatalogFeatureInterface(viewController: viewController)
     }

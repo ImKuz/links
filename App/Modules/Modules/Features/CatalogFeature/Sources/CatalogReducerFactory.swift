@@ -20,46 +20,25 @@ struct CatalogReducerFactory {
             Reducer { state, action, env in
                 switch action {
                 case .viewDidLoad:
+                    setupState(state: &state, env: env)
                     return Effect(value: .suscribeToUpdates)
-                case .viewWillAppear:
-                    switch state.mode {
-                    case .local:
-                        if env.permissions.contains(.write) {
-                            state.rightButton = .init(title: nil, systemImageName: "plus")
-                        }
-                    case .remote:
-                        state.rightButton = .init(title: nil, systemImageName: "arrow.clockwise")
-                        state.leftButton = .init(title: "Disconnect", systemImageName: "xmark")
-                    }
-                    return .none
                 case .suscribeToUpdates:
                     return env
                         .subscribe()
                         .receive(on: DispatchQueue.main)
                         .catchToEffect(CatalogAction.itemsUpdated)
                         .cancellable(id: ID.updates)
-                case .leftButtonTap:
-                    switch state.mode {
-                    case .remote:
-                        return .none
-                    default:
-                        return .none
-                    }
-                case .rightButtonTap:
-                    switch state.mode {
-                    case .remote:
-                        return .none
-                    case .local:
-                        if env.permissions.contains(.write) {
-                            return env
-                                .showForm()
-                                .cancellable(id: ID.showForm, cancelInFlight: true)
-                        } else {
-                            return .none
-                        }
-                    }
+                case .addItem:
+                    guard env.permissions.contains(.write) else { return .none }
+
+                    return env
+                        .showForm()
+                        .cancellable(id: ID.showForm, cancelInFlight: true)
+                case .close:
+                    return .none
                 case let .itemsUpdated(.success(items)):
                     state.items = items
+                    return .none
                 case let .itemsUpdated(.failure(error)):
                     return env
                         .showErrorAlert(error: error)
@@ -89,12 +68,31 @@ struct CatalogReducerFactory {
                         env: env
                     )
                 }
-                return .none
             }
         )
     }
 
     // MARK: - Row action
+
+    private func setupState(state: inout CatalogState, env: CatalogEnv) {
+        state.canMoveItems = env.permissions.contains(.read)
+
+        if env.permissions.contains(.write) {
+            state.rightButton = .init(
+                title: nil,
+                systemImageName: "plus",
+                action: .addItem
+            )
+        }
+
+        if state.hasCloseButton {
+            state.leftButton = .init(
+                title: "Disconnect",
+                systemImageName: "xmark",
+                action: .close
+            )
+        }
+    }
 
     private func handleRowAction(
         state: inout CatalogState,
@@ -105,7 +103,7 @@ struct CatalogReducerFactory {
         guard let index = state.items.index(id: itemId) else { return .none }
 
         switch action {
-        case .onTap:
+        case .copy:
             let content = state.items[index].content
 
             return env
@@ -119,7 +117,7 @@ struct CatalogReducerFactory {
                     }
                 }
                 .eraseToEffect()
-        case .onDelete:
+        case .delete:
             let temp = state.items.remove(at: index)
 
             return env

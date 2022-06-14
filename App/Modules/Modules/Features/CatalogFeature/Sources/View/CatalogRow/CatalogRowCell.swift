@@ -43,7 +43,6 @@ final class CatalogRowCell: UICollectionViewCell {
             for: .normal
         )
 
-        button.menu = makeMenu()
         button.showsMenuAsPrimaryAction = true
 
         return button
@@ -128,23 +127,33 @@ final class CatalogRowCell: UICollectionViewCell {
         titleLabel.text = viewStore.title
         contentLabel.text = viewStore.content
         iconImageView.image = UIImage(systemName: viewStore.icon.rawValue)
+        showMoreButton.isHidden = viewStore.actions.isEmpty
+        showMoreButton.menu = makeMenu()
     }
 
     // MARK: - Context menu
 
-    private func makeMenu() -> UIMenu {
-        UIMenu(
+    private func makeMenu() -> UIMenu? {
+        guard let viewStore = viewStore else { return nil }
+
+        let children: [UIAction] = viewStore.actions.map { item in
+            let attributes: UIMenuElement.Attributes = item.isDestructive
+                ? .destructive
+                : []
+
+            return UIAction(
+                title: item.title,
+                image: UIImage(systemName: item.iconName),
+                attributes: attributes,
+                handler: { [weak self] _ in
+                    self?.viewStore?.send(item.action)
+                }
+            )
+        }
+
+        return UIMenu(
             options: .displayInline,
-            children: [
-                UIAction(
-                    title: "Delete",
-                    image: UIImage(systemName: "trash"),
-                    attributes: [.destructive],
-                    handler: { [weak self] _ in
-                        self?.viewStore?.send(.onDelete)
-                    }
-                )
-            ]
+            children: children
         )
     }
 
