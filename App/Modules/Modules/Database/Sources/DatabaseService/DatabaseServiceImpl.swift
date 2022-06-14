@@ -36,12 +36,12 @@ final public class DatabaseServiceImpl: DatabaseService {
             .eraseToAnyPublisher()
     }
 
-    public func fetchAsync<Entity>(
+    public func fetch<Entity>(
         _ type: Entity.Type,
         request: FetchRequest
     ) -> AnyPublisher<[Entity], Error>
     where Entity: PersistableEntity {
-        storage.fetchAsync(type, request: request)
+        storage.fetch(type, request: request)
     }
 
     public func deleteAll<Entity: PersistableEntity>(type: Entity.Type) -> AnyPublisher<Void, Error> {

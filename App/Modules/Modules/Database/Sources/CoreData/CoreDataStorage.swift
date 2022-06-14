@@ -21,7 +21,7 @@ final class CoreDataStorage {
     )
 
     private var readContext: NSManagedObjectContext { container.viewContext }
-    
+
     private lazy var writeContext: NSManagedObjectContext = {
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
@@ -141,7 +141,7 @@ extension CoreDataStorage: Storage {
         .eraseToAnyPublisher()
     }
 
-    func fetchAsync<Entity>(
+    func fetch<Entity>(
         _ type: Entity.Type,
         request: FetchRequest
     ) -> AnyPublisher<[Entity], Error>
