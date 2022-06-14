@@ -31,6 +31,7 @@ protocol CatalogEnv: AnyObject {
     func add(_ item: CatalogItem) -> Effect<Void, AppError>
 
     func handleContent(_ content: CatalogItemContent) -> Effect<Void, Never>
+    func copyContent(_ content: String) -> Effect<Void, Never>
     func showForm() -> Effect<CatalogAction, Never>
     func showErrorAlert(error: AppError) -> Effect<Void, Never>
     func dismissPresetnedView() -> Effect<Void, Never>

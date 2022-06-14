@@ -61,9 +61,14 @@ final class CatalogEnvImpl: CatalogEnv {
         case let .link(url):
             UIApplication.shared.open(url)
         case let .text(string):
-            pastboard.string = string
+            return copyContent(string)
         }
 
+        return Just(()).eraseToEffect()
+    }
+
+    func copyContent(_ content: String) -> Effect<Void, Never> {
+        pastboard.string = content
         return Just(()).eraseToEffect()
     }
 

@@ -186,13 +186,7 @@ final class CatalogViewController: UICollectionViewController {
         didSelectItemAt indexPath: IndexPath
     ) {
         let item = currentItems[indexPath.row]
-
-        viewStore.send(
-            .rowAction(
-                id: item.id,
-                action: .copy
-            )
-        )
+        viewStore.send(.rowAction(id: item.id, action: .tap))
     }
 
     override func collectionView(

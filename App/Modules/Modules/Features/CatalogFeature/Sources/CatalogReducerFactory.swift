@@ -101,7 +101,7 @@ struct CatalogReducerFactory {
         guard let index = state.items.index(id: itemId) else { return .none }
 
         switch action {
-        case .copy:
+        case .tap:
             let content = state.items[index].content
 
             return env
@@ -115,6 +115,23 @@ struct CatalogReducerFactory {
                     }
                 }
                 .eraseToEffect()
+        case .copy:
+            let content = state.items[index].content
+
+            let string: String = {
+                switch content {
+                case let .link(url):
+                    return url.absoluteString
+                case let .text(text):
+                    return text
+                }
+            }()
+
+            return env
+                .copyContent(string)
+                .eraseToEffect {
+                    CatalogAction.titleMessage(text: "Copied to clipboard!")
+                }
         case .delete:
             let temp = state.items.remove(at: index)
 

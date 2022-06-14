@@ -21,6 +21,7 @@ struct CatalogRowState: Equatable {
 
 public enum CatalogRowAction: Equatable {
     case copy
+    case tap
     case delete
 }
 
