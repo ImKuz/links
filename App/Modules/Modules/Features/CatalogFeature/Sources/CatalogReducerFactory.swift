@@ -33,7 +33,9 @@ struct CatalogReducerFactory {
                         .showForm()
                         .cancellable(id: ID.showForm, cancelInFlight: true)
                 case .close:
-                    return .none
+                    return env
+                        .close()
+                        .fireAndForget()
                 case let .itemsUpdated(.success(items)):
                     state.items = items
                     return .none

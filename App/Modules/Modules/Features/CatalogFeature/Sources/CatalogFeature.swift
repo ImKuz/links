@@ -35,6 +35,7 @@ protocol CatalogEnv: AnyObject {
     func showForm() -> Effect<CatalogAction, Never>
     func showErrorAlert(error: AppError) -> Effect<Void, Never>
     func dismissPresetnedView() -> Effect<Void, Never>
+    func close() -> Effect<Void, Never>
 }
 
 // MARK: - Reducer

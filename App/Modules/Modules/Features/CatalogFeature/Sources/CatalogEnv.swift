@@ -116,4 +116,11 @@ final class CatalogEnvImpl: CatalogEnv {
             }
         }.eraseToEffect()
     }
+
+    func close() -> Effect<Void, Never> {
+        Future { [self] promise in
+            router.pop(isAnimated: true)
+            promise(.success(()))
+        }.eraseToEffect()
+    }
 }
