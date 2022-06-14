@@ -68,7 +68,10 @@ final class CatalogEnvImpl: CatalogEnv {
     }
 
     func showForm() -> Effect<CatalogAction, Never> {
-        guard let interface = container.resolve(AddItemFeatureInterface.self, argument: catalogSource) else {
+        guard
+            permissions.contains(.write),
+            let interface = container.resolve(AddItemFeatureInterface.self, argument: catalogSource)
+        else {
             return .none
         }
 
