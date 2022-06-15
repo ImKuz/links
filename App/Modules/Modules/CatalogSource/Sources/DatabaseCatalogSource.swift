@@ -11,8 +11,8 @@ final class DatabaseCatalogSource: CatalogSource {
     let permissions: CatalogDataSourcePermissions = .all
 
     private var itemsSubject = PassthroughSubject<IdentifiedArrayOf<Database.CatalogItem>, AppError>()
+    private var cancellables = [AnyCancellable]()
     private let databaseService: DatabaseService
-    private let cancellables = [AnyCancellable]()
 
     init(databaseService: DatabaseService) {
         self.databaseService = databaseService
@@ -22,6 +22,7 @@ final class DatabaseCatalogSource: CatalogSource {
 
     func subscribe() -> AnyPublisher<IdentifiedArrayOf<Models.CatalogItem>, AppError> {
         defer { updateItems() }
+
         itemsSubject = .init()
 
         return itemsSubject
@@ -34,8 +35,8 @@ final class DatabaseCatalogSource: CatalogSource {
     }
 
     func delete(_ item: Models.CatalogItem) -> AnyPublisher<Void, AppError> {
-        Future { [weak self] promise in
-            self?.databaseService.writeAsync { context in
+        databaseService
+            .write { context in
                 let items = try context.read(
                     type: Database.CatalogItem.self,
                     request: .init(predicate: .init(format: "itemId == %@", item.id))
@@ -46,21 +47,23 @@ final class DatabaseCatalogSource: CatalogSource {
                 try context.delete(item)
                 try context.updateIndices(from: Int(item.index))
                 try context.save()
-            } completion: {
-                self?.updateItems()
-                Self.completion(promise: promise, result: $0)
             }
-        }
-        .eraseToAnyPublisher()
+            .handleEvents(receiveOutput: { [weak self] in
+                self?.updateItems()
+            })
+            .mapError { _ in AppError.businessLogic("Unable to delete items") }
+            .eraseToAnyPublisher()
     }
 
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError> {
         fetchItems()
             .map { IdentifiedArray(uniqueElements: $0) }
-            .mapError { _ in AppError.businessLogic("Unable to fethc items from the database") }
-            .flatMap { items -> Future<Void, AppError> in
-                Future { [weak self] promise in
-                    self?.databaseService.writeAsync { context in
+            .mapError { _ in AppError.businessLogic("Unable to fetch items") }
+            .flatMap { [weak self] items -> AnyPublisher<Void, AppError> in
+                guard let self = self else { return Empty().eraseToAnyPublisher() }
+
+                return self.databaseService
+                    .write { context in
                         var newItems = items
 
                         let item = newItems.remove(at: from)
@@ -68,73 +71,62 @@ final class DatabaseCatalogSource: CatalogSource {
 
                         try context.updateIndices(items: &newItems, offset: min(from, to))
                         try context.save()
-                    } completion: {
-                        self?.updateItems()
-                        Self.completion(promise: promise, result: $0)
                     }
-                }
+                    .handleEvents(receiveOutput: { [weak self] in
+                        self?.updateItems()
+                    })
+                    .mapError { _ in AppError.businessLogic("Unable to move items") }
+                    .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
 
     func add(item: Models.CatalogItem) -> AnyPublisher<Void, AppError> {
-        Future { [weak self] promise in
-            self?.databaseService.writeAsync { context in
+        databaseService
+            .write { context in
                 try context.create(item.convertToEntity(withIndex: 0))
                 try context.updateIndices(from: 0)
                 try context.save()
-            } completion: {
-                self?.updateItems()
-                Self.completion(promise: promise, result: $0)
             }
-        }
-        .eraseToAnyPublisher()
+            .handleEvents(receiveOutput: { [weak self] in
+                self?.updateItems()
+            })
+            .mapError { _ in
+                AppError.businessLogic("Unable to add item")
+            }
+            .eraseToAnyPublisher()
     }
 
     // MARK: - Private methods
 
     private func fetchItems() -> AnyPublisher<[Database.CatalogItem], Error> {
-        Future { [weak self] promise in
-            self?.fetchItems { promise($0) }
-        }.eraseToAnyPublisher()
-    }
-
-    private func fetchItems(completion: @escaping (Result<[Database.CatalogItem], Error>) -> Void) {
-        databaseService.fetchAsync(
+        databaseService.fetch(
             Database.CatalogItem.self,
-            request: .init(sortDescriptor: .init(key: "index", ascending: true)),
-            completion: completion
+            request: .init(sortDescriptor: .init(key: "index", ascending: true))
         )
     }
 
     private func updateItems(completion: (() -> ())? = nil) {
-        fetchItems { [weak self] result in
-            defer { completion?() }
-
-            switch result {
-            case let .success(fetchedItems):
-                let array = IdentifiedArrayOf<Database.CatalogItem>(uniqueElements: fetchedItems)
-                self?.itemsSubject.send(array)
-            case .failure:
-                let error = AppError.common(description: "Unable to update items")
-                self?.itemsSubject.send(completion: .failure(error))
+        fetchItems()
+            .mapError { _ in
+                AppError.common(description: "Unable to update items")
             }
-        }
-    }
-
-    private static func completion(
-        promise: @escaping (Result<Void, AppError>) -> Void,
-        result: Result<Void, Error>
-    ) {
-        switch result {
-        case let .failure(error):
-            print(error.localizedDescription)
-            promise(.failure(.common(description: "UnableToAdd")))
-        case .success:
-            promise(.success(()))
-        }
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    if case let .failure(error) = completion {
+                        self?.itemsSubject.send(completion: .failure(error))
+                    }
+                },
+                receiveValue: { [weak self] items in
+                    let array = IdentifiedArrayOf<Database.CatalogItem>(uniqueElements: items)
+                    self?.itemsSubject.send(array)
+                }
+            )
+            .store(in: &cancellables)
     }
 }
+
+// MARK: - Context Helpers
 
 private extension Database.Context {
 

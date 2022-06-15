@@ -100,23 +100,18 @@ extension CatalogServerImpl: CatalogServer {
 extension CatalogServerImpl: CatalogSourceProviderDelegate {
 
     func providerRequestsData() -> AnyPublisher<[Models.CatalogItem], AppError> {
-        Future<[Models.CatalogItem], AppError> { [weak self] promise in
-            guard let self = self else { return }
+        let request = FetchRequest(
+            sortDescriptor: .init(key: "index", ascending: true)
+        )
 
-            let request = FetchRequest(
-                sortDescriptor: .init(key: "index", ascending: true)
+        return database
+            .fetch(
+                Database.CatalogItem.self,
+                request: request
             )
-
-            self.database.fetchAsync(Database.CatalogItem.self, request: request) {
-                switch $0 {
-                case let .success(items):
-                    let mappedItems = items.map { $0.convertToModel() }
-                    promise(.success(mappedItems))
-                case .failure:
-                    promise(.failure(.common(description: "Unable to fetch items from database")))
-                }
-            }
-        }.eraseToAnyPublisher()
+            .map { items in items.map { $0.convertToModel() } }
+            .mapError { _ in AppError.businessLogic("Unable to fetch items") }
+            .eraseToAnyPublisher()
     }
 }
 
