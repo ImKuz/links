@@ -4,6 +4,7 @@ import IPAddressProvider
 import CatalogServer
 import CatalogClient
 import CatalogSource
+import Logger
 
 import RootFeature
 import CatalogFeature
@@ -24,6 +25,7 @@ public enum AppAssemblerFactory {
             // MARK: - Services
 
             ServicesAssembly(),
+            LoggerAssembly(),
             DatabaseServiceAssembly(),
             IPAddressProviderAssembly(),
             CatalogServerAssembly(),

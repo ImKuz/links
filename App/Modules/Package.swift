@@ -16,11 +16,13 @@ let content: [(Product, [Target])] = [
                     "IPAddressProvider",
                     "Database",
                     "ToolKit",
+                    "Logger",
                     // Features
                     "RootFeature",
                     "CatalogFeature",
                     "AddItemFeature",
                     "RemoteFeature",
+                    // External dependencies
                     .product(name: "Swinject", package: "Swinject"),
                 ],
                 path: "Modules/AppAssembler/Sources"
