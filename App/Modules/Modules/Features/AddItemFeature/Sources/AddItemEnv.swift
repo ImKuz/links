@@ -25,9 +25,7 @@ final class AddItemEnvImpl: AddItemEnv {
 
     func done(state: AddItemState) -> Effect<Void, AppError> {
         guard let item = Self.map(state: state) else {
-            return Fail(
-                error: AppError.mapping(description: "Unable to map state into CatalogItem")
-            ).eraseToEffect()
+            return Fail(error: AppError.mapping(description: "Unable to map state into CatalogItem")).eraseToEffect()
         }
 
         return catalogSource

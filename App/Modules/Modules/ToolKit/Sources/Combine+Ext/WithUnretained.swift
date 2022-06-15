@@ -46,9 +46,8 @@ public extension Publisher {
     /// - Returns: A cancellable instance, which you use when you end assignment of the received value. Deallocation of the result will tear down the subscription stream.
     func sink<UnretainedObject: AnyObject>(
         unretainedObject obj: UnretainedObject,
-        receiveCompletion: @escaping (
-            (Subscribers.Completion<Self.Failure>) -> Void),
-            receiveValue: @escaping ((UnretainedObject, Self.Output) -> Void)
+        receiveCompletion: @escaping ((Subscribers.Completion<Self.Failure>) -> Void),
+        receiveValue: @escaping ((UnretainedObject, Self.Output) -> Void)
     ) -> AnyCancellable {
         withUnretained(obj)
             .sink(receiveCompletion: receiveCompletion, receiveValue: receiveValue)
@@ -90,8 +89,10 @@ public extension Publishers {
 // MARK: - Subscriber
 
 private extension Publishers.WithUnretained {
+
     class Subscriber<Downstream: Combine.Subscriber>: Combine.Subscriber
     where Downstream.Input == Output, Downstream.Failure == Failure {
+
         typealias Input = Upstream.Output
         typealias Failure = Downstream.Failure
 

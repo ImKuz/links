@@ -3,6 +3,8 @@ import Logging
 
 public struct LoggerAssembly: Assembly {
 
+    public init() {}
+
     public func assemble(container: Container) {
         container.register(Logger.self) { _ in
             let logger = Logging.Logger(label: "com.copy-pasta.app")

@@ -59,10 +59,9 @@ final class DatabaseCatalogSource: CatalogSource {
         fetchItems()
             .map { IdentifiedArray(uniqueElements: $0) }
             .mapError { _ in AppError.businessLogic("Unable to fetch items") }
-            .flatMap { [weak self] items -> AnyPublisher<Void, AppError> in
-                guard let self = self else { return Empty().eraseToAnyPublisher() }
-
-                return self.databaseService
+            .withUnretained(self)
+            .flatMap { strongSelf, items -> AnyPublisher<Void, AppError> in
+                strongSelf.databaseService
                     .write { context in
                         var newItems = items
 
