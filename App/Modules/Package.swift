@@ -145,6 +145,20 @@ let content: [(Product, [Target])] = [
             ),
         ]
     ),
+    (
+        .library(name: "Logger", targets: ["Logger"]),
+        [
+            .target(
+                name: "Logger",
+                dependencies: [
+                    "ToolKit",
+                    "Swinject",
+                    .product(name: "Logging", package: "swift-log"),
+                ],
+                path: "Modules/Logger/Sources"
+            ),
+        ]
+    ),
 
     // MARK: - Features
 
@@ -242,6 +256,10 @@ let package = Package(
             name: "swift-identified-collections",
             url: "https://github.com/pointfreeco/swift-identified-collections",
             from: "0.3.2"
+        ),
+        .package(
+            url: "https://github.com/apple/swift-log.git",
+            from: "1.0.0"
         ),
     ],
     targets: content.flatMap { $0.1 }
