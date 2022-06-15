@@ -117,7 +117,7 @@ final class CatalogViewController: UICollectionViewController {
     }
 
     private func apllyDiff(newItems: IdentifiedArrayOf<CatalogItem>) {
-        guard newItems != currentItems else { return }
+        guard !isItemsEqual(current: currentItems, new: newItems) else { return }
         
         let diff = newItems.difference(from: currentItems)
 
@@ -139,6 +139,20 @@ final class CatalogViewController: UICollectionViewController {
             collectionView.deleteItems(at: removeIndexPaths)
             collectionView.insertItems(at: insertIndexPaths)
         }
+    }
+
+    private func isItemsEqual(
+        current: IdentifiedArrayOf<CatalogItem>,
+        new: IdentifiedArrayOf<CatalogItem>
+    ) -> Bool {
+        if current.count != new.count { return false }
+
+        return zip(current, new)
+            .allSatisfy { lhs, rhs in
+                lhs.id == rhs.id &&
+                lhs.name == rhs.name &&
+                lhs.content == rhs.content
+            }
     }
 
     // MARK: - UICollectionViewDataSource

@@ -84,8 +84,8 @@ final class DatabaseCatalogSource: CatalogSource {
     func add(item: Models.CatalogItem) -> AnyPublisher<Void, AppError> {
         databaseService
             .write { context in
+                try context.updateIndices(from: 0, indexOffset: 1)
                 try context.create(item.convertToEntity(withIndex: 0))
-                try context.updateIndices(from: 0)
                 try context.save()
             }
             .handleEvents(receiveOutput: { [weak self] in
@@ -140,7 +140,11 @@ private extension Database.Context {
         )
     }
 
-    func updateIndices(items: inout IdentifiedArrayOf<Database.CatalogItem>, offset: Int = 0) throws {
+    func updateIndices(
+        items: inout IdentifiedArrayOf<Database.CatalogItem>,
+        offset: Int = 0,
+        indexOffset: Int = 0
+    ) throws {
         guard !items.isEmpty else { return }
         var sliceItems = [Database.CatalogItem]()
 
@@ -152,17 +156,25 @@ private extension Database.Context {
 
         sliceItems.forEach { item in
             let index = items.index(id: item.id)!
-            items[id: item.id]?.index = Int16(index)
+            items[id: item.id]?.index = Int16(index + indexOffset)
         }
 
         try update(Array(items))
         try save()
     }
 
-    func updateIndices(from offset: Int) throws {
+    func updateIndices(
+        from offset: Int,
+        indexOffset: Int = 0
+    ) throws {
         let items = try readCatalogItems(offset: offset)
         var array = IdentifiedArrayOf<Database.CatalogItem>(uniqueElements: items)
-        try updateIndices(items: &array, offset: offset)
+
+        try updateIndices(
+            items: &array,
+            offset: offset,
+            indexOffset: indexOffset
+        )
     }
 }
 
