@@ -7,6 +7,12 @@ import Models
 
 struct RemoteState: Equatable {
     var isRememberSwitchOn = false
+    var defaultOption: Option?
+    var lastConnectedCredentials: ServerCredentials?
+
+    enum Option: Int, Equatable {
+        case server, client
+    }
 }
 
 // MARK: - Action
@@ -19,9 +25,17 @@ enum RemoteAction: Equatable {
 
 // MARK: - Enviroment
 
-protocol RemoteEnv {
+protocol RemoteEnv: AnyObject {
+    var shouldRememberAction: Bool { get set }
+
     func showServerView(isAnimated: Bool)
-    func showCatalog(host: String, port: Int) -> Effect<Void, Never>
+
+    func showCatalog(
+        host: String,
+        port: Int,
+        isAnimated: Bool
+    )
+
     func showConnectForm() -> Effect<(String, Int), Never>
 }
 
@@ -32,8 +46,13 @@ let remoteReducer = Reducer<RemoteState, RemoteAction, RemoteEnv> { state, actio
     case .connectTap:
         return env
             .showConnectForm()
-            .flatMap { host, port in
-                env.showCatalog(host: host, port: port)
+            .flatMap { host, port -> Effect<Void, Never> in
+                env.showCatalog(
+                    host: host,
+                    port: port,
+                    isAnimated: true
+                )
+                return .none
             }
             .fireAndForget()
     case .hostTap:
@@ -41,6 +60,7 @@ let remoteReducer = Reducer<RemoteState, RemoteAction, RemoteEnv> { state, actio
         return .none
     case let .toggleSwitch(isOn):
         state.isRememberSwitchOn = isOn
+        env.shouldRememberAction = isOn
         return .none
     }
 }

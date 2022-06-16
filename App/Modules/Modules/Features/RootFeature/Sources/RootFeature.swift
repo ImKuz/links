@@ -6,7 +6,6 @@ import Models
 // MARK: - State
 
 struct RootState: Equatable {
-    var remoteSourceData: RemoteSourceData
     let tabs: [Tab]
 }
 

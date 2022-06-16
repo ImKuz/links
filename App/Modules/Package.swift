@@ -8,6 +8,7 @@ enum Module: String, CaseIterable, Equatable {
     case CatalogClient
     case CatalogServer
     case CatalogSource
+    case Constants
     case Contracts
     case Database
     case IPAddressProvider
@@ -67,6 +68,7 @@ let dependencyMap: [Module: [Dependency]] = [
 ]
 
 let commonModuleDependencies: [Dependency] = [
+    .module(.Constants),
     .module(.Logger),
     .module(.ToolKit),
     .external("Swinject"),

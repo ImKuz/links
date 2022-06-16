@@ -1,4 +1,4 @@
-public struct RemoteSourceData: Equatable {
+public struct ServerCredentials: Equatable {
 
     public let host: String
     public let port: Int

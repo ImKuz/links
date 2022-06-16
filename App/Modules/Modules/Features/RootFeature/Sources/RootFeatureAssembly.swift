@@ -15,7 +15,7 @@ public struct RootFeatureAssembly: Assembly {
         ]
 
         let store: Store<RootState, RootAction> = .init(
-            initialState: .init(remoteSourceData: .default, tabs: tabs),
+            initialState: .init(tabs: tabs),
             reducer: RootReducerFactory.make(),
             environment: RootEnv()
         )
