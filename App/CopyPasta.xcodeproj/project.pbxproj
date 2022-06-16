@@ -12,9 +12,6 @@
 		74EEC7B9282FB41C0013CC3F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */; };
 		74EEC7C2282FB41D0013CC3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C1282FB41D0013CC3F /* Assets.xcassets */; };
 		74EEC7C5282FB41D0013CC3F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74EEC7C3282FB41D0013CC3F /* LaunchScreen.storyboard */; };
-		74EEC8CD282FE29C0013CC3F /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8CC282FE29C0013CC3F /* Swinject */; };
-		74EEC8D4282FE4DC0013CC3F /* ToolKit in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8D3282FE4DC0013CC3F /* ToolKit */; };
-		74EEC8D6282FE4DF0013CC3F /* SharedInterfaces in Frameworks */ = {isa = PBXBuildFile; productRef = 74EEC8D5282FE4DF0013CC3F /* SharedInterfaces */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,9 +31,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				74EEC8D4282FE4DC0013CC3F /* ToolKit in Frameworks */,
-				74EEC8CD282FE29C0013CC3F /* Swinject in Frameworks */,
-				74EEC8D6282FE4DF0013CC3F /* SharedInterfaces in Frameworks */,
 				74A1A59E2858E03A0079196B /* AppAssembler in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -116,9 +110,6 @@
 			);
 			name = CopyPasta;
 			packageProductDependencies = (
-				74EEC8CC282FE29C0013CC3F /* Swinject */,
-				74EEC8D3282FE4DC0013CC3F /* ToolKit */,
-				74EEC8D5282FE4DF0013CC3F /* SharedInterfaces */,
 				74A1A59D2858E03A0079196B /* AppAssembler */,
 			);
 			productName = CopyPasta;
@@ -413,19 +404,6 @@
 		74A1A59D2858E03A0079196B /* AppAssembler */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppAssembler;
-		};
-		74EEC8CC282FE29C0013CC3F /* Swinject */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 74EEC8CB282FE29C0013CC3F /* XCRemoteSwiftPackageReference "Swinject" */;
-			productName = Swinject;
-		};
-		74EEC8D3282FE4DC0013CC3F /* ToolKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ToolKit;
-		};
-		74EEC8D5282FE4DF0013CC3F /* SharedInterfaces */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SharedInterfaces;
 		};
 /* End XCSwiftPackageProductDependency section */
 
