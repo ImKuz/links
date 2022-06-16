@@ -12,6 +12,6 @@ public struct DatabaseServiceAssembly: Assembly {
             } catch {
                 fatalError("Unable to assemble DatabaseService\nreason: \(error.localizedDescription)")
             }
-        }
+        }.inObjectScope(.container)
     }
 }
