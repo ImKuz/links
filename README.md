@@ -2,6 +2,10 @@
   <h1 align="center">CopyPasta for iOS and macOS</h1>
 </p>
 
+<p align="center">
+  <img src="./Resources/screen.png" width="500" title="screenshot">
+</p>
+
 ## Description
 
 CopyPasta is a cross-platfrom application that allows QA engineers and developers to handle copy/paste content over all their bunch of devices and simulators easily.
