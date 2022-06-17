@@ -17,6 +17,11 @@ CopyPasta is a cross-platfrom application that allows QA engineers and developer
 
 I want to create a simple solution for resolving daily testing routines such as testing DeepLinks or pasting test strings.
 
+## Architecture
+
+The application is modular and implementened using [TCA](https://github.com/pointfreeco/swift-composable-architecture) architecture.
+UI is build using SwiftUI and UIKit.
+
 ## TODO
 
 - [ ] Favorites section for a quick access.
