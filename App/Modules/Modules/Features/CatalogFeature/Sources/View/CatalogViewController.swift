@@ -106,7 +106,7 @@ final class CatalogViewController: UICollectionViewController {
             image = UIImage(systemName: imageName)
         }
 
-        return .init(
+        let button = UIBarButtonItem(
             title: config.title,
             image: image,
             primaryAction: .init { [weak self] _ in
@@ -114,6 +114,10 @@ final class CatalogViewController: UICollectionViewController {
             },
             menu: nil
         )
+
+        button.tintColor = config.tintColor
+
+        return button
     }
 
     private func apllyDiff(newItems: IdentifiedArrayOf<CatalogItem>) {

@@ -25,9 +25,7 @@ private extension CatalogSourceAssembly {
     func registerRemoteSource(container: Container) {
         let factory: (Resolver, String, Int) -> CatalogSource = { resolver, host, port in
             let client = resolver.resolve(CatalogClient.self, arguments: host, port)!
-            let source = RemoteCatalogSource()
-            source.set(client: client)
-            return source
+            return RemoteCatalogSource(client: client)
         }
 
         container.register(CatalogSource.self, name: "remote", factory: factory)

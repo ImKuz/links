@@ -31,6 +31,14 @@ final class CatalogEnvImpl: CatalogEnv {
         self.router = router
     }
 
+    func observeConnectivity() -> Effect<ConnectionState, Never> {
+        if let connectivityPublisher = (catalogSource as? ConnectionObservable)?.connectivityPublisher {
+            return connectivityPublisher.eraseToEffect()
+        } else {
+            return .none
+        }
+    }
+
     func subscribe() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError> {
         catalogSource
             .subscribe()
@@ -103,6 +111,30 @@ final class CatalogEnvImpl: CatalogEnv {
 
             alertVC.addAction(
                 .init(title: "Dismiss", style: .cancel, handler: nil)
+            )
+
+            router?.presentAlert(controller: alertVC)
+        }.eraseToEffect()
+    }
+
+    func showConnectionErrorSheet() -> Effect<CatalogAction, Never> {
+        Future { [weak router] promise in
+            let alertVC = UIAlertController(
+                title: "Connection error has occured",
+                message: "Check server app status or try again",
+                preferredStyle: .actionSheet
+            )
+
+            alertVC.addAction(
+                .init(title: "Try again", style: .default) { _ in
+                    promise(.success(.suscribeToUpdates))
+                }
+            )
+
+            alertVC.addAction(
+                .init(title: "Disconnect", style: .cancel) { _ in
+                    promise(.success(.close))
+                }
             )
 
             router?.presentAlert(controller: alertVC)

@@ -7,7 +7,9 @@ struct CatalogReducerFactory {
 
     private enum ID {
         static let showForm = "showForm"
+        static let showErrorSheet = "showErrorSheet"
         static let updates = "updates"
+        static let connectivity = "connectivity"
     }
 
     func make() -> CatalogReducerType {
@@ -23,11 +25,43 @@ struct CatalogReducerFactory {
                     setupState(state: &state, env: env)
                     return Effect(value: .suscribeToUpdates)
                 case .suscribeToUpdates:
-                    return env
+                    let itemsUpdates = env
                         .subscribe()
                         .receive(on: DispatchQueue.main)
                         .catchToEffect(CatalogAction.itemsUpdated)
                         .cancellable(id: ID.updates)
+
+                    let connectivityUpdates = env
+                        .observeConnectivity()
+                        .print()
+                        .receive(on: DispatchQueue.main)
+                        .eraseToEffect(CatalogAction.handleConnectionStateChange)
+                        .cancellable(id: ID.connectivity)
+
+                    return itemsUpdates
+                        .merge(with: connectivityUpdates)
+                        .eraseToEffect()
+                case let .handleConnectionStateChange(connectionState):
+                    switch connectionState {
+                    case .failure:
+                        state.rightButton = .init(
+                            title: nil,
+                            systemImageName: "exclamationmark.circle",
+                            action: .connectionFailureInfo,
+                            tintColor: .systemRed
+                        )
+                        return .none
+                    case .connecting:
+                        // TODO: Handle loading
+                        return .none
+                    case .ok:
+                        state.rightButton = nil
+                        return .none
+                    }
+                case .connectionFailureInfo:
+                    return env
+                        .showConnectionErrorSheet()
+                        .cancellable(id: ID.showErrorSheet, cancelInFlight: true)
                 case .addItem:
                     return env
                         .showForm()

@@ -13,6 +13,8 @@ enum CatalogAction: Equatable {
     case suscribeToUpdates
     case close
     case addItem
+    case connectionFailureInfo
+    case handleConnectionStateChange(ConnectionState)
     case itemsUpdated(Result<IdentifiedArrayOf<CatalogItem>, AppError>)
     case moveItem(from: Int, to: Int)
     case rowAction(id: CatalogItem.ID, action: CatalogRowAction)
@@ -25,6 +27,7 @@ enum CatalogAction: Equatable {
 protocol CatalogEnv: AnyObject {
     var permissions: CatalogDataSourcePermissions { get }
 
+    func observeConnectivity() -> Effect<ConnectionState, Never>
     func subscribe() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError>
     func delete(_ item: CatalogItem) -> Effect<Void, AppError>
     func move(_ from: Int, _ to: Int) -> Effect<Void, AppError>
@@ -34,6 +37,7 @@ protocol CatalogEnv: AnyObject {
     func copyContent(_ content: String) -> Effect<Void, Never>
     func showForm() -> Effect<CatalogAction, Never>
     func showErrorAlert(error: AppError) -> Effect<Void, Never>
+    func showConnectionErrorSheet() -> Effect<CatalogAction, Never>
     func dismissPresetnedView() -> Effect<Void, Never>
     func close() -> Effect<Void, Never>
 }

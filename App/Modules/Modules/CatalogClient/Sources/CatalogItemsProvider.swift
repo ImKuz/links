@@ -11,15 +11,19 @@ protocol CatalogItemsProvider {
     func configure(host: String, port: Int)
     func disconnect()
     func subscribe() -> AnyPublisher<[CatalogItem], AppError>
+    func connectivity() -> AnyPublisher<ConnectionState, Never>
 }
 
-final class CatalogItemsProviderImpl: CatalogItemsProvider {
+final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDelegate {
 
     private var client: Catalog_SourceClientProtocol?
     private var clientConnection: ClientConnection?
     private var itemsSubject = PassthroughSubject<[CatalogItem], AppError>()
+    private var connectivitySubject = PassthroughSubject<ConnectionState, Never>()
     private var call: ServerStreamingCall<Catalog_Empty, Catalog_Catalog>?
     private var cancellables = [AnyCancellable]()
+
+    // MARK: - CatalogItemsProvider
 
     func configure(host: String, port: Int) {
         guard clientConnection == nil else { return }
@@ -36,6 +40,8 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider {
                 )
             )
             .connect(host: host, port: port)
+
+        channel.connectivity.delegate = self
 
         clientConnection = channel
         client = Catalog_SourceClient(channel: channel)
@@ -75,6 +81,33 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider {
             .share()
             .eraseToAnyPublisher()
     }
+
+    func connectivity() -> AnyPublisher<ConnectionState, Never> {
+        connectivitySubject
+            .removeDuplicates()
+            .share()
+            .eraseToAnyPublisher()
+    }
+
+    // MARK: - ConnectivityStateDelegate
+
+    func connectivityStateDidChange(
+        from oldState: ConnectivityState,
+        to newState: ConnectivityState
+    ) {
+        switch newState {
+        case .idle, .ready:
+            connectivitySubject.send(.ok)
+        case .connecting:
+            connectivitySubject.send(.connecting)
+        case .transientFailure:
+            connectivitySubject.send(.failure)
+        case .shutdown:
+            return
+        }
+    }
+
+    // MARK: - Private methods
 
     private static func mapError(_ error: Error) -> AppError {
         if let status = error as? GRPCStatus {
