@@ -16,44 +16,39 @@ protocol CatalogItemsProvider {
 
 final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDelegate {
 
+    private let catalogSourceClientFactory: CatalogSourceClientFactory
+
     private var client: Catalog_SourceClientProtocol?
-    private var clientConnection: ClientConnection?
     private var itemsSubject = PassthroughSubject<[CatalogItem], AppError>()
     private var connectivitySubject = PassthroughSubject<ConnectionState, Never>()
     private var call: ServerStreamingCall<Catalog_Empty, Catalog_Catalog>?
     private var cancellables = [AnyCancellable]()
 
+    // MARK: - Init
+
+    init(catalogSourceClientFactory: CatalogSourceClientFactory) {
+        self.catalogSourceClientFactory = catalogSourceClientFactory
+    }
+
     // MARK: - CatalogItemsProvider
 
     func configure(host: String, port: Int) {
-        guard clientConnection == nil else { return }
+        guard client == nil else { return }
 
-        let group = PlatformSupport.makeEventLoopGroup(loopCount: 1)
-
-        let channel = ClientConnection
-            .insecure(group: group)
-            .withKeepalive(
-                .init(
-                    interval: .seconds(120),
-                    timeout: .seconds(60),
-                    permitWithoutCalls: true
-                )
-            )
-            .connect(host: host, port: port)
-
-        channel.connectivity.delegate = self
-
-        clientConnection = channel
-        client = Catalog_SourceClient(channel: channel)
+        client = catalogSourceClientFactory.make(
+            host: host,
+            port: port,
+            connectivityStateDelegate: self
+        )
     }
 
     func disconnect() {
-        _ = clientConnection?.close()
+        _ = client?.channel.close()
     }
 
     func subscribe() -> AnyPublisher<[CatalogItem], AppError> {
         guard let client = client else {
-            return Fail(error: AppError.common(description: "Client is not configured")).eraseToAnyPublisher()
+            return Fail(error: AppError.common(description: Strings.clientIsNotConfigured)).eraseToAnyPublisher()
         }
 
         call = client.fetch(.init(), callOptions: .none) { [weak self] catalog in
@@ -115,22 +110,22 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
         } else if let error = error as? AppError {
             return error
         } else {
-            return .common(description: "Something went wrong")
+            return .common(description: Strings.commonError)
         }
     }
 
     private static func mapGRPCStatus(_ status: GRPCStatus) -> AppError {
         switch status.code {
         case .internalError:
-            return .businessLogic("Server internal error has occured")
+            return .businessLogic(Strings.internalError)
         case .cancelled:
-            return .businessLogic("Connection has been cancelled")
+            return .businessLogic(Strings.cancelled)
         case .aborted:
-            return .businessLogic("Connection has been aborted")
+            return .businessLogic(Strings.aborted)
         case .unavailable:
-            return .businessLogic("Server is not avaliable")
+            return .businessLogic(Strings.unavailable)
         default:
-            return .businessLogic("Something went wrong")
+            return .businessLogic(Strings.commonError)
         }
     }
 

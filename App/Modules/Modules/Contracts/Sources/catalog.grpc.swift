@@ -92,6 +92,51 @@ public final class Catalog_SourceClient: Catalog_SourceClientProtocol {
   }
 }
 
+public final class Catalog_SourceTestClient: Catalog_SourceClientProtocol {
+  private let fakeChannel: FakeChannel
+  public var defaultCallOptions: CallOptions
+  public var interceptors: Catalog_SourceClientInterceptorFactoryProtocol?
+
+  public var channel: GRPCChannel {
+    return self.fakeChannel
+  }
+
+  public init(
+    fakeChannel: FakeChannel = FakeChannel(),
+    defaultCallOptions callOptions: CallOptions = CallOptions(),
+    interceptors: Catalog_SourceClientInterceptorFactoryProtocol? = nil
+  ) {
+    self.fakeChannel = fakeChannel
+    self.defaultCallOptions = callOptions
+    self.interceptors = interceptors
+  }
+
+  /// Make a streaming response for the fetch RPC. This must be called
+  /// before calling 'fetch'. See also 'FakeStreamingResponse'.
+  ///
+  /// - Parameter requestHandler: a handler for request parts sent by the RPC.
+  public func makefetchResponseStream(
+    _ requestHandler: @escaping (FakeRequestPart<Catalog_Empty>) -> () = { _ in }
+  ) -> FakeStreamingResponse<Catalog_Empty, Catalog_Catalog> {
+    return self.fakeChannel.makeFakeStreamingResponse(path: "/Catalog.Source/fetch", requestHandler: requestHandler)
+  }
+
+  public func enqueuefetchResponses(
+    _ responses: [Catalog_Catalog],
+    _ requestHandler: @escaping (FakeRequestPart<Catalog_Empty>) -> () = { _ in }
+  )  {
+    let stream = self.makefetchResponseStream(requestHandler)
+    // These are the only operation on the stream; try! is fine.
+    responses.forEach { try! stream.sendMessage($0) }
+    try! stream.sendEnd()
+  }
+
+  /// Returns true if there are response streams enqueued for 'fetch'
+  public var hasfetchResponsesRemaining: Bool {
+    return self.fakeChannel.hasFakeResponseEnqueued(forPath: "/Catalog.Source/fetch")
+  }
+}
+
 /// To build a server, implement a class that conforms to this protocol.
 public protocol Catalog_SourceProvider: CallHandlerProvider {
   var interceptors: Catalog_SourceServerInterceptorFactoryProtocol? { get }

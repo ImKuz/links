@@ -36,10 +36,6 @@ final class CatalogClientImpl: ConnectionObservable, CatalogClient {
         return self.provider.subscribe()
     }
 
-    func connectivity() -> AnyPublisher<ConnectionState, Never> {
-        provider.connectivity()
-    }
-
     // MARK: - Private methods
 
     private func configureIfNeeded(host: String, port: Int) {

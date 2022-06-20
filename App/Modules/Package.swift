@@ -4,7 +4,7 @@ import PackageDescription
 
 // MARK: - Public
 
-enum Module: String, CaseIterable, Equatable {
+enum Module: String, CaseIterable, Equatable, Hashable {
     case CatalogClient
     case CatalogServer
     case CatalogSource
@@ -66,6 +66,10 @@ let dependencyMap: [Module: [Dependency]] = [
     .RemoteFeature: [
         .module(.CatalogServer),
     ],
+]
+
+let unitTestCoveredModules: Set<Module> = [
+    .CatalogClient
 ]
 
 let commonModuleDependencies: [Dependency] = [
@@ -148,13 +152,25 @@ let packageContent: [(Product, [Target])] = {
 
         let product = Product.library(name: moduleName, targets: [moduleName])
 
-        let target = Target.target(
-            name: moduleName,
-            dependencies: targetDependencies,
-            path: "Modules\(isFeature ? "/Features" : "")/\(moduleName)/Sources"
-        )
+        var targets = [
+            Target.target(
+                name: moduleName,
+                dependencies: targetDependencies,
+                path: "Modules\(isFeature ? "/Features" : "")/\(moduleName)/Sources"
+            )
+        ]
 
-        array.append((product, [target]))
+        if unitTestCoveredModules.contains(module) {
+            targets.append(
+                Target.testTarget(
+                    name: moduleName + "UnitTests",
+                    dependencies: targetDependencies + [.init(stringLiteral: moduleName)],
+                    path: "Modules\(isFeature ? "/Features" : "")/\(moduleName)/UnitTests"
+                )
+            )
+        }
+
+        array.append((product, targets))
     }
 
     // Assembler module
