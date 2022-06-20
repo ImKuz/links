@@ -13,9 +13,14 @@ final class DatabaseCatalogSource: CatalogSource {
     private var itemsSubject = PassthroughSubject<IdentifiedArrayOf<Database.CatalogItem>, AppError>()
     private var cancellables = [AnyCancellable]()
     private let databaseService: DatabaseService
+    private let topLevelPredicate: NSPredicate?
 
-    init(databaseService: DatabaseService) {
+    init(
+        databaseService: DatabaseService,
+        topLevelPredicate: NSPredicate?
+    ) {
         self.databaseService = databaseService
+        self.topLevelPredicate = topLevelPredicate
     }
 
     // MARK: - CatalogSource
@@ -101,7 +106,10 @@ final class DatabaseCatalogSource: CatalogSource {
     private func fetchItems() -> AnyPublisher<[Database.CatalogItem], Error> {
         databaseService.fetch(
             Database.CatalogItem.self,
-            request: .init(sortDescriptor: .init(key: "index", ascending: true))
+            request: .init(
+                sortDescriptor: .init(key: "index", ascending: true),
+                predicate: topLevelPredicate
+            )
         )
     }
 

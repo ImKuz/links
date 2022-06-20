@@ -2,6 +2,7 @@ import Swinject
 import CatalogClient
 import Database
 import SharedInterfaces
+import Foundation
 
 public struct CatalogSourceAssembly: Assembly {
 
@@ -16,10 +17,18 @@ public struct CatalogSourceAssembly: Assembly {
 private extension CatalogSourceAssembly {
     
     func registerLocalSource(container: Container) {
-        container.register(CatalogSource.self, name: "local") { resolver in
+        let factory: (Resolver, NSPredicate?) -> CatalogSource = { resolver, topLevelPredicate in
             let databaseService = resolver.resolve(DatabaseService.self)!
-            return DatabaseCatalogSource(databaseService: databaseService)
+
+            return DatabaseCatalogSource(
+                databaseService: databaseService,
+                topLevelPredicate: topLevelPredicate
+            )
         }
+
+        container
+            .register(CatalogSource.self, name: "local", factory: factory)
+            .inObjectScope(.transient)
     }
 
     func registerRemoteSource(container: Container) {
@@ -28,6 +37,8 @@ private extension CatalogSourceAssembly {
             return RemoteCatalogSource(client: client)
         }
 
-        container.register(CatalogSource.self, name: "remote", factory: factory)
+        container
+            .register(CatalogSource.self, name: "remote", factory: factory)
+            .inObjectScope(.transient)
     }
 }

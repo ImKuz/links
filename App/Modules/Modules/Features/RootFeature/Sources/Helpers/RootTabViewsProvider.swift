@@ -27,7 +27,12 @@ final class RootTabViewsProviderImpl: RootTabViewsProvider {
         case .local:
             let navigationController = UINavigationController()
             let router = container.resolve(Router.self, argument: navigationController)!
-            let input = CatalogFeatureInterface.Input(router: router, credentials: nil)
+
+            let input = CatalogFeatureInterface.Input(
+                router: router,
+                title: "Local",
+                mode: .local(.init(topLevelPredicate: nil))
+            )
 
             let catalogView = container.resolve(
                 CatalogFeatureInterface.self,

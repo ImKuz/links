@@ -23,29 +23,14 @@ public struct CatalogFeatureAssembly: Assembly {
 
     private func registerCatalog(kind: CatalogKind, container: Container) {
         let factory: (Resolver, CatalogFeatureInterface.Input) -> CatalogFeatureInterface = { resolver, input in
-            let source = Self.dataSource(
-                resolver: resolver,
-                input: input,
-                kind: kind
-            )
-
-            let title: String = {
-                switch kind {
-                case .local:
-                    return "Local"
-                case .remote:
-                    return "Remote"
-                }
-            }()
-
-            let isLocal = kind == .local
+            let source = Self.dataSource(resolver: resolver, input: input)
 
             return createModule(
                 container: container,
                 source: source,
                 router: input.router,
-                title: title,
-                isLocal: isLocal
+                title: input.title,
+                isLocal: kind == .local
             )
         }
 
@@ -58,21 +43,20 @@ public struct CatalogFeatureAssembly: Assembly {
 
     private static func dataSource(
         resolver: Resolver,
-        input: CatalogFeatureInterface.Input,
-        kind: CatalogKind
+        input: CatalogFeatureInterface.Input
     ) -> CatalogSource {
-        switch kind {
-        case .local:
-            return resolver.resolve(CatalogSource.self, name: "local")!
-        case .remote:
-            guard let creds = input.credentials else {
-                fatalError("Attempt to create remote CatalogSource without credentials!")
-            }
-
+        switch input.mode {
+        case let .local(config):
+            return resolver.resolve(
+                CatalogSource.self,
+                name: "local",
+                argument: config.topLevelPredicate
+            )!
+        case let .remote(config):
             return resolver.resolve(
                 CatalogSource.self,
                 name: "remote",
-                arguments: creds.host, creds.port
+                arguments: config.host, config.port
             )!
         }
     }

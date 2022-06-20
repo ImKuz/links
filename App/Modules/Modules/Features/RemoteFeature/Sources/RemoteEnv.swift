@@ -75,7 +75,16 @@ final class RemoteEnvImpl: RemoteEnv {
     ) {
         defer { rememberOptionIfNeeded(option: .client) }
 
-        let input = CatalogFeatureInterface.Input(router: router, credentials: (host, port))
+        let input = CatalogFeatureInterface.Input(
+            router: router,
+            title: "Remote",
+            mode: .remote(
+                CatalogFeatureInterface.RemoteModeConfig(
+                    host: host,
+                    port: port
+                )
+            )
+        )
 
         guard let interface = container.resolve(
             CatalogFeatureInterface.self,
