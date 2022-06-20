@@ -45,7 +45,7 @@ public extension CatalogSource {
     }
 
     func add(item: CatalogItem) -> AnyPublisher<Void, AppError> {
-        guard permissions.contains(.write) else {
+        guard permissions.contains(.add) else {
             return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
         }
 
