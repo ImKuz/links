@@ -26,6 +26,16 @@ public final class CatalogItem:
         self.content = content
         self.isFavorite = isFavorite
     }
+
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? Self else { return false }
+
+        return
+            other.id == id &&
+            other.name == name &&
+            other.content == content &&
+            other.isFavorite == isFavorite
+    }
 }
 
 public extension CatalogItem {

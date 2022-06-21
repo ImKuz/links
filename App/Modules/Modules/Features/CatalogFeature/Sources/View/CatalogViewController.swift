@@ -153,9 +153,7 @@ final class CatalogViewController: UICollectionViewController {
 
         return zip(current, new)
             .allSatisfy { lhs, rhs in
-                lhs.id == rhs.id &&
-                lhs.name == rhs.name &&
-                lhs.content == rhs.content
+                lhs.isEqual(rhs)
             }
     }
 

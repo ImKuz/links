@@ -24,6 +24,8 @@ final class DatabaseCatalogSource: CatalogSource {
         self.databaseService = databaseService
         self.topLevelPredicate = topLevelPredicate
         self.favoritesCatalogSourceHelper = favoritesCatalogSourceHelper
+
+        subscribeToDatabaseUpdates()
     }
 
     // MARK: - CatalogSource
@@ -56,9 +58,6 @@ final class DatabaseCatalogSource: CatalogSource {
                 try context.updateIndices(from: Int(item.index))
                 try context.save()
             }
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.updateItems()
-            })
             .mapError { _ in AppError.businessLogic("Unable to delete items") }
             .eraseToAnyPublisher()
     }
@@ -79,9 +78,6 @@ final class DatabaseCatalogSource: CatalogSource {
                         try context.updateIndices(items: &newItems, offset: min(from, to))
                         try context.save()
                     }
-                    .handleEvents(receiveOutput: { [weak self] in
-                        self?.updateItems()
-                    })
                     .mapError { _ in AppError.businessLogic("Unable to move items") }
                     .eraseToAnyPublisher()
             }
@@ -95,9 +91,6 @@ final class DatabaseCatalogSource: CatalogSource {
                 try context.create(item.convertToEntity(withIndex: 0))
                 try context.save()
             }
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.updateItems()
-            })
             .mapError { _ in
                 AppError.businessLogic("Unable to add item")
             }
@@ -105,10 +98,21 @@ final class DatabaseCatalogSource: CatalogSource {
     }
 
     func setIsFavorite(id: Models.CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
-        favoritesCatalogSourceHelper.setIsFavorite(id: id, isFavorite: isFavorite)
+        favoritesCatalogSourceHelper
+            .setIsFavorite(id: id, isFavorite: isFavorite)
+
     }
 
     // MARK: - Private methods
+
+    private func subscribeToDatabaseUpdates() {
+        databaseService
+            .contentUpdatePublisher
+            .sink { [weak self] in
+                self?.updateItems()
+            }
+            .store(in: &cancellables)
+    }
 
     private func fetchItems() -> AnyPublisher<[Database.CatalogItem], Error> {
         databaseService.fetch(
@@ -120,7 +124,7 @@ final class DatabaseCatalogSource: CatalogSource {
         )
     }
 
-    private func updateItems(completion: (() -> ())? = nil) {
+    private func updateItems() {
         fetchItems()
             .mapError { _ in
                 AppError.common(description: "Unable to update items")

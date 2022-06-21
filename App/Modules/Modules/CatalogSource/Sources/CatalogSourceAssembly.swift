@@ -9,6 +9,7 @@ public struct CatalogSourceAssembly: Assembly {
     public init() {}
 
     public func assemble(container: Container) {
+        registerHelpers(container: container)
         registerLocalSource(container: container)
         registerRemoteSource(container: container)
     }

@@ -64,6 +64,12 @@ final class CatalogEnvImpl: CatalogEnv {
             .eraseToEffect()
     }
 
+    func setIsFavorite(id: CatalogItem.ID, isFavorite: Bool) -> Effect<Void, AppError> {
+        catalogSource
+            .setIsFavorite(id: id, isFavorite: isFavorite)
+            .eraseToEffect()
+    }
+
     func handleContent(_ content: CatalogItemContent) -> Effect<Void, Never> {
         switch content {
         case let .link(url):

@@ -27,7 +27,23 @@ final class CatalogRowMenuActionsProviderImpl: CatalogRowMenuActionsProvider {
         }
 
         if env.permissions.contains(.favorites) {
+            let action: CatalogState.RowMenuAction
 
+            if item.isFavorite {
+                action = .init(
+                    iconName: "star.slash",
+                    title: "Remove from favorites",
+                    action: .setIsFavorite(false)
+                )
+            } else {
+                action = .init(
+                    iconName: "star",
+                    title: "Add to favorites",
+                    action: .setIsFavorite(true)
+                )
+            }
+
+            menuActions.append(action)
         }
 
         if env.permissions.contains(.modify) {

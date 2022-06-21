@@ -33,13 +33,13 @@ struct CatalogReducerFactory {
 
                     let connectivityUpdates = env
                         .observeConnectivity()
-                        .print()
                         .receive(on: DispatchQueue.main)
                         .eraseToEffect(CatalogAction.handleConnectionStateChange)
                         .cancellable(id: ID.connectivity)
 
                     return itemsUpdates
                         .merge(with: connectivityUpdates)
+                        .print()
                         .eraseToEffect()
                 case let .handleConnectionStateChange(connectionState):
                     switch connectionState {
@@ -173,6 +173,11 @@ struct CatalogReducerFactory {
 
             return env
                 .delete(temp)
+                .receive(on: DispatchQueue.main)
+                .fireAndForget()
+        case let .setIsFavorite(isFaviorite):
+            return env
+                .setIsFavorite(id: itemId, isFavorite: isFaviorite)
                 .receive(on: DispatchQueue.main)
                 .fireAndForget()
         }

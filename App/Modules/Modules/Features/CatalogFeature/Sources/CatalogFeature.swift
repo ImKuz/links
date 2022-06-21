@@ -32,6 +32,7 @@ protocol CatalogEnv: AnyObject {
     func delete(_ item: CatalogItem) -> Effect<Void, AppError>
     func move(_ from: Int, _ to: Int) -> Effect<Void, AppError>
     func add(_ item: CatalogItem) -> Effect<Void, AppError>
+    func setIsFavorite(id: CatalogItem.ID, isFavorite: Bool) -> Effect<Void, AppError>
 
     func handleContent(_ content: CatalogItemContent) -> Effect<Void, Never>
     func copyContent(_ content: String) -> Effect<Void, Never>
