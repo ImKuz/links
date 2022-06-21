@@ -15,14 +15,23 @@ public struct CatalogSourceAssembly: Assembly {
 }
 
 private extension CatalogSourceAssembly {
+
+    func registerHelpers(container: Container) {
+        container.register(FavoritesCatalogSourceHelper.self) { resolver in
+            let database = resolver.resolve(DatabaseService.self)!
+            return FavoritesCatalogSourceHelperImpl(databaseService: database)
+        }
+    }
     
     func registerLocalSource(container: Container) {
         let factory: (Resolver, NSPredicate?) -> CatalogSource = { resolver, topLevelPredicate in
             let databaseService = resolver.resolve(DatabaseService.self)!
+            let helper = resolver.resolve(FavoritesCatalogSourceHelper.self)!
 
             return DatabaseCatalogSource(
                 databaseService: databaseService,
-                topLevelPredicate: topLevelPredicate
+                topLevelPredicate: topLevelPredicate,
+                favoritesCatalogSourceHelper: helper
             )
         }
 
@@ -34,7 +43,12 @@ private extension CatalogSourceAssembly {
     func registerRemoteSource(container: Container) {
         let factory: (Resolver, String, Int) -> CatalogSource = { resolver, host, port in
             let client = resolver.resolve(CatalogClient.self, arguments: host, port)!
-            return RemoteCatalogSource(client: client)
+            let helper = resolver.resolve(FavoritesCatalogSourceHelper.self)!
+
+            return RemoteCatalogSource(
+                client: client,
+                favoritesCatalogSourceHelper: helper
+            )
         }
 
         container

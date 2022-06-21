@@ -14,13 +14,16 @@ final class DatabaseCatalogSource: CatalogSource {
     private var cancellables = [AnyCancellable]()
     private let databaseService: DatabaseService
     private let topLevelPredicate: NSPredicate?
+    private let favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
 
     init(
         databaseService: DatabaseService,
-        topLevelPredicate: NSPredicate?
+        topLevelPredicate: NSPredicate?,
+        favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
     ) {
         self.databaseService = databaseService
         self.topLevelPredicate = topLevelPredicate
+        self.favoritesCatalogSourceHelper = favoritesCatalogSourceHelper
     }
 
     // MARK: - CatalogSource
@@ -102,25 +105,7 @@ final class DatabaseCatalogSource: CatalogSource {
     }
 
     func setIsFavorite(id: Models.CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
-        databaseService
-            .write { context in
-                let items = try context.read(
-                    type: Database.CatalogItem.self,
-                    request: .init(predicate: .init(format: "itemId == %@", id.description))
-                )
-
-                guard let entity = items.first else { return }
-
-                entity.isFavorite = isFavorite
-
-                try context.update(entity)
-                try context.save()
-            }
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.updateItems()
-            })
-            .mapError { _ in AppError.businessLogic("Unable to delete items") }
-            .eraseToAnyPublisher()
+        favoritesCatalogSourceHelper.setIsFavorite(id: id, isFavorite: isFavorite)
     }
 
     // MARK: - Private methods

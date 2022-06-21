@@ -7,16 +7,21 @@ import SharedInterfaces
 
 final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
 
-    private let client: CatalogClient
-
     let permissions: CatalogDataSourcePermissions = .read
+
+    private let client: CatalogClient
+    private let favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
 
     var connectivityPublisher: AnyPublisher<ConnectionState, Never> {
         client.connectivityPublisher
     }
 
-    init(client: CatalogClient) {
+    init(
+        client: CatalogClient,
+        favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
+    ) {
         self.client = client
+        self.favoritesCatalogSourceHelper = favoritesCatalogSourceHelper
     }
 
     func subscribe() -> AnyPublisher<IdentifiedArrayOf<CatalogItem>, AppError> {
@@ -27,6 +32,6 @@ final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
     }
 
     func setIsFavorite(id: CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
-        Empty().eraseToAnyPublisher()
+        favoritesCatalogSourceHelper.setIsFavorite(id: id, isFavorite: isFavorite)
     }
 }
