@@ -25,4 +25,8 @@ final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
             .map { IdentifiedArrayOf(uniqueElements: $0) }
             .eraseToAnyPublisher()
     }
+
+    func setIsFavorite(id: CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+        Empty().eraseToAnyPublisher()
+    }
 }

@@ -9,6 +9,7 @@ public final class CatalogItem:
     public let id: String
     public let _name: String?
     public let content: CatalogItemContent
+    public let isFavorite: Bool
 
     public var name: String {
         _name ?? nameFromContent()
@@ -17,11 +18,13 @@ public final class CatalogItem:
     public init(
         id: String,
         name: String?,
-        content: CatalogItemContent
+        content: CatalogItemContent,
+        isFavorite: Bool
     ) {
         self.id = id
         self._name = name
         self.content = content
+        self.isFavorite = isFavorite
     }
 }
 
@@ -31,7 +34,8 @@ public extension CatalogItem {
         self.init(
             id: UUID().uuidString,
             name: name,
-            content: .link(link)
+            content: .link(link),
+            isFavorite: false
         )
     }
 
@@ -39,7 +43,8 @@ public extension CatalogItem {
         self.init(
             id: UUID().uuidString,
             name: name,
-            content: .text(text)
+            content: .text(text),
+            isFavorite: false
         )
     }
 }
@@ -50,7 +55,8 @@ public extension CatalogItem {
         return .init(
             id: id,
             name: name ?? self.name,
-            content: content ?? self.content
+            content: content ?? self.content,
+            isFavorite: self.isFavorite
         )
     }
 

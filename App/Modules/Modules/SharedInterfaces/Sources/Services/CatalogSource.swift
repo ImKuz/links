@@ -11,6 +11,8 @@ public protocol CatalogSource: AnyObject {
     func delete(_ item: CatalogItem) -> AnyPublisher<Void, AppError>
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError>
     func add(item: CatalogItem) -> AnyPublisher<Void, AppError>
+
+    func setIsFavorite(id: Models.CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError>
 }
 
 public extension CatalogSource {
@@ -27,7 +29,7 @@ public extension CatalogSource {
     }
 
     func delete(_ item: CatalogItem) -> AnyPublisher<Void, AppError> {
-        guard permissions.contains(.delete) else {
+        guard permissions.contains(.modify) else {
             return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
         }
 
@@ -36,7 +38,7 @@ public extension CatalogSource {
     }
 
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError> {
-        guard permissions.contains(.move) else {
+        guard permissions.contains(.modify) else {
             return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
         }
 

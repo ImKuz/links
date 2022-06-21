@@ -1,4 +1,5 @@
 import Swinject
+import Database
 
 public struct CatalogClientAssembly: Assembly {
 
@@ -8,9 +9,13 @@ public struct CatalogClientAssembly: Assembly {
 
         let factory: (Resolver, String, Int) -> CatalogClient = { resolver, host, port in
             let catalogSourceClientFactory = CatalogSourceClientFactoryImpl()
+            let localCatalogFavoritesProvider = LocalCatalogFavoritesProviderImpl(
+                database: resolver.resolve(DatabaseService.self)!
+            )
 
             let provider = CatalogItemsProviderImpl(
-                catalogSourceClientFactory: catalogSourceClientFactory
+                catalogSourceClientFactory: catalogSourceClientFactory,
+                localCatalogFavoritesProvider: localCatalogFavoritesProvider
             )
 
             return CatalogClientImpl(

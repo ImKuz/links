@@ -109,7 +109,7 @@ struct CatalogReducerFactory {
     // MARK: - Row action
 
     private func setupState(state: inout CatalogState, env: CatalogEnv) {
-        state.canMoveItems = env.permissions.contains(.move)
+        state.canMoveItems = env.permissions.contains(.modify)
 
         if env.permissions.contains(.add) {
             state.rightButton = .init(

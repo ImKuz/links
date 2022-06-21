@@ -26,7 +26,11 @@ final class CatalogRowMenuActionsProviderImpl: CatalogRowMenuActionsProvider {
             )
         }
 
-        if env.permissions.contains(.delete) {
+        if env.permissions.contains(.favorites) {
+
+        }
+
+        if env.permissions.contains(.modify) {
             menuActions.append(
                 .init(
                     iconName: "trash",

@@ -101,6 +101,28 @@ final class DatabaseCatalogSource: CatalogSource {
             .eraseToAnyPublisher()
     }
 
+    func setIsFavorite(id: Models.CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+        databaseService
+            .write { context in
+                let items = try context.read(
+                    type: Database.CatalogItem.self,
+                    request: .init(predicate: .init(format: "itemId == %@", id.description))
+                )
+
+                guard let entity = items.first else { return }
+
+                entity.isFavorite = isFavorite
+
+                try context.update(entity)
+                try context.save()
+            }
+            .handleEvents(receiveOutput: { [weak self] in
+                self?.updateItems()
+            })
+            .mapError { _ in AppError.businessLogic("Unable to delete items") }
+            .eraseToAnyPublisher()
+    }
+
     // MARK: - Private methods
 
     private func fetchItems() -> AnyPublisher<[Database.CatalogItem], Error> {
@@ -236,7 +258,8 @@ private extension Database.CatalogItem {
         return .init(
             id: itemId,
             name: name,
-            content: itemContent
+            content: itemContent,
+            isFavorite: isFavorite
         )
     }
 }
