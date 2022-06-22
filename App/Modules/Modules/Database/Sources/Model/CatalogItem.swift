@@ -1,6 +1,6 @@
 import ToolKit
 
-public struct CatalogItem: PersistableEntity {
+public class CatalogItem: PersistableEntity {
 
     public typealias ModelObject = CatalogItemEntity
 
@@ -9,7 +9,7 @@ public struct CatalogItem: PersistableEntity {
     public let name: String?
     public let content: String
     public let contentType: String
-    public let isFavorite: Bool
+    public var isFavorite: Bool
     public var index: Int16
     public let remoteServerId: String?
 
@@ -33,7 +33,7 @@ public struct CatalogItem: PersistableEntity {
         self.remoteServerId = remoteServerId
     }
 
-    public init?(object: ModelObject) {
+    required public init?(object: ModelObject) {
         guard
             let storeId = object.storeId,
             let itemId = object.itemId,

@@ -14,13 +14,18 @@ final class DatabaseCatalogSource: CatalogSource {
     private var cancellables = [AnyCancellable]()
     private let databaseService: DatabaseService
     private let topLevelPredicate: NSPredicate?
+    private let favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
 
     init(
         databaseService: DatabaseService,
-        topLevelPredicate: NSPredicate?
+        topLevelPredicate: NSPredicate?,
+        favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
     ) {
         self.databaseService = databaseService
         self.topLevelPredicate = topLevelPredicate
+        self.favoritesCatalogSourceHelper = favoritesCatalogSourceHelper
+
+        subscribeToDatabaseUpdates()
     }
 
     // MARK: - CatalogSource
@@ -53,9 +58,6 @@ final class DatabaseCatalogSource: CatalogSource {
                 try context.updateIndices(from: Int(item.index))
                 try context.save()
             }
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.updateItems()
-            })
             .mapError { _ in AppError.businessLogic("Unable to delete items") }
             .eraseToAnyPublisher()
     }
@@ -76,9 +78,6 @@ final class DatabaseCatalogSource: CatalogSource {
                         try context.updateIndices(items: &newItems, offset: min(from, to))
                         try context.save()
                     }
-                    .handleEvents(receiveOutput: { [weak self] in
-                        self?.updateItems()
-                    })
                     .mapError { _ in AppError.businessLogic("Unable to move items") }
                     .eraseToAnyPublisher()
             }
@@ -92,16 +91,27 @@ final class DatabaseCatalogSource: CatalogSource {
                 try context.create(item.convertToEntity(withIndex: 0))
                 try context.save()
             }
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.updateItems()
-            })
             .mapError { _ in
                 AppError.businessLogic("Unable to add item")
             }
             .eraseToAnyPublisher()
     }
 
+    func setIsFavorite(item: Models.CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+        favoritesCatalogSourceHelper
+            .setIsFavorite(item: item, isFavorite: isFavorite)
+    }
+
     // MARK: - Private methods
+
+    private func subscribeToDatabaseUpdates() {
+        databaseService
+            .contentUpdatePublisher
+            .sink { [weak self] in
+                self?.updateItems()
+            }
+            .store(in: &cancellables)
+    }
 
     private func fetchItems() -> AnyPublisher<[Database.CatalogItem], Error> {
         databaseService.fetch(
@@ -113,7 +123,7 @@ final class DatabaseCatalogSource: CatalogSource {
         )
     }
 
-    private func updateItems(completion: (() -> ())? = nil) {
+    private func updateItems() {
         fetchItems()
             .mapError { _ in
                 AppError.common(description: "Unable to update items")
@@ -187,7 +197,7 @@ private extension Database.Context {
 
 // MARK: - Mapping
 
-private extension Models.CatalogItem {
+extension Models.CatalogItem {
 
     func convertToEntity(withIndex index: Int) -> Database.CatalogItem {
         let contentString: String
@@ -215,7 +225,7 @@ private extension Models.CatalogItem {
     }
 }
 
-private extension Database.CatalogItem {
+extension Database.CatalogItem {
 
     func convertToModel() -> Models.CatalogItem {
         let itemContent: CatalogItemContent
@@ -236,7 +246,8 @@ private extension Database.CatalogItem {
         return .init(
             id: itemId,
             name: name,
-            content: itemContent
+            content: itemContent,
+            isFavorite: isFavorite
         )
     }
 }

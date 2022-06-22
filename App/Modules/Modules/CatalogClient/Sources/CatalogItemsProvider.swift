@@ -17,6 +17,7 @@ protocol CatalogItemsProvider {
 final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDelegate {
 
     private let catalogSourceClientFactory: CatalogSourceClientFactory
+    private let localCatalogFavoritesProvider: LocalCatalogFavoritesProvider
 
     private var client: Catalog_SourceClientProtocol?
     private var itemsSubject = PassthroughSubject<[CatalogItem], AppError>()
@@ -26,8 +27,12 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
 
     // MARK: - Init
 
-    init(catalogSourceClientFactory: CatalogSourceClientFactory) {
+    init(
+        catalogSourceClientFactory: CatalogSourceClientFactory,
+        localCatalogFavoritesProvider: LocalCatalogFavoritesProvider
+    ) {
         self.catalogSourceClientFactory = catalogSourceClientFactory
+        self.localCatalogFavoritesProvider = localCatalogFavoritesProvider
     }
 
     // MARK: - CatalogItemsProvider
@@ -52,8 +57,15 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
         }
 
         call = client.fetch(.init(), callOptions: .none) { [weak self] catalog in
-            let items = Self.mapCatalog(catalog)
-            self?.itemsSubject.send(items)
+            guard let self = self else { return }
+
+            self.localCatalogFavoritesProvider
+                .favorites()
+                .sink { [weak self, catalog] favorites in
+                    let items = Self.mapCatalog(catalog: catalog, favorites: favorites)
+                    self?.itemsSubject.send(items)
+                }
+                .store(in: &self.cancellables)
         }
 
         call?.status.whenComplete { [weak self] in
@@ -129,7 +141,10 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
         }
     }
 
-    private static func mapCatalog(_ catalog: Catalog_Catalog) -> [CatalogItem] {
+    private static func mapCatalog(
+        catalog: Catalog_Catalog,
+        favorites: Set<String>
+    ) -> [CatalogItem] {
         catalog.items.compactMap { item in
             switch item.kind {
             case .group:
@@ -139,13 +154,15 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
                 return .init(
                     id: link.id,
                     name: link.name,
-                    content: .link(url)
+                    content: .link(url),
+                    isFavorite: favorites.contains(link.id)
                 )
             case let .snippet(snippet):
                 return .init(
                     id: snippet.id,
                     name: snippet.name,
-                    content: .text(snippet.content)
+                    content: .text(snippet.content),
+                    isFavorite: favorites.contains(snippet.id)
                 )
             case .none:
                 return .none

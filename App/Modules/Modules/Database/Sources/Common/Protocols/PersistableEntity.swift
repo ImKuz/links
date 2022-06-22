@@ -1,6 +1,6 @@
 import CoreData
 
-public protocol PersistableEntity {
+public protocol PersistableEntity: AnyObject {
 
     var storeId: String { get }
 

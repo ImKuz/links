@@ -138,7 +138,8 @@ private extension Database.CatalogItem {
         return .init(
             id: itemId,
             name: name,
-            content: itemContent
+            content: itemContent,
+            isFavorite: isFavorite
         )
     }
 }

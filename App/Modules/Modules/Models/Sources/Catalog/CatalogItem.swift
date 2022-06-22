@@ -1,14 +1,15 @@
 import Foundation
 
-public final class CatalogItem:
-    NSObject,
+public struct CatalogItem:
+    Equatable,
     Identifiable,
     Codable
 {
-
     public let id: String
     public let _name: String?
     public let content: CatalogItemContent
+
+    public let isFavorite: Bool
 
     public var name: String {
         _name ?? nameFromContent()
@@ -17,29 +18,40 @@ public final class CatalogItem:
     public init(
         id: String,
         name: String?,
-        content: CatalogItemContent
+        content: CatalogItemContent,
+        isFavorite: Bool
     ) {
         self.id = id
         self._name = name
         self.content = content
+        self.isFavorite = isFavorite
+    }
+
+    public static func == (lhs: CatalogItem, rhs: CatalogItem) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.name == rhs.name &&
+        lhs.content == rhs.content &&
+        lhs.isFavorite == rhs.isFavorite
     }
 }
 
 public extension CatalogItem {
 
-    convenience init(name: String?, link: URL) {
+    init(name: String?, link: URL) {
         self.init(
             id: UUID().uuidString,
             name: name,
-            content: .link(link)
+            content: .link(link),
+            isFavorite: false
         )
     }
 
-    convenience init(name: String?, text: String) {
+    init(name: String?, text: String) {
         self.init(
             id: UUID().uuidString,
             name: name,
-            content: .text(text)
+            content: .text(text),
+            isFavorite: false
         )
     }
 }
@@ -50,7 +62,8 @@ public extension CatalogItem {
         return .init(
             id: id,
             name: name ?? self.name,
-            content: content ?? self.content
+            content: content ?? self.content,
+            isFavorite: self.isFavorite
         )
     }
 

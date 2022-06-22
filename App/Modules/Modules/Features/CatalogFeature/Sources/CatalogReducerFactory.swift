@@ -33,7 +33,6 @@ struct CatalogReducerFactory {
 
                     let connectivityUpdates = env
                         .observeConnectivity()
-                        .print()
                         .receive(on: DispatchQueue.main)
                         .eraseToEffect(CatalogAction.handleConnectionStateChange)
                         .cancellable(id: ID.connectivity)
@@ -109,9 +108,9 @@ struct CatalogReducerFactory {
     // MARK: - Row action
 
     private func setupState(state: inout CatalogState, env: CatalogEnv) {
-        state.canMoveItems = env.permissions.contains(.write)
+        state.canMoveItems = env.permissions.contains(.modify)
 
-        if env.permissions.contains(.write) {
+        if env.permissions.contains(.add) {
             state.rightButton = .init(
                 title: nil,
                 systemImageName: "plus",
@@ -173,6 +172,13 @@ struct CatalogReducerFactory {
 
             return env
                 .delete(temp)
+                .receive(on: DispatchQueue.main)
+                .fireAndForget()
+        case let .setIsFavorite(isFaviorite):
+            let item = state.items[index]
+
+            return env
+                .setIsFavorite(item: item, isFavorite: isFaviorite)
                 .receive(on: DispatchQueue.main)
                 .fireAndForget()
         }

@@ -9,20 +9,39 @@ public struct CatalogSourceAssembly: Assembly {
     public init() {}
 
     public func assemble(container: Container) {
+        registerHelpers(container: container)
         registerLocalSource(container: container)
         registerRemoteSource(container: container)
     }
 }
 
 private extension CatalogSourceAssembly {
+
+    func registerHelpers(container: Container) {
+        container
+            .register(FavoritesCatalogSourceHelper.self) { resolver in
+                let database = resolver.resolve(DatabaseService.self)!
+                return FavoritesCatalogSourceHelperImpl(databaseService: database)
+            }
+            .inObjectScope(.transient)
+
+        container
+            .register(RemoteCatalogSourceDatabaseBus.self) { resolver in
+                let database = resolver.resolve(DatabaseService.self)!
+                return RemoteCatalogSourceDatabaseBusImpl(databaseService: database)
+            }
+            .inObjectScope(.transient)
+    }
     
     func registerLocalSource(container: Container) {
         let factory: (Resolver, NSPredicate?) -> CatalogSource = { resolver, topLevelPredicate in
             let databaseService = resolver.resolve(DatabaseService.self)!
+            let helper = resolver.resolve(FavoritesCatalogSourceHelper.self)!
 
             return DatabaseCatalogSource(
                 databaseService: databaseService,
-                topLevelPredicate: topLevelPredicate
+                topLevelPredicate: topLevelPredicate,
+                favoritesCatalogSourceHelper: helper
             )
         }
 
@@ -34,7 +53,14 @@ private extension CatalogSourceAssembly {
     func registerRemoteSource(container: Container) {
         let factory: (Resolver, String, Int) -> CatalogSource = { resolver, host, port in
             let client = resolver.resolve(CatalogClient.self, arguments: host, port)!
-            return RemoteCatalogSource(client: client)
+            let helper = resolver.resolve(FavoritesCatalogSourceHelper.self)!
+            let bus = resolver.resolve(RemoteCatalogSourceDatabaseBus.self)!
+
+            return RemoteCatalogSource(
+                client: client,
+                favoritesCatalogSourceHelper: helper,
+                bus: bus
+            )
         }
 
         container

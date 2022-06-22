@@ -64,6 +64,12 @@ final class CatalogEnvImpl: CatalogEnv {
             .eraseToEffect()
     }
 
+    func setIsFavorite(item: CatalogItem, isFavorite: Bool) -> Effect<Void, AppError> {
+        catalogSource
+            .setIsFavorite(item: item, isFavorite: isFavorite)
+            .eraseToEffect()
+    }
+
     func handleContent(_ content: CatalogItemContent) -> Effect<Void, Never> {
         switch content {
         case let .link(url):
@@ -82,7 +88,7 @@ final class CatalogEnvImpl: CatalogEnv {
 
     func showForm() -> Effect<CatalogAction, Never> {
         guard
-            permissions.contains(.write),
+            permissions.contains(.add),
             let interface = container.resolve(AddItemFeatureInterface.self, argument: catalogSource)
         else {
             return .none

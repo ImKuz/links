@@ -38,6 +38,7 @@ let dependencyMap: [Module: [Dependency]] = [
         .module(.Models),
         .module(.Contracts),
         .module(.SharedInterfaces),
+        .module(.Database)
     ],
     .CatalogServer: [
         .module(.Models),
