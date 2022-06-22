@@ -12,7 +12,7 @@ public protocol CatalogSource: AnyObject {
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError>
     func add(item: CatalogItem) -> AnyPublisher<Void, AppError>
 
-    func setIsFavorite(id: Models.CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError>
+    func setIsFavorite(item: CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError>
 }
 
 public extension CatalogSource {

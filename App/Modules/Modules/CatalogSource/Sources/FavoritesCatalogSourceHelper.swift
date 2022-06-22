@@ -4,7 +4,7 @@ import ToolKit
 import Combine
 
 protocol FavoritesCatalogSourceHelper {
-    func setIsFavorite(id: Models.CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError>
+    func setIsFavorite(item: Models.CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError>
 }
 
 final class FavoritesCatalogSourceHelperImpl: FavoritesCatalogSourceHelper {
@@ -15,19 +15,23 @@ final class FavoritesCatalogSourceHelperImpl: FavoritesCatalogSourceHelper {
         self.databaseService = databaseService
     }
 
-    func setIsFavorite(id: Models.CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+    func setIsFavorite(item: Models.CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         databaseService
             .write { context in
                 let items = try context.read(
                     type: Database.CatalogItem.self,
-                    request: .init(predicate: .init(format: "itemId == %@", id.description))
+                    request: .init(predicate: .init(format: "itemId == %@", item.id))
                 )
 
-                guard let entity = items.first else { return }
+                if let entity = items.first {
+                    entity.isFavorite = isFavorite
+                    try context.update(entity)
+                } else if isFavorite {
+                    let entity = item.convertToEntity(withIndex: 0)
+                    entity.isFavorite = true
+                    try context.create(entity)
+                }
 
-                entity.isFavorite = isFavorite
-
-                try context.update(entity)
                 try context.save()
             }
             .mapError { _ in AppError.businessLogic("Unable to make item favorite") }

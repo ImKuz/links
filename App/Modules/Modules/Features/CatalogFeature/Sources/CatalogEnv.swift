@@ -64,9 +64,9 @@ final class CatalogEnvImpl: CatalogEnv {
             .eraseToEffect()
     }
 
-    func setIsFavorite(id: CatalogItem.ID, isFavorite: Bool) -> Effect<Void, AppError> {
+    func setIsFavorite(item: CatalogItem, isFavorite: Bool) -> Effect<Void, AppError> {
         catalogSource
-            .setIsFavorite(id: id, isFavorite: isFavorite)
+            .setIsFavorite(item: item, isFavorite: isFavorite)
             .eraseToEffect()
     }
 

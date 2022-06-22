@@ -97,10 +97,9 @@ final class DatabaseCatalogSource: CatalogSource {
             .eraseToAnyPublisher()
     }
 
-    func setIsFavorite(id: Models.CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+    func setIsFavorite(item: Models.CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         favoritesCatalogSourceHelper
-            .setIsFavorite(id: id, isFavorite: isFavorite)
-
+            .setIsFavorite(item: item, isFavorite: isFavorite)
     }
 
     // MARK: - Private methods
@@ -198,7 +197,7 @@ private extension Database.Context {
 
 // MARK: - Mapping
 
-private extension Models.CatalogItem {
+extension Models.CatalogItem {
 
     func convertToEntity(withIndex index: Int) -> Database.CatalogItem {
         let contentString: String
@@ -226,7 +225,7 @@ private extension Models.CatalogItem {
     }
 }
 
-private extension Database.CatalogItem {
+extension Database.CatalogItem {
 
     func convertToModel() -> Models.CatalogItem {
         let itemContent: CatalogItemContent

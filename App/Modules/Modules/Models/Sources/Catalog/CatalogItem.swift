@@ -1,14 +1,14 @@
 import Foundation
 
-public final class CatalogItem:
-    NSObject,
+public struct CatalogItem:
+    Equatable,
     Identifiable,
     Codable
 {
-
     public let id: String
     public let _name: String?
     public let content: CatalogItemContent
+
     public let isFavorite: Bool
 
     public var name: String {
@@ -27,20 +27,17 @@ public final class CatalogItem:
         self.isFavorite = isFavorite
     }
 
-    public override func isEqual(_ object: Any?) -> Bool {
-        guard let other = object as? Self else { return false }
-
-        return
-            other.id == id &&
-            other.name == name &&
-            other.content == content &&
-            other.isFavorite == isFavorite
+    public static func == (lhs: CatalogItem, rhs: CatalogItem) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.name == rhs.name &&
+        lhs.content == rhs.content &&
+        lhs.isFavorite == rhs.isFavorite
     }
 }
 
 public extension CatalogItem {
 
-    convenience init(name: String?, link: URL) {
+    init(name: String?, link: URL) {
         self.init(
             id: UUID().uuidString,
             name: name,
@@ -49,7 +46,7 @@ public extension CatalogItem {
         )
     }
 
-    convenience init(name: String?, text: String) {
+    init(name: String?, text: String) {
         self.init(
             id: UUID().uuidString,
             name: name,

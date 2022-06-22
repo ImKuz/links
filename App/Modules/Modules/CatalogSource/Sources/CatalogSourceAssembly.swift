@@ -18,10 +18,19 @@ public struct CatalogSourceAssembly: Assembly {
 private extension CatalogSourceAssembly {
 
     func registerHelpers(container: Container) {
-        container.register(FavoritesCatalogSourceHelper.self) { resolver in
-            let database = resolver.resolve(DatabaseService.self)!
-            return FavoritesCatalogSourceHelperImpl(databaseService: database)
-        }
+        container
+            .register(FavoritesCatalogSourceHelper.self) { resolver in
+                let database = resolver.resolve(DatabaseService.self)!
+                return FavoritesCatalogSourceHelperImpl(databaseService: database)
+            }
+            .inObjectScope(.transient)
+
+        container
+            .register(RemoteCatalogSourceDatabaseBus.self) { resolver in
+                let database = resolver.resolve(DatabaseService.self)!
+                return RemoteCatalogSourceDatabaseBusImpl(databaseService: database)
+            }
+            .inObjectScope(.transient)
     }
     
     func registerLocalSource(container: Container) {
@@ -45,10 +54,12 @@ private extension CatalogSourceAssembly {
         let factory: (Resolver, String, Int) -> CatalogSource = { resolver, host, port in
             let client = resolver.resolve(CatalogClient.self, arguments: host, port)!
             let helper = resolver.resolve(FavoritesCatalogSourceHelper.self)!
+            let bus = resolver.resolve(RemoteCatalogSourceDatabaseBus.self)!
 
             return RemoteCatalogSource(
                 client: client,
-                favoritesCatalogSourceHelper: helper
+                favoritesCatalogSourceHelper: helper,
+                bus: bus
             )
         }
 

@@ -7,10 +7,13 @@ import SharedInterfaces
 
 final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
 
-    let permissions: CatalogDataSourcePermissions = .read
+    let permissions: CatalogDataSourcePermissions = [.read, .favorites]
 
     private let client: CatalogClient
     private let favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
+    private let bus: RemoteCatalogSourceDatabaseBus
+
+    private var clientSubscription: AnyCancellable?
 
     var connectivityPublisher: AnyPublisher<ConnectionState, Never> {
         client.connectivityPublisher
@@ -18,20 +21,45 @@ final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
 
     init(
         client: CatalogClient,
-        favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
+        favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper,
+        bus: RemoteCatalogSourceDatabaseBus
     ) {
         self.client = client
         self.favoritesCatalogSourceHelper = favoritesCatalogSourceHelper
+        self.bus = bus
+    }
+
+    private func bindClientUpdates() {
+        bus.reset()
+        clientSubscription = client
+            .subscribe()
+            .map { IdentifiedArrayOf(uniqueElements: $0) }
+            .sink(
+                receiveCompletion: { [weak bus] in
+                    if case let .failure(error) = $0 {
+                        bus?.pass(error: error)
+                    }
+                },
+                receiveValue: { [weak bus] in
+                    bus?.pass(items: $0)
+                }
+            )
     }
 
     func subscribe() -> AnyPublisher<IdentifiedArrayOf<CatalogItem>, AppError> {
-        client
-            .subscribe()
-            .map { IdentifiedArrayOf(uniqueElements: $0) }
+        bindClientUpdates()
+
+        return bus.output
+            .removeDuplicates()
             .eraseToAnyPublisher()
     }
 
-    func setIsFavorite(id: CatalogItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
-        favoritesCatalogSourceHelper.setIsFavorite(id: id, isFavorite: isFavorite)
+    func setIsFavorite(item: CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+        favoritesCatalogSourceHelper
+            .setIsFavorite(item: item, isFavorite: isFavorite)
+            .handleEvents(receiveOutput: { [weak bus] _ in
+                bus?.synchronizeState()
+            })
+            .eraseToAnyPublisher()
     }
 }

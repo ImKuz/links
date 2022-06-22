@@ -53,7 +53,6 @@ final class CatalogViewController: UICollectionViewController {
 
         viewStore.publisher
             .items
-            .removeDuplicates()
             .sink { newItems in
                 weakSelf?.apllyDiff(newItems: newItems)
             }
@@ -122,7 +121,7 @@ final class CatalogViewController: UICollectionViewController {
 
     private func apllyDiff(newItems: IdentifiedArrayOf<CatalogItem>) {
         guard !isItemsEqual(current: currentItems, new: newItems) else { return }
-        
+
         let diff = newItems.difference(from: currentItems)
 
         var removeIndexPaths = [IndexPath]()
@@ -139,9 +138,13 @@ final class CatalogViewController: UICollectionViewController {
 
         currentItems = newItems
 
-        collectionView.performBatchUpdates {
-            collectionView.deleteItems(at: removeIndexPaths)
-            collectionView.insertItems(at: insertIndexPaths)
+        if insertIndexPaths.count == currentItems.count {
+            collectionView.reloadData()
+        } else {
+            collectionView.performBatchUpdates {
+                collectionView.deleteItems(at: removeIndexPaths)
+                collectionView.insertItems(at: insertIndexPaths)
+            }
         }
     }
 
@@ -152,9 +155,7 @@ final class CatalogViewController: UICollectionViewController {
         if current.count != new.count { return false }
 
         return zip(current, new)
-            .allSatisfy { lhs, rhs in
-                lhs.isEqual(rhs)
-            }
+            .allSatisfy { $0 == $1 }
     }
 
     // MARK: - UICollectionViewDataSource
