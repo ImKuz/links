@@ -39,6 +39,9 @@ struct ConnectFormView: View {
             }
             .padding(.top, 16)
             .background(Color(.secondarySystemBackground))
+            .onAppear {
+                viewStore.send(.viewDidAppear)
+            }
         }
     }
 }

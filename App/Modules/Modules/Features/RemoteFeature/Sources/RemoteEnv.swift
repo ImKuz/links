@@ -103,6 +103,8 @@ final class RemoteEnvImpl: RemoteEnv {
     func showConnectForm() -> Effect<(String, Int), Never> {
         Future<(String, Int), Never> { [weak self] promise in
             let form = ConnectFormFactory.make(
+                defaultHost: self?.userDefaults.value(forKey: UserDefaultsKeys.lastConnectedHost) as? String,
+                defaultPort: self?.userDefaults.value(forKey: UserDefaultsKeys.lastConnectedPort) as? Int,
                 onDone: { host, port in
                     self?.router.dismiss(isAnimated: true)
                     promise(.success((host, port)))

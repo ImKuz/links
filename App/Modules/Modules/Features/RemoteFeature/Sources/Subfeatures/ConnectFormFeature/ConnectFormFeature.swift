@@ -2,6 +2,7 @@ import ComposableArchitecture
 import ToolKit
 import Foundation
 import Models
+import Combine
 
 // MARK: - State
 
@@ -14,6 +15,8 @@ struct ConnectFormState: Equatable {
 // MARK: - Action
 
 enum ConnectFormAction: BindableAction {
+    case viewDidAppear
+    case validateState
     case binding(BindingAction<ConnectFormState>)
     case validationResult(Bool)
     case doneTap
@@ -33,7 +36,11 @@ protocol ConnectFormEnv {
 
 let connectFormReducer = Reducer<ConnectFormState, ConnectFormAction, ConnectFormEnv> { state, action, env in
     switch action {
+    case .viewDidAppear:
+        return Just(ConnectFormAction.validateState).eraseToEffect()
     case .binding:
+        return Just(ConnectFormAction.validateState).eraseToEffect()
+    case .validateState:
         return env
             .validateState(state)
             .eraseToEffect { .validationResult($0) }
