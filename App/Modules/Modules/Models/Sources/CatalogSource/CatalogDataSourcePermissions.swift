@@ -19,4 +19,8 @@ public struct CatalogDataSourcePermissions: OptionSet {
     public init(rawValue: UInt8) {
         self.rawValue = rawValue
     }
+
+    public mutating func override(with other: Self) {
+        self = self.intersection(other)
+    }
 }

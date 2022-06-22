@@ -23,14 +23,26 @@ final class RootTabViewsProviderImpl: RootTabViewsProvider {
     func view(for tabType: TabType) -> AnyView? {
         switch tabType {
         case .favorites:
+            let config = CatalogSourceConfig(
+                permissionsOverride: [.read, .favorites],
+                typeConfig: .local(
+                    .init(topLevelPredicate: NSPredicate(format: "isFavorite == YES"))
+                )
+            )
+
             return makeLocalCatalog(
                 title: "Favorites",
-                predicate: .init(format: "isFavorite == YES")
+                config: config
             )
         case .local:
+            let config = CatalogSourceConfig(
+                permissionsOverride: nil,
+                typeConfig: .local(.init(topLevelPredicate: nil))
+            )
+
             return makeLocalCatalog(
                 title: "Local",
-                predicate: nil
+                config: config
             )
         case .remote:
             return container.resolve(RemoteFeatureInterface.self)!.view
@@ -39,7 +51,7 @@ final class RootTabViewsProviderImpl: RootTabViewsProvider {
 
     private func makeLocalCatalog(
         title: String,
-        predicate: NSPredicate?
+        config: CatalogSourceConfig
     ) -> AnyView {
         let navigationController = UINavigationController()
         let router = container.resolve(Router.self, argument: navigationController)!
@@ -47,9 +59,7 @@ final class RootTabViewsProviderImpl: RootTabViewsProvider {
         let input = CatalogFeatureInterface.Input(
             router: router,
             title: title,
-            mode: .local(
-                .init(topLevelPredicate: predicate)
-            )
+            config: config
         )
 
         let catalogView = container.resolve(

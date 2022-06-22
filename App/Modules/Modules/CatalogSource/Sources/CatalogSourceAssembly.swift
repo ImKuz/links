@@ -3,6 +3,7 @@ import CatalogClient
 import Database
 import SharedInterfaces
 import Foundation
+import Models
 
 public struct CatalogSourceAssembly: Assembly {
 
@@ -34,14 +35,19 @@ private extension CatalogSourceAssembly {
     }
     
     func registerLocalSource(container: Container) {
-        let factory: (Resolver, NSPredicate?) -> CatalogSource = { resolver, topLevelPredicate in
+        let factory: (Resolver, CatalogSourceConfig) -> CatalogSource = { resolver, config in
             let databaseService = resolver.resolve(DatabaseService.self)!
             let helper = resolver.resolve(FavoritesCatalogSourceHelper.self)!
 
+            guard case let .local(localConfig) = config.typeConfig else {
+                fatalError("CatalogSource resolved with uncompatible config")
+            }
+
             return DatabaseCatalogSource(
                 databaseService: databaseService,
-                topLevelPredicate: topLevelPredicate,
-                favoritesCatalogSourceHelper: helper
+                favoritesCatalogSourceHelper: helper,
+                topLevelPredicate: localConfig.topLevelPredicate,
+                overridingPermissions: config.permissionsOverride
             )
         }
 
@@ -51,8 +57,13 @@ private extension CatalogSourceAssembly {
     }
 
     func registerRemoteSource(container: Container) {
-        let factory: (Resolver, String, Int) -> CatalogSource = { resolver, host, port in
-            let client = resolver.resolve(CatalogClient.self, arguments: host, port)!
+        let factory: (Resolver, CatalogSourceConfig) -> CatalogSource = { resolver, config in
+
+            guard case let .remote(remoteConfig) = config.typeConfig else {
+                fatalError("CatalogSource resolved with uncompatible config")
+            }
+
+            let client = resolver.resolve(CatalogClient.self, arguments: remoteConfig.host, remoteConfig.port)!
             let helper = resolver.resolve(FavoritesCatalogSourceHelper.self)!
             let bus = resolver.resolve(RemoteCatalogSourceDatabaseBus.self)!
 

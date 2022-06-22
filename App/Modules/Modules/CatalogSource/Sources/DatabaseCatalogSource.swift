@@ -8,7 +8,7 @@ import SharedInterfaces
 
 final class DatabaseCatalogSource: CatalogSource {
 
-    let permissions: CatalogDataSourcePermissions = .all
+    private(set) var permissions: CatalogDataSourcePermissions = .all
 
     private var itemsSubject = PassthroughSubject<IdentifiedArrayOf<Database.CatalogItem>, AppError>()
     private var cancellables = [AnyCancellable]()
@@ -18,12 +18,17 @@ final class DatabaseCatalogSource: CatalogSource {
 
     init(
         databaseService: DatabaseService,
+        favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper,
         topLevelPredicate: NSPredicate?,
-        favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
+        overridingPermissions: CatalogDataSourcePermissions?
     ) {
         self.databaseService = databaseService
         self.topLevelPredicate = topLevelPredicate
         self.favoritesCatalogSourceHelper = favoritesCatalogSourceHelper
+
+        if let overridingPermissions = overridingPermissions {
+            permissions.override(with: overridingPermissions)
+        }
 
         subscribeToDatabaseUpdates()
     }

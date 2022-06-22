@@ -45,18 +45,18 @@ public struct CatalogFeatureAssembly: Assembly {
         resolver: Resolver,
         input: CatalogFeatureInterface.Input
     ) -> CatalogSource {
-        switch input.mode {
-        case let .local(config):
+        switch input.config.typeConfig {
+        case .local:
             return resolver.resolve(
                 CatalogSource.self,
                 name: "local",
-                argument: config.topLevelPredicate
+                argument: input.config
             )!
-        case let .remote(config):
+        case .remote:
             return resolver.resolve(
                 CatalogSource.self,
                 name: "remote",
-                arguments: config.host, config.port
+                argument: input.config
             )!
         }
     }

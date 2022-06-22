@@ -6,6 +6,7 @@ import Swinject
 import SharedInterfaces
 import Foundation
 import Constants
+import Models
 
 final class RemoteEnvImpl: RemoteEnv {
 
@@ -75,15 +76,20 @@ final class RemoteEnvImpl: RemoteEnv {
     ) {
         defer { rememberOptionIfNeeded(option: .client) }
 
-        let input = CatalogFeatureInterface.Input(
-            router: router,
-            title: "Remote",
-            mode: .remote(
-                CatalogFeatureInterface.RemoteModeConfig(
+        let config = CatalogSourceConfig(
+            permissionsOverride: nil,
+            typeConfig: .remote(
+                .init(
                     host: host,
                     port: port
                 )
             )
+        )
+
+        let input = CatalogFeatureInterface.Input(
+            router: router,
+            title: "Remote",
+            config: config
         )
 
         guard let interface = container.resolve(
