@@ -16,11 +16,13 @@ enum Module: String, CaseIterable, Equatable, Hashable {
     case Models
     case SharedInterfaces
     case ToolKit
+    case SharedHelpers
     // Features
     case AddItemFeature
     case CatalogFeature
     case RemoteFeature
     case RootFeature
+    case SettingsFeature
 }
 
 enum Dependency {
