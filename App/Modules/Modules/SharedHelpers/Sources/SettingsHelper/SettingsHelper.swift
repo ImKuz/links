@@ -24,7 +24,8 @@ public final class SettingsHelperImpl: SettingsHelper {
 
     public var tabTag: String {
         get {
-            userDefaults.string(forKey: UserDefaultsKeys.Settings.defaultTabTag) ?? ""
+            userDefaults.value(forKey: UserDefaultsKeys.Settings.defaultTabTag) as? String
+                ?? defaultTabTag
         }
         set {
             userDefaults.set(newValue, forKey: UserDefaultsKeys.Settings.defaultTabTag)
@@ -34,7 +35,8 @@ public final class SettingsHelperImpl: SettingsHelper {
 
     public var linkTapBehaviour: String {
         get {
-            userDefaults.string(forKey: UserDefaultsKeys.Settings.linkTapBehaviour) ?? ""
+            userDefaults.value(forKey: UserDefaultsKeys.Settings.linkTapBehaviour) as? String
+                ?? defaultLinkTapBehaviour
         }
         set {
             userDefaults.set(newValue, forKey: UserDefaultsKeys.Settings.linkTapBehaviour)
@@ -48,11 +50,14 @@ public final class SettingsHelperImpl: SettingsHelper {
             .eraseToAnyPublisher()
     }
 
-    init(userDefaults: UserDefaults) {
+    init(
+        userDefaults: UserDefaults,
+        defaultTabTag: String,
+        defaultLinkTapBehaviour: String
+    ) {
         self.userDefaults = userDefaults
-
-        defaultTabTag = "favorites"
-        defaultLinkTapBehaviour = "open"
+        self.defaultTabTag = defaultTabTag
+        self.defaultLinkTapBehaviour = defaultLinkTapBehaviour
     }
 
     public func setDefault() {

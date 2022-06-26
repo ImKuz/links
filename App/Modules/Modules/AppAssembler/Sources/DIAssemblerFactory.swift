@@ -5,11 +5,13 @@ import CatalogServer
 import CatalogClient
 import CatalogSource
 import Logger
+import SharedHelpers
 
 import RootFeature
 import CatalogFeature
 import AddItemFeature
 import RemoteFeature
+import SettingsFeature
 
 public enum DIAssemblerFactory {
 
@@ -26,6 +28,7 @@ public enum DIAssemblerFactory {
 
             ServicesAssembly(),
             LoggerAssembly(),
+            SharedHelpersAssembly(),
             DatabaseServiceAssembly(),
             IPAddressProviderAssembly(),
             CatalogServerAssembly(),
@@ -38,6 +41,7 @@ public enum DIAssemblerFactory {
             CatalogFeatureAssembly(),
             AddItemFeatureAssembly(),
             RemoteFeatureAssembly(),
+            SettingsFeatureAssembly(),
         ])
     }
 }

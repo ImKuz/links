@@ -35,8 +35,9 @@ enum SettingsAction: Equatable, BindableAction {
 // MARK: - Enviroment
 
 protocol SettingsEnv {
-    func setTabTag(_ value: String)
-    func setLinkTapBehaviour(_ value: String)
+    var tabTag: String { get set }
+    var linkTapBehaviour: String { get set }
+
     func discardDefaults()
     func restoreDefaultSettings()
     func eraseAll() -> Effect<Void, AppError>
@@ -53,6 +54,13 @@ let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnv> { stat
         return .none
     case .restoreDefaultSettings:
         env.restoreDefaultSettings()
+
+        state.selectedTabOption = state.tabOptions
+            .firstIndex { $0.tag == env.tabTag } ?? 0
+
+        state.selectedLinkTapBehaviourOption = state.linkTapBehaviours
+            .firstIndex { $0.tag == env.linkTapBehaviour } ?? 0
+
         return .none
     case .eraseAll:
         state.showsConfirmAlert = true

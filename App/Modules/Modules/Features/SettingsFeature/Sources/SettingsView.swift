@@ -45,9 +45,11 @@ struct SettingsView: View {
                         Text("Delete all content")
                             .foregroundColor(.red)
                     }
+                    Section {
+                        Text("App version: \(viewStore.appVersion)")
+                            .font(.footnote)
+                    }
                 }
-                Text("App version: \(viewStore.appVersion)")
-                    .font(.footnote)
             }
             .alert(
                 Text("Are you sure?"),

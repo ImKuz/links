@@ -11,6 +11,16 @@ final class SettingsEnvImpl: SettingsEnv {
     private let userDefaults: UserDefaults
     private let databaseService: DatabaseService
 
+    var tabTag: String {
+        get { settings.tabTag }
+        set { settings.tabTag = newValue }
+    }
+
+    var linkTapBehaviour: String {
+        get { settings.linkTapBehaviour }
+        set { settings.linkTapBehaviour = newValue }
+    }
+
     init(
         settings: SettingsHelper,
         userDefaults: UserDefaults,
@@ -19,14 +29,6 @@ final class SettingsEnvImpl: SettingsEnv {
         self.settings = settings
         self.userDefaults = userDefaults
         self.databaseService = databaseService
-    }
-
-    func setTabTag(_ value: String) {
-        settings.tabTag = value
-    }
-
-    func setLinkTapBehaviour(_ value: String) {
-        settings.linkTapBehaviour = value
     }
 
     func discardDefaults() {
