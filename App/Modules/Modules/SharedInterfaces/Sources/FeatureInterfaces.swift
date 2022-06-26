@@ -69,3 +69,12 @@ public struct RemoteFeatureInterface: FeatureInterface {
         self.view = view
     }
 }
+
+public struct SettingsFeatureInterface: FeatureInterface {
+    
+    public var view: AnyView
+
+    public init(view: AnyView) {
+        self.view = view
+    }
+}

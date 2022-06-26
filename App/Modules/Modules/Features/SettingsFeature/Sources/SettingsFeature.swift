@@ -1,15 +1,24 @@
 import ComposableArchitecture
+import ToolKit
 
 // MARK: - State
 
+struct SettingsOption: Equatable {
+    let title: String
+    let tag: String
+}
+
 struct SettingsState: Equatable {
 
-    let tabOptions: [String]
-    let linkTapBehaviour: [String]
+    typealias Option = SettingsOption
+
+    let tabOptions: [Option]
+    let linkTapBehaviours: [Option]
+
+    let appVersion: String
 
     @BindableState var selectedTabOption: Int
     @BindableState var selectedLinkTapBehaviourOption: Int
-    
     @BindableState var showsConfirmAlert = false
 }
 
@@ -30,7 +39,7 @@ protocol SettingsEnv {
     func setLinkTapBehaviour(_ value: String)
     func discardDefaults()
     func restoreDefaultSettings()
-    func eraseAll()
+    func eraseAll() -> Effect<Void, AppError>
 }
 
 // MARK: - Reducer
@@ -40,12 +49,17 @@ let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnv> { stat
     case .binding:
         return .none
     case .discardDefaults:
+        env.discardDefaults()
         return .none
     case .restoreDefaultSettings:
+        env.restoreDefaultSettings()
         return .none
     case .eraseAll:
+        state.showsConfirmAlert = true
         return .none
     case .eraseAllConfirm:
-        return .none
+        return env
+            .eraseAll()
+            .fireAndForget()
     }
 }.binding()

@@ -3,7 +3,7 @@ import Constants
 import Models
 import Combine
 
-public protocol SettingsHelper {
+public protocol SettingsHelper: AnyObject {
 
     var tabTag: String { get set }
     var linkTapBehaviour: String { get set }
@@ -24,7 +24,7 @@ public final class SettingsHelperImpl: SettingsHelper {
 
     public var tabTag: String {
         get {
-            userDefaults.string(forKey: UserDefaultsKeys.Settings.defaultTabTag)
+            userDefaults.string(forKey: UserDefaultsKeys.Settings.defaultTabTag) ?? ""
         }
         set {
             userDefaults.set(newValue, forKey: UserDefaultsKeys.Settings.defaultTabTag)
@@ -34,7 +34,7 @@ public final class SettingsHelperImpl: SettingsHelper {
 
     public var linkTapBehaviour: String {
         get {
-            userDefaults.string(forKey: UserDefaultsKeys.Settings.linkTapBehaviour)
+            userDefaults.string(forKey: UserDefaultsKeys.Settings.linkTapBehaviour) ?? ""
         }
         set {
             userDefaults.set(newValue, forKey: UserDefaultsKeys.Settings.linkTapBehaviour)
@@ -50,6 +50,9 @@ public final class SettingsHelperImpl: SettingsHelper {
 
     init(userDefaults: UserDefaults) {
         self.userDefaults = userDefaults
+
+        defaultTabTag = "favorites"
+        defaultLinkTapBehaviour = "open"
     }
 
     public func setDefault() {

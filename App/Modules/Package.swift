@@ -36,6 +36,9 @@ let dependencyMap: [Module: [Dependency]] = [
         .module(.Models),
         .external(.product(name: "IdentifiedCollections", package: "swift-identified-collections")),
     ],
+    .SharedHelpers: [
+        .module(.Models),
+    ],
     .CatalogClient: [
         .module(.Models),
         .module(.Contracts),
@@ -68,6 +71,10 @@ let dependencyMap: [Module: [Dependency]] = [
     ],
     .RemoteFeature: [
         .module(.CatalogServer),
+    ],
+    .SettingsFeature: [
+        .module(.SharedHelpers),
+        .module(.Database),
     ],
 ]
 
