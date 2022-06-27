@@ -39,8 +39,8 @@ public struct SettingsFeatureAssembly: Assembly {
 
         let tabOptions: [SettingsOption] = [
             .init(title: "Favorites", tag: "favorites"),
-            .init(title: "Local", tag: "local"),
-            .init(title: "Remote", tag: "remote"),
+            .init(title: "Snippets", tag: "local"),
+            .init(title: "Network", tag: "remote"),
         ]
 
         let linkTapBehaviours: [SettingsOption] = [

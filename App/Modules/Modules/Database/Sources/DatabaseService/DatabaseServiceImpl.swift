@@ -48,6 +48,7 @@ final public class DatabaseServiceImpl: DatabaseService {
         write { context in
             let objects = try context.read(type: type.self)
             try context.delete(objects)
+            try context.save()
         }
     }
 }

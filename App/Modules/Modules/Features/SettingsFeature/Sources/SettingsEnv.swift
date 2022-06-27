@@ -44,6 +44,7 @@ final class SettingsEnvImpl: SettingsEnv {
     func eraseAll() -> Effect<Void, AppError> {
         databaseService
             .deleteAll(type: Database.CatalogItem.self)
+            .receive(on: DispatchQueue.main)
             .mapError { _ in AppError.businessLogic("Unable to delete items")}
             .eraseToEffect()
     }
