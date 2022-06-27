@@ -69,6 +69,9 @@ let dependencyMap: [Module: [Dependency]] = [
     .AddItemFeature: [
         .module(.CatalogSource),
     ],
+    .CatalogFeature: [
+        .module(.SharedHelpers)
+    ],
     .RemoteFeature: [
         .module(.CatalogServer),
     ],

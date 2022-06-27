@@ -34,7 +34,7 @@ enum SettingsAction: Equatable, BindableAction {
 
 // MARK: - Enviroment
 
-protocol SettingsEnv {
+protocol SettingsEnv: AnyObject {
     var tabTag: String { get set }
     var linkTapBehaviour: String { get set }
 
@@ -47,6 +47,12 @@ protocol SettingsEnv {
 
 let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnv> { state, action, env in
     switch action {
+    case .binding(\.$selectedTabOption):
+        env.tabTag = state.tabOptions[state.selectedTabOption].tag
+        return .none
+    case .binding(\.$selectedLinkTapBehaviourOption):
+        env.linkTapBehaviour = state.linkTapBehaviours[state.selectedLinkTapBehaviourOption].tag
+        return .none
     case .binding:
         return .none
     case .discardDefaults:

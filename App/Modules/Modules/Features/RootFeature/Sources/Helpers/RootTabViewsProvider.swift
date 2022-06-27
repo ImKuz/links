@@ -46,6 +46,8 @@ final class RootTabViewsProviderImpl: RootTabViewsProvider {
             )
         case .remote:
             return container.resolve(RemoteFeatureInterface.self)!.view
+        case .settings:
+            return container.resolve(SettingsFeatureInterface.self)!.view
         }
     }
 

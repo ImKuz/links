@@ -1,11 +1,11 @@
-enum TabType: Int {
+enum TabType: String {
     case favorites
     case local
     case remote
+    case settings
 }
 
-struct Tab: Equatable, Identifiable {
-    var id: Int { type.rawValue }
+struct Tab: Equatable {
     let type: TabType
     let name: String
     let iconName: String

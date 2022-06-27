@@ -12,14 +12,18 @@ struct RootView: View {
 
     var body: some View {
         WithViewStore(store) { viewStore in
-            TabView {
-                ForEach(viewStore.tabs) { tab in
+            TabView(
+                selection: viewStore.binding(
+                    get: { $0.selectedTab },
+                    send: { RootAction.tabChanged($0) }
+                )
+            ) {
+                ForEach(Array(viewStore.tabs.enumerated()), id: \.0) { index, tab in
                     tabViewsProvider
                         .view(for: tab.type)?
                         .background(Color(UIColor.secondarySystemBackground))
-                        .tabItem {
-                            Label(tab.name, systemImage: tab.iconName)
-                        }
+                        .tabItem { Label(tab.name, systemImage: tab.iconName) }
+                        .tag(index)
                 }
             }
         }
