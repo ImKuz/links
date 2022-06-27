@@ -48,8 +48,9 @@ struct CatalogReducerFactory {
                         .merge(with: connectivityUpdates, appUpdates)
                         .eraseToEffect()
                 case .applicationStateUpdated:
-                    env.reloadCatalog()
-                    return .none
+                    return env
+                        .reloadCatalog()
+                        .fireAndForget()
                 case let .handleConnectionStateChange(connectionState):
                     switch connectionState {
                     case .failure:

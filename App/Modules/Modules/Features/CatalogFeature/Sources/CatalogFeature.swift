@@ -35,7 +35,7 @@ protocol CatalogEnv: AnyObject {
     var permissions: CatalogDataSourcePermissions { get }
     var linkTapAction: CatalogAction.HandleContentAction { get }
 
-    func reloadCatalog()
+    func reloadCatalog() -> Effect<Void, Never>
     func observeAppStateChanges() -> Effect<Void, Never>
     func observeConnectivity() -> Effect<ConnectionState, Never>
     func subscribe() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError>

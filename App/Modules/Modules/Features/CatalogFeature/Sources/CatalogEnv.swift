@@ -54,8 +54,9 @@ final class CatalogEnvImpl: CatalogEnv {
         self.settings = settings
     }
 
-    func reloadCatalog() {
+    func reloadCatalog() -> Effect<Void, Never> {
         catalogUpdateSubject.send()
+        return .none
     }
 
     func observeAppStateChanges() -> Effect<Void, Never> {
