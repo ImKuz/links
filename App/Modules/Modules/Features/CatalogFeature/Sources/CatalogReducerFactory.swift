@@ -10,6 +10,7 @@ struct CatalogReducerFactory {
         static let showErrorSheet = "showErrorSheet"
         static let updates = "updates"
         static let connectivity = "connectivity"
+        static let appUpdates = "appUpdates"
     }
 
     func make() -> CatalogReducerType {
@@ -37,9 +38,18 @@ struct CatalogReducerFactory {
                         .eraseToEffect(CatalogAction.handleConnectionStateChange)
                         .cancellable(id: ID.connectivity)
 
+                    let appUpdates = env
+                        .observeAppStateChanges()
+                        .receive(on: DispatchQueue.main)
+                        .eraseToEffect { CatalogAction.applicationStateUpdated }
+                        .cancellable(id: ID.appUpdates)
+
                     return itemsUpdates
-                        .merge(with: connectivityUpdates)
+                        .merge(with: connectivityUpdates, appUpdates)
                         .eraseToEffect()
+                case .applicationStateUpdated:
+                    env.reloadCatalog()
+                    return .none
                 case let .handleConnectionStateChange(connectionState):
                     switch connectionState {
                     case .failure:
@@ -100,6 +110,12 @@ struct CatalogReducerFactory {
                         action: action,
                         env: env
                     )
+                case let .contentHandleActionCompleted(handleAction):
+                    if case .copy = handleAction {
+                        return Effect(value: CatalogAction.titleMessage(text: "Copied to clipboard!"))
+                    } else {
+                        return .none
+                    }
                 }
             }
         )
@@ -141,15 +157,17 @@ struct CatalogReducerFactory {
 
             return env
                 .handleContent(content)
-                .compactMap { [content] in
-                    switch content {
-                    case .text:
-                        return CatalogAction.titleMessage(text: "Copied to clipboard!")
-                    case .link:
-                        return nil
-                    }
+                .eraseToEffect {
+                    CatalogAction.contentHandleActionCompleted(action: $0)
                 }
-                .eraseToEffect()
+        case .follow:
+            guard case let .link(url) = state.items[index].content else { return .none }
+
+            return env
+                .followLink(url)
+                .eraseToEffect {
+                    CatalogAction.contentHandleActionCompleted(action: $0)
+                }
         case .copy:
             let content = state.items[index].content
 
@@ -165,7 +183,7 @@ struct CatalogReducerFactory {
             return env
                 .copyContent(string)
                 .eraseToEffect {
-                    CatalogAction.titleMessage(text: "Copied to clipboard!")
+                    CatalogAction.contentHandleActionCompleted(action: $0)
                 }
         case .delete:
             let temp = state.items.remove(at: index)

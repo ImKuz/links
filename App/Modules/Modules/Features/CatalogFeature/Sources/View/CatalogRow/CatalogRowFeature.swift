@@ -4,13 +4,14 @@ import ToolKit
 
 // MARK: - State
 
-struct CatalogRowState: Equatable {
+struct CatalogRowState: Equatable, Identifiable {
 
     enum Icon: String {
         case link = "link"
         case text = "textformat"
     }
 
+    let id: String
     let title: String?
     let content: String?
     let icon: Icon
@@ -21,6 +22,7 @@ struct CatalogRowState: Equatable {
 
 public enum CatalogRowAction: Equatable {
     case copy
+    case follow
     case tap
     case delete
     case setIsFavorite(Bool)

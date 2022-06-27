@@ -1,6 +1,12 @@
 import UIKit
 
 protocol CatalogRowMenuActionsProvider {
+    func asyncActions(
+        id: CatalogRowState.ID,
+        state: CatalogState,
+        completion: @escaping ([CatalogState.RowMenuAction]) -> ()
+    )
+
     func acitons(state: CatalogState, indexPath: IndexPath) -> [CatalogState.RowMenuAction]
 }
 
@@ -12,19 +18,42 @@ final class CatalogRowMenuActionsProviderImpl: CatalogRowMenuActionsProvider {
         self.env = env
     }
 
+    func asyncActions(
+        id: CatalogRowState.ID,
+        state: CatalogState,
+        completion: @escaping ([CatalogState.RowMenuAction]) -> ()
+    ) {
+        guard let item = state.items[id: id] else { return completion([]) }
+
+        var actions = [CatalogState.RowMenuAction]()
+
+        if case .link = item.content {
+            switch env.linkTapAction {
+            case .follow:
+                actions.append(
+                    .init(
+                        iconName: "doc.on.doc",
+                        title: "Copy link",
+                        action: .copy
+                    )
+                )
+            case .copy:
+                actions.append(
+                    .init(
+                        iconName: "link",
+                        title: "Follow link",
+                        action: .follow
+                    )
+                )
+            }
+        }
+
+        completion(actions)
+    }
+
     func acitons(state: CatalogState, indexPath: IndexPath) -> [CatalogState.RowMenuAction] {
         var menuActions = [CatalogState.RowMenuAction]()
         let item = state.items[indexPath.row]
-
-        if case .link = item.content {
-            menuActions.append(
-                .init(
-                    iconName: "doc.on.doc",
-                    title: "Copy link",
-                    action: .copy
-                )
-            )
-        }
 
         if env.permissions.contains(.favorites) {
             let action: CatalogState.RowMenuAction

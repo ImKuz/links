@@ -22,7 +22,7 @@ public struct RootFeatureAssembly: Assembly {
 
         let store: Store<RootState, RootAction> = .init(
             initialState: .init(selectedTab: selectedTabIndex, tabs: tabs),
-            reducer: RootReducerFactory.make(),
+            reducer: rootReducer,
             environment: RootEnv()
         )
 

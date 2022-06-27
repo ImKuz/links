@@ -6,29 +6,62 @@ import ToolKit
 import UIKit
 import Swinject
 import SharedInterfaces
+import SharedHelpers
 
 final class CatalogEnvImpl: CatalogEnv {
 
     private let container: Container
     private let catalogSource: CatalogSource
+    private let settings: SettingsHelper
     private let pastboard: UIPasteboard
     private let router: Router
+
+    private let catalogUpdateSubject = PassthroughSubject<Void, Never>()
     private var cancellables = [AnyCancellable]()
 
     var permissions: CatalogDataSourcePermissions {
         catalogSource.permissions
     }
 
+    var catalogUpdatePublisher: AnyPublisher<Void, Never> {
+        catalogUpdateSubject
+            .share()
+            .eraseToAnyPublisher()
+    }
+
+    var linkTapAction: CatalogAction.HandleContentAction {
+        switch settings.linkTapBehaviour {
+        case "copy":
+            return .copy
+        case "follow":
+            return .follow
+        default:
+            return .follow
+        }
+    }
+
     init(
         container: Container,
         catalogSource: CatalogSource,
         pastboard: UIPasteboard,
-        router: Router
+        router: Router,
+        settings: SettingsHelper
     ) {
         self.container = container
         self.catalogSource = catalogSource
         self.pastboard = pastboard
         self.router = router
+        self.settings = settings
+    }
+
+    func reloadCatalog() {
+        catalogUpdateSubject.send()
+    }
+
+    func observeAppStateChanges() -> Effect<Void, Never> {
+        settings
+            .changesPublisher
+            .eraseToEffect()
     }
 
     func observeConnectivity() -> Effect<ConnectionState, Never> {
@@ -70,25 +103,36 @@ final class CatalogEnvImpl: CatalogEnv {
             .eraseToEffect()
     }
 
-    func handleContent(_ content: CatalogItemContent) -> Effect<Void, Never> {
+    func handleContent(_ content: CatalogItemContent) -> Effect<CatalogAction.HandleContentAction?, Never> {
         switch content {
         case let .link(url):
-            UIApplication.shared.open(url)
+            switch settings.linkTapBehaviour {
+            case "copy":
+                return copyContent(url.absoluteString)
+            case "follow":
+                return followLink(url)
+            default:
+                return Effect(value: nil)
+            }
         case let .text(string):
             return copyContent(string)
         }
-
-        return Just(()).eraseToEffect()
     }
 
-    func copyContent(_ content: String) -> Effect<Void, Never> {
+    func followLink(_ url: URL) -> Effect<CatalogAction.HandleContentAction?, Never> {
+        UIApplication.shared.open(url)
+        return Effect(value: .follow)
+    }
+
+    func copyContent(_ content: String) -> Effect<CatalogAction.HandleContentAction?, Never> {
         pastboard.string = content
-        return Just(()).eraseToEffect()
+        return Effect(value: .copy)
     }
 
     func showForm() -> Effect<CatalogAction, Never> {
         guard
             permissions.contains(.add),
+            // TODO: Resolving should not be inside this class
             let interface = container.resolve(AddItemFeatureInterface.self, argument: catalogSource)
         else {
             return .none

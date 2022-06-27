@@ -1,9 +1,21 @@
 import ComposableArchitecture
 import UIKit
 
+protocol CatalogRowCellAsyncAcitonsProvider: AnyObject {
+
+    func catalogRowRequestsAsyncActions(
+        id: CatalogRowState.ID,
+        completion: (([CatalogState.RowMenuAction]) -> ())?
+    )
+}
+
 final class CatalogRowCell: UICollectionViewCell {
 
     static var reuseId = "CatalogRowCell"
+
+    // MARK: - Internal properties
+
+    weak var asyncActionsProvider: CatalogRowCellAsyncAcitonsProvider?
 
     // MARK: - Subviews
 
@@ -133,23 +145,26 @@ final class CatalogRowCell: UICollectionViewCell {
 
     // MARK: - Context menu
 
+    private func loadAsyncMenuElements(completion: @escaping ([UIMenuElement]) -> ()) {
+        guard let id = viewStore?.id else { return }
+
+        asyncActionsProvider?.catalogRowRequestsAsyncActions(id: id) { [weak self] actions in
+            let elements = actions.compactMap { action in
+                self?.convertAciton(action)
+            }
+
+            completion(elements)
+        }
+    }
+
     private func makeMenu() -> UIMenu? {
         guard let viewStore = viewStore else { return nil }
 
-        let children: [UIAction] = viewStore.actions.map { item in
-            let attributes: UIMenuElement.Attributes = item.isDestructive
-                ? .destructive
-                : []
+        var children: [UIMenuElement] = [
+            UIDeferredMenuElement(loadAsyncMenuElements)
+        ]
 
-            return UIAction(
-                title: item.title,
-                image: UIImage(systemName: item.iconName),
-                attributes: attributes,
-                handler: { [weak self] _ in
-                    self?.viewStore?.send(item.action)
-                }
-            )
-        }
+        children.append(contentsOf: viewStore.actions.map { convertAciton($0) })
 
         return UIMenu(
             options: .displayInline,
@@ -157,4 +172,14 @@ final class CatalogRowCell: UICollectionViewCell {
         )
     }
 
+    private func convertAciton(_ action: CatalogState.RowMenuAction) -> UIAction {
+        UIAction(
+            title: action.title,
+            image: UIImage(systemName: action.iconName),
+            attributes: action.isDestructive ? .destructive : [],
+            handler: { [weak self] _ in
+                self?.viewStore?.send(action.action)
+            }
+        )
+    }
 }

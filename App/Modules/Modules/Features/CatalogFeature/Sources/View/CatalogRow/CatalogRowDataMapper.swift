@@ -20,6 +20,7 @@ enum CatalogRowDataMapper {
         }
 
         return .init(
+            id: item.id,
             title: item.name,
             content: content,
             icon: icon,

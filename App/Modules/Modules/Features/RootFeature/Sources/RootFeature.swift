@@ -24,4 +24,10 @@ struct RootEnv {
 
 // MARK: - Reducer
 
-typealias RootReducerType = Reducer<RootState, RootAction, RootEnv>
+let rootReducer = Reducer<RootState, RootAction, RootEnv> { state, action, env in
+    switch action {
+    case let .tabChanged(index):
+        state.selectedTab = index
+        return .none
+    }
+}

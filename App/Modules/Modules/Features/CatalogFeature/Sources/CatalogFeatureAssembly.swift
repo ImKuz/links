@@ -5,6 +5,7 @@ import Models
 import SharedInterfaces
 import SwiftUI
 import UIKit
+import SharedHelpers
 
 public struct CatalogFeatureAssembly: Assembly {
 
@@ -72,7 +73,8 @@ public struct CatalogFeatureAssembly: Assembly {
             container: container,
             catalogSource: source,
             pastboard: UIPasteboard.general,
-            router: router
+            router: router,
+            settings: container.resolve(SettingsHelper.self)!
         )
 
         let store = Store(
@@ -85,7 +87,8 @@ public struct CatalogFeatureAssembly: Assembly {
 
         let viewController = CatalogViewController(
             store: store,
-            rowMenuActionsProvider: rowMenuActionsProvider
+            rowMenuActionsProvider: rowMenuActionsProvider,
+            catalogUpdatePublisher: environment.catalogUpdatePublisher
         )
 
         return CatalogFeatureInterface(viewController: viewController)
