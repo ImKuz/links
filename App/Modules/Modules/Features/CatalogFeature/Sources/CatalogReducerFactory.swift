@@ -62,7 +62,6 @@ struct CatalogReducerFactory {
                         )
                         return .none
                     case .connecting:
-                        // TODO: Handle loading
                         return .none
                     case .ok:
                         state.rightButton = nil

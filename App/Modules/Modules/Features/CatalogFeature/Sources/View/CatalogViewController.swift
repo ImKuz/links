@@ -98,13 +98,19 @@ final class CatalogViewController: UICollectionViewController {
     }
 
     private func setupLeftButton(_ config: CatalogState.ButtonConfig?) {
-        guard let config = config else { return }
-        navigationItem.leftBarButtonItem = makeBarButton(config: config)
+        if let  config = config {
+            navigationItem.leftBarButtonItem = makeBarButton(config: config)
+        } else {
+            navigationItem.leftBarButtonItem = nil
+        }
     }
 
     private func setupRightButton(_ config: CatalogState.ButtonConfig?) {
-        guard let config = config else { return }
-        navigationItem.rightBarButtonItem = makeBarButton(config: config)
+        if let  config = config {
+            navigationItem.rightBarButtonItem = makeBarButton(config: config)
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
     }
 
     private func makeBarButton(config: CatalogState.ButtonConfig) -> UIBarButtonItem {
@@ -147,7 +153,7 @@ final class CatalogViewController: UICollectionViewController {
 
         currentItems = newItems
 
-        if insertIndexPaths.count == currentItems.count {
+        if insertIndexPaths.count > removeIndexPaths.count {
             collectionView.reloadData()
         } else {
             collectionView.performBatchUpdates {
@@ -168,8 +174,6 @@ final class CatalogViewController: UICollectionViewController {
     }
 
     // MARK: - UICollectionViewDataSource
-
-    override func numberOfSections(in collectionView: UICollectionView) -> Int { 1 }
 
     override func collectionView(
         _ collectionView: UICollectionView,

@@ -40,6 +40,8 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
     func configure(host: String, port: Int) {
         guard client == nil else { return }
 
+        itemsSubject = .init()
+
         client = catalogSourceClientFactory.make(
             host: host,
             port: port,
@@ -49,6 +51,7 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
 
     func disconnect() {
         _ = client?.channel.close()
+        client = nil
     }
 
     func subscribe() -> AnyPublisher<[CatalogItem], AppError> {

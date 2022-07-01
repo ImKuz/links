@@ -31,6 +31,8 @@ final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
 
     private func bindClientUpdates() {
         bus.reset()
+        client.disconnect()
+
         clientSubscription = client
             .subscribe()
             .map { IdentifiedArrayOf(uniqueElements: $0) }

@@ -2,41 +2,6 @@
 
 Package for work with CoreData stack
 
-# Usage example
-
-```
-    let db: DatabaseService
-    
-    func writeSync() throws {
-        try db.wrtieSync { context in
-            try context.create(user)
-            try context.save()
-        }
-    }
-    
-    func writeAsync(_ completion: @escaping (Result<Void, Error>) -> Void) {
-        db.wrtieAsync(completion: completion) { context in
-            try context.create(users)
-            try context.save()
-        } 
-    }
-    
-    func read() -> [User] throws {
-        try db.fetchSync(User.self)
-    }
-    
-    func read(_ completion: (Result<[User], Error>) -> Void) {
-        var request = FetchRequest()
-        request.apply(.filter(keyPath: \User.ModelObject.name, equalTo: "John"))
-        
-        db.fetchAsync(
-            User.self, 
-            request: request, 
-            completion: completion
-        )
-    }
-}
-```
 # Models
 
 In order to create new model, perform the following steps:
@@ -98,22 +63,3 @@ enum CoreDataMigrationVersion: Int, CaseIterable {
     case v1 = 1, v2, v3
 ```
 5) Generate NSManagedObject subclass for changed enitites and replace the old ones
-
-# NSPredicate
-
-The package provides useful extensions for `NSPredicate` use. 
-
-```
-// Comparsions
-NSPredicate.filter(keyPath: \User.ModelObject.age, equalTo: 42)
-NSPredicate.filter(keyPath: \User.ModelObject.name, equalTo: "John")
-
-// Compounding by AND
-NSPredicate.compound(
-    .filter(keyPath: \User.ModelObject.age, moreThan: 30),
-    .filter(keyPath: \User.ModelObject.department, value: "dev-", operator: .beginsWith)
-)
-
-// Reverse logic condition
-NSPredicate.not(.filter(keyPath: \User.ModelObject.tag, in: ["tag1", "tag2"]))
-```

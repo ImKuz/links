@@ -21,6 +21,7 @@ final class CatalogServerImpl {
 
     private var server: EventLoopFuture<Server>?
     private var group: MultiThreadedEventLoopGroup?
+    private var provider: CatalogSourceProvider?
     private let contentUpdateSubject = PassthroughSubject<Void, Never>()
 
     init(
@@ -46,6 +47,7 @@ extension CatalogServerImpl: CatalogServer {
                 )
                 
                 provider.delegate = strongSelf
+                strongSelf.provider = provider
 
                 let server = Server
                     .insecure(group: group)
@@ -86,6 +88,8 @@ extension CatalogServerImpl: CatalogServer {
                 do {
                     try self?.group?.syncShutdownGracefully()
                     try self?.server?.eventLoop.close()
+                    self?.provider?.cancel()
+                    self?.server = nil
                     promise(.success(()))
                 } catch {
                     promise(.failure(.common(description: "Unable to stop server")))

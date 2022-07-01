@@ -4,6 +4,7 @@ import ToolKit
 import SharedInterfaces
 
 public protocol CatalogClient: ConnectionObservable {
+    func disconnect()
     func subscribe() -> AnyPublisher<[CatalogItem], AppError>
 }
 
@@ -28,6 +29,10 @@ final class CatalogClientImpl: ConnectionObservable, CatalogClient {
     }
 
     deinit {
+        provider.disconnect()
+    }
+
+    func disconnect() {
         provider.disconnect()
     }
 
