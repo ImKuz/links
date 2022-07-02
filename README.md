@@ -24,7 +24,7 @@ UI is build using SwiftUI and UIKit.
 
 ## TODO
 
-- [ ] Favorites section for a quick access.
+- [x] Favorites section for a quick access.
 - [ ] Install the app instance to simulator from macOS app
 - [ ] Groupping snippets
 - [ ] Import from CSV
