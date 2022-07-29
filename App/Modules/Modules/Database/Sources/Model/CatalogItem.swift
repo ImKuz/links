@@ -1,8 +1,12 @@
 import ToolKit
+import Foundation
 
 public class CatalogItem: PersistableEntity {
 
     public typealias ModelObject = CatalogItemEntity
+    public typealias Params = [String: String]
+
+    // MARK: - Properties
 
     public let storeId: String
     public let itemId: String
@@ -12,6 +16,9 @@ public class CatalogItem: PersistableEntity {
     public var isFavorite: Bool
     public var index: Int16
     public let remoteServerId: String?
+    public let params: Params
+
+    // MARK: - Init
 
     public init(
         storeId: String,
@@ -21,7 +28,8 @@ public class CatalogItem: PersistableEntity {
         contentType: String,
         isFavorite: Bool,
         index: Int16,
-        remoteServerId: String?
+        remoteServerId: String?,
+        params: Params
     ) {
         self.storeId = storeId
         self.itemId = itemId
@@ -31,6 +39,7 @@ public class CatalogItem: PersistableEntity {
         self.isFavorite = isFavorite
         self.index = index
         self.remoteServerId = remoteServerId
+        self.params = params
     }
 
     required public init?(object: ModelObject) {
@@ -49,7 +58,10 @@ public class CatalogItem: PersistableEntity {
         self.isFavorite = object.isFavorite
         self.index = object.index
         self.remoteServerId = object.remoteServerId
+        self.params = Self.decodeParams(object.params)
     }
+
+    // MARK: - Public methods
 
     public func convertProperties(object: ModelObject) {
         object.storeId = storeId
@@ -60,6 +72,21 @@ public class CatalogItem: PersistableEntity {
         object.isFavorite = isFavorite
         object.index = index
         object.remoteServerId = remoteServerId
+        object.params = encodeParams()
+    }
+
+    // MARK: - Private methods
+
+    private func encodeParams() -> Data? {
+        guard !params.isEmpty else { return nil }
+
+        return try? JSONEncoder().encode(params)
+    }
+
+    private static func decodeParams(_ data: Data?) -> [String: String] {
+        guard let data = data else { return [:] }
+
+        return (try? JSONDecoder().decode(Params.self, from: data)) ?? [:]
     }
 }
 

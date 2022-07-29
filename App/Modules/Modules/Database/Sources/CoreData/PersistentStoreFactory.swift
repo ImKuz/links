@@ -3,11 +3,6 @@ import Foundation
 
 struct PersistentStoreFactory {
 
-    enum Const {
-        static let dbFilename = "CoreData.sqlite"
-        static let storeName = "Store"
-    }
-
     static func create(path: URL) throws -> NSPersistentContainer {
         guard
             let modelURL = Bundle.main.url(forResource: CoreDataConst.modelName, withExtension: "momd"),
@@ -20,13 +15,13 @@ struct PersistentStoreFactory {
             throw DatabaseError(code: .unableToLoad, description: description)
         }
 
-        let container = NSPersistentContainer(name: Const.storeName, managedObjectModel: model)
+        let container = NSPersistentContainer(name: CoreDataConst.storeName, managedObjectModel: model)
 
         let description = container.persistentStoreDescriptions.first
         description?.shouldInferMappingModelAutomatically = false // inferred mapping will be handled else where
         description?.shouldMigrateStoreAutomatically = false
         description?.type = NSSQLiteStoreType
-        description?.url = path.appendingPathComponent(Const.dbFilename)
+        description?.url = path.appendingPathComponent(CoreDataConst.dbFilename)
 
         return container
     }

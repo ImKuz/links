@@ -4,10 +4,6 @@ import Combine
 
 final class CoreDataStorage {
 
-    private enum Spec {
-        static let storeSubpath = "persistentStore"
-    }
-
     // MARK: - Private properties
 
     private let container: NSPersistentContainer
@@ -40,7 +36,7 @@ final class CoreDataStorage {
             create: true
         )
 
-        storeUrl.appendPathComponent(Spec.storeSubpath, isDirectory: true)
+        storeUrl.appendPathComponent(CoreDataConst.storeSubpath, isDirectory: true)
 
         if !fileManager.fileExists(atPath: storeUrl.path, isDirectory: &isDirectory) {
             try fileManager.createDirectory(
