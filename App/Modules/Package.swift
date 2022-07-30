@@ -65,6 +65,9 @@ let dependencyMap: [Module: [Dependency]] = [
     .Logger: [
         .external(.product(name: "Logging", package: "swift-log")),
     ],
+    .Models: [
+        .external(.product(name: "Collections", package: "swift-collections")),
+    ],
     // Features
     .AddItemFeature: [
         .module(.CatalogSource),
@@ -118,6 +121,11 @@ let externalDependecies: [Package.Dependency] = [
         name: "swift-identified-collections",
         url: "https://github.com/pointfreeco/swift-identified-collections",
         from: "0.3.2"
+    ),
+    .package(
+        name: "swift-collections",
+        url: "https://github.com/apple/swift-collections",
+        from: "1.0.2"
     ),
     .package(
         url: "https://github.com/apple/swift-log.git",

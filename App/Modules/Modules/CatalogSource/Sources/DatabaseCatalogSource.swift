@@ -217,7 +217,7 @@ extension Models.CatalogItem {
             contentType = "text"
         }
 
-        return .init(
+        return Database.CatalogItem(
             storeId: UUID().uuidString,
             itemId: id,
             name: _name,
@@ -225,7 +225,8 @@ extension Models.CatalogItem {
             contentType: contentType,
             isFavorite: false,
             index: Int16(index),
-            remoteServerId: nil
+            remoteServerId: nil,
+            params: nil
         )
     }
 }

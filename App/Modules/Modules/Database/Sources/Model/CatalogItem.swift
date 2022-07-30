@@ -16,7 +16,7 @@ public class CatalogItem: PersistableEntity {
     public var isFavorite: Bool
     public var index: Int16
     public let remoteServerId: String?
-    public let params: Params
+    public let params: Params?
 
     // MARK: - Init
 
@@ -29,7 +29,7 @@ public class CatalogItem: PersistableEntity {
         isFavorite: Bool,
         index: Int16,
         remoteServerId: String?,
-        params: Params
+        params: Params?
     ) {
         self.storeId = storeId
         self.itemId = itemId
@@ -78,14 +78,12 @@ public class CatalogItem: PersistableEntity {
     // MARK: - Private methods
 
     private func encodeParams() -> Data? {
-        guard !params.isEmpty else { return nil }
-
+        guard let params = params, !params.isEmpty else { return nil }
         return try? JSONEncoder().encode(params)
     }
 
     private static func decodeParams(_ data: Data?) -> [String: String] {
         guard let data = data else { return [:] }
-
         return (try? JSONDecoder().decode(Params.self, from: data)) ?? [:]
     }
 }
