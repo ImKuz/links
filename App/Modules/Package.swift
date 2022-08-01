@@ -18,7 +18,7 @@ enum Module: String, CaseIterable, Equatable, Hashable {
     case ToolKit
     case SharedHelpers
     // Features
-    case AddItemFeature
+    case EditLinkFeature
     case CatalogFeature
     case RemoteFeature
     case RootFeature
@@ -69,7 +69,7 @@ let dependencyMap: [Module: [Dependency]] = [
         .external(.product(name: "Collections", package: "swift-collections")),
     ],
     // Features
-    .AddItemFeature: [
+    .EditLinkFeature: [
         .module(.CatalogSource),
     ],
     .CatalogFeature: [

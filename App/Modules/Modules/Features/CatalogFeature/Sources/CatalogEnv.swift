@@ -134,7 +134,7 @@ final class CatalogEnvImpl: CatalogEnv {
         guard
             permissions.contains(.add),
             // TODO: Resolving should not be inside this class
-            let interface = container.resolve(AddItemFeatureInterface.self, argument: catalogSource)
+            let interface = container.resolve(EditLinkFeatureInterface.self, argument: catalogSource)
         else {
             return .none
         }

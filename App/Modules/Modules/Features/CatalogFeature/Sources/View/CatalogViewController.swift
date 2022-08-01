@@ -167,10 +167,7 @@ final class CatalogViewController: UICollectionViewController {
         current: IdentifiedArrayOf<CatalogItem>,
         new: IdentifiedArrayOf<CatalogItem>
     ) -> Bool {
-        if current.count != new.count { return false }
-
-        return zip(current, new)
-            .allSatisfy { $0 == $1 }
+        zip(current, new).allSatisfy { $0 == $1 }
     }
 
     // MARK: - UICollectionViewDataSource

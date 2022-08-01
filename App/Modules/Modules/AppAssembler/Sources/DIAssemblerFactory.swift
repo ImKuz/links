@@ -9,7 +9,7 @@ import SharedHelpers
 
 import RootFeature
 import CatalogFeature
-import AddItemFeature
+import EditLinkFeature
 import RemoteFeature
 import SettingsFeature
 
@@ -39,7 +39,7 @@ public enum DIAssemblerFactory {
 
             RootFeatureAssembly(),
             CatalogFeatureAssembly(),
-            AddItemFeatureAssembly(),
+            EditLinkFeatureAssembly(),
             RemoteFeatureAssembly(),
             SettingsFeatureAssembly(),
         ])

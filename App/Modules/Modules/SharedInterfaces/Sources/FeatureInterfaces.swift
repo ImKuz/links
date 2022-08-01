@@ -45,7 +45,7 @@ public struct RootFeatureInterface: FeatureInterface {
     }
 }
 
-public struct AddItemFeatureInterface: FeatureInterface {
+public struct EditLinkFeatureInterface: FeatureInterface {
 
     public typealias Input = CatalogSource
 
