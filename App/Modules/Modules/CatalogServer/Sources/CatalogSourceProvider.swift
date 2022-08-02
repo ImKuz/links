@@ -6,7 +6,7 @@ import ToolKit
 import Combine
 
 protocol CatalogSourceProviderDelegate: AnyObject {
-    func providerRequestsData() -> AnyPublisher<[CatalogItem], AppError>
+    func providerRequestsData() -> AnyPublisher<[LinkItem], AppError>
 }
 
 final class CatalogSourceProvider: Catalog_SourceProvider {
@@ -21,8 +21,8 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
 
     private var cancellables = [AnyCancellable]()
     private let updateEventsPublisher: AnyPublisher<Void, Never>
-    private var catalogSubject = PassthroughSubject<Catalog_Catalog, AppError>()
-    private var contexts = [StreamingResponseCallContext<Catalog_Catalog>]()
+    private var catalogSubject = PassthroughSubject<Catalog_LinkItemsList, AppError>()
+    private var contexts = [StreamingResponseCallContext<Catalog_LinkItemsList>]()
 
     // MARK: - Init
 
@@ -48,7 +48,7 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
 
     func fetch(
         request: Catalog_Empty,
-        context: StreamingResponseCallContext<Catalog_Catalog>
+        context: StreamingResponseCallContext<Catalog_LinkItemsList>
     ) -> EventLoopFuture<GRPCStatus> {
         contexts.append(context)
         fillContextWithInitialData(context: context)
@@ -58,7 +58,7 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
     // MARK: - Private methods
 
     private func fillContextWithInitialData(
-        context: StreamingResponseCallContext<Catalog_Catalog>
+        context: StreamingResponseCallContext<Catalog_LinkItemsList>
     ) {
         getCurrentItems()
             .sink(
@@ -77,7 +77,7 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
     private func setupUpdatesBinding() {
         updateEventsPublisher
             .setFailureType(to: AppError.self)
-            .flatMap { [weak self] _ -> AnyPublisher<[Models.CatalogItem], AppError> in
+            .flatMap { [weak self] _ -> AnyPublisher<[LinkItem], AppError> in
                 guard let delegate = self?.delegate else { return Empty().eraseToAnyPublisher() }
                 return delegate.providerRequestsData()
             }
@@ -103,7 +103,7 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
             .store(in: &cancellables)
     }
 
-    private func getCurrentItems() -> AnyPublisher<Catalog_Catalog, AppError> {
+    private func getCurrentItems() -> AnyPublisher<Catalog_LinkItemsList, AppError> {
         guard let delegate = delegate else { return Empty().eraseToAnyPublisher() }
 
         return delegate
@@ -112,32 +112,15 @@ final class CatalogSourceProvider: Catalog_SourceProvider {
             .eraseToAnyPublisher()
     }
 
-    private static func mapItems(_ items: [CatalogItem]) -> Catalog_Catalog {
-        let items = items.map { item -> Catalog_Item in
-            let kind: Catalog_Item.OneOf_Kind
-
-            switch item.content {
-            case let .link(url):
-                kind = .link(.with {
+    private static func mapItems(_ items: [LinkItem]) -> Catalog_LinkItemsList {
+        return Catalog_LinkItemsList.with {
+            $0.items = items.map { item in
+                Catalog_LinkItem.with {
                     $0.id = item.id
                     $0.name = item.name
-                    $0.link = url.absoluteString
-                })
-            case let .text(text):
-                kind = .snippet(.with {
-                    $0.id = item.id
-                    $0.name = item.name
-                    $0.content = text
-                })
+                    $0.urlString = item.urlString
+                }
             }
-
-            return Catalog_Item.with {
-                $0.kind = kind
-            }
-        }
-
-        return .with {
-            $0.items = items
         }
     }
 }
