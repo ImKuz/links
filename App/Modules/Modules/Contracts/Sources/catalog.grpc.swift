@@ -33,8 +33,8 @@ public protocol Catalog_SourceClientProtocol: GRPCClient {
   func fetch(
     _ request: Catalog_Empty,
     callOptions: CallOptions?,
-    handler: @escaping (Catalog_Catalog) -> Void
-  ) -> ServerStreamingCall<Catalog_Empty, Catalog_Catalog>
+    handler: @escaping (Catalog_LinkItemsList) -> Void
+  ) -> ServerStreamingCall<Catalog_Empty, Catalog_LinkItemsList>
 }
 
 extension Catalog_SourceClientProtocol {
@@ -52,8 +52,8 @@ extension Catalog_SourceClientProtocol {
   public func fetch(
     _ request: Catalog_Empty,
     callOptions: CallOptions? = nil,
-    handler: @escaping (Catalog_Catalog) -> Void
-  ) -> ServerStreamingCall<Catalog_Empty, Catalog_Catalog> {
+    handler: @escaping (Catalog_LinkItemsList) -> Void
+  ) -> ServerStreamingCall<Catalog_Empty, Catalog_LinkItemsList> {
     return self.makeServerStreamingCall(
       path: "/Catalog.Source/fetch",
       request: request,
@@ -67,7 +67,7 @@ extension Catalog_SourceClientProtocol {
 public protocol Catalog_SourceClientInterceptorFactoryProtocol {
 
   /// - Returns: Interceptors to use when invoking 'fetch'.
-  func makefetchInterceptors() -> [ClientInterceptor<Catalog_Empty, Catalog_Catalog>]
+  func makefetchInterceptors() -> [ClientInterceptor<Catalog_Empty, Catalog_LinkItemsList>]
 }
 
 public final class Catalog_SourceClient: Catalog_SourceClientProtocol {
@@ -117,12 +117,12 @@ public final class Catalog_SourceTestClient: Catalog_SourceClientProtocol {
   /// - Parameter requestHandler: a handler for request parts sent by the RPC.
   public func makefetchResponseStream(
     _ requestHandler: @escaping (FakeRequestPart<Catalog_Empty>) -> () = { _ in }
-  ) -> FakeStreamingResponse<Catalog_Empty, Catalog_Catalog> {
+  ) -> FakeStreamingResponse<Catalog_Empty, Catalog_LinkItemsList> {
     return self.fakeChannel.makeFakeStreamingResponse(path: "/Catalog.Source/fetch", requestHandler: requestHandler)
   }
 
   public func enqueuefetchResponses(
-    _ responses: [Catalog_Catalog],
+    _ responses: [Catalog_LinkItemsList],
     _ requestHandler: @escaping (FakeRequestPart<Catalog_Empty>) -> () = { _ in }
   )  {
     let stream = self.makefetchResponseStream(requestHandler)
@@ -141,7 +141,7 @@ public final class Catalog_SourceTestClient: Catalog_SourceClientProtocol {
 public protocol Catalog_SourceProvider: CallHandlerProvider {
   var interceptors: Catalog_SourceServerInterceptorFactoryProtocol? { get }
 
-  func fetch(request: Catalog_Empty, context: StreamingResponseCallContext<Catalog_Catalog>) -> EventLoopFuture<GRPCStatus>
+  func fetch(request: Catalog_Empty, context: StreamingResponseCallContext<Catalog_LinkItemsList>) -> EventLoopFuture<GRPCStatus>
 }
 
 extension Catalog_SourceProvider {
@@ -158,7 +158,7 @@ extension Catalog_SourceProvider {
       return ServerStreamingServerHandler(
         context: context,
         requestDeserializer: ProtobufDeserializer<Catalog_Empty>(),
-        responseSerializer: ProtobufSerializer<Catalog_Catalog>(),
+        responseSerializer: ProtobufSerializer<Catalog_LinkItemsList>(),
         interceptors: self.interceptors?.makefetchInterceptors() ?? [],
         userFunction: self.fetch(request:context:)
       )
@@ -173,5 +173,5 @@ public protocol Catalog_SourceServerInterceptorFactoryProtocol {
 
   /// - Returns: Interceptors to use when handling 'fetch'.
   ///   Defaults to calling `self.makeInterceptors()`.
-  func makefetchInterceptors() -> [ServerInterceptor<Catalog_Empty, Catalog_Catalog>]
+  func makefetchInterceptors() -> [ServerInterceptor<Catalog_Empty, Catalog_LinkItemsList>]
 }

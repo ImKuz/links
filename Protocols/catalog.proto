@@ -3,36 +3,16 @@ package Catalog;
 
 message Empty {}
 
-message Catalog {
-    repeated Item items = 1;
+message LinkItemsList {
+    repeated LinkItem items = 1;
 }
 
-message Item {
-    oneof kind {
-        Snippet snippet = 1;
-        Group group = 2;
-        Link link = 3;
-    };
-}
-
-message Group {
+message LinkItem {
     string id = 2;
     string name = 3;
-    repeated Item items = 4;
-}
-
-message Snippet {
-    string id = 2;
-    string name = 3;
-    string content = 4;
-}
-
-message Link {
-    string id = 2;
-    string name = 3;
-    string link = 4;
+    string urlString = 4;
 }
 
 service Source {
-    rpc fetch(Empty) returns (stream Catalog);
+    rpc fetch(Empty) returns (stream LinkItemsList);
 }
