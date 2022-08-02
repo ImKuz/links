@@ -5,7 +5,7 @@ protocol CatalogRowCellAsyncAcitonsProvider: AnyObject {
 
     func catalogRowRequestsAsyncActions(
         id: CatalogRowState.ID,
-        completion: (([CatalogState.RowMenuAction]) -> ())?
+        completion: (([RowMenuAction]) -> ())?
     )
 }
 
@@ -43,6 +43,7 @@ final class CatalogRowCell: UICollectionViewCell {
         let imageView = UIImageView()
 
         imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(systemName: "link")
 
         return imageView
     }()
@@ -137,8 +138,7 @@ final class CatalogRowCell: UICollectionViewCell {
         guard let viewStore = viewStore else { return }
 
         titleLabel.text = viewStore.title
-        contentLabel.text = viewStore.content
-        iconImageView.image = UIImage(systemName: viewStore.icon.rawValue)
+        contentLabel.text = viewStore.contentPreview
         showMoreButton.isHidden = viewStore.actions.isEmpty
         showMoreButton.menu = makeMenu()
     }
@@ -172,7 +172,7 @@ final class CatalogRowCell: UICollectionViewCell {
         )
     }
 
-    private func convertAciton(_ action: CatalogState.RowMenuAction) -> UIAction {
+    private func convertAciton(_ action: RowMenuAction) -> UIAction {
         UIAction(
             title: action.title,
             image: UIImage(systemName: action.iconName),

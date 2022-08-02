@@ -68,6 +68,9 @@ let dependencyMap: [Module: [Dependency]] = [
     .Models: [
         .external(.product(name: "Collections", package: "swift-collections")),
     ],
+    .ToolKit: [
+        .external(.product(name: "ComposableArchitecture", package: "swift-composable-architecture")),
+    ],
     // Features
     .EditLinkFeature: [
         .module(.CatalogSource),

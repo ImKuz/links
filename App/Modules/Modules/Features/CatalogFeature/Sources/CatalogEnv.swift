@@ -10,14 +10,19 @@ import SharedHelpers
 
 final class CatalogEnvImpl: CatalogEnv {
 
+    // MARK: - Private properties
+
     private let container: Container
     private let catalogSource: CatalogSource
     private let settings: SettingsHelper
     private let pastboard: UIPasteboard
     private let router: Router
+    private let urlOpener: URLOpener
 
     private let catalogUpdateSubject = PassthroughSubject<Void, Never>()
     private var cancellables = [AnyCancellable]()
+
+    // MARK: - CatalogEnv properties
 
     var permissions: CatalogDataSourcePermissions {
         catalogSource.permissions
@@ -29,39 +34,52 @@ final class CatalogEnvImpl: CatalogEnv {
             .eraseToAnyPublisher()
     }
 
-    var linkTapAction: CatalogAction.HandleContentAction {
+    var configurableActions: [CatalogRowAction] {
         switch settings.linkTapBehaviour {
-        case "copy":
-            return .copy
+        case "edit":
+            return [.follow]
+        case "follow":
+            return [.edit]
+        default:
+            return [.follow]
+        }
+    }
+
+    var tapAction: CatalogRowAction {
+        switch settings.linkTapBehaviour {
+        case "edit":
+            return .edit
         case "follow":
             return .follow
         default:
-            return .follow
+            return .edit
         }
     }
+
+    // MARK: - Init
 
     init(
         container: Container,
         catalogSource: CatalogSource,
         pastboard: UIPasteboard,
         router: Router,
+        urlOpener: URLOpener,
         settings: SettingsHelper
     ) {
         self.container = container
         self.catalogSource = catalogSource
         self.pastboard = pastboard
         self.router = router
+        self.urlOpener = urlOpener
         self.settings = settings
     }
 
-    func reloadCatalog() -> Effect<Void, Never> {
-        catalogUpdateSubject.send()
-        return .none
-    }
+    // MARK: Updates subscription
 
     func observeAppStateChanges() -> Effect<Void, Never> {
         settings
             .changesPublisher
+            .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }
 
@@ -73,76 +91,90 @@ final class CatalogEnvImpl: CatalogEnv {
         }
     }
 
-    func subscribe() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError> {
+    func subscribeToCatalogUpdates() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError> {
         catalogSource
             .subscribe()
             .removeDuplicates()
+            .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }
 
-    func delete(_ item: CatalogItem) -> Effect<Void, AppError> {
+    // MARK: Catalog
+
+    func reloadCatalog() -> Effect<Void, Never> {
+        catalogUpdateSubject.send()
+        return .none
+    }
+
+    func delete(_ item: LinkItem) -> Effect<Void, AppError> {
         catalogSource
             .delete(item)
+            .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }
 
     func move(_ from: Int, _ to: Int) -> Effect<Void, AppError> {
         catalogSource
             .move(from: from, to: to)
+            .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }
 
-    func add(_ item: CatalogItem) -> Effect<Void, AppError> {
+    func add(_ item: LinkItem) -> Effect<Void, AppError> {
         catalogSource
             .add(item: item)
+            .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }
 
-    func setIsFavorite(item: CatalogItem, isFavorite: Bool) -> Effect<Void, AppError> {
+    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> Effect<Void, AppError> {
         catalogSource
             .setIsFavorite(item: item, isFavorite: isFavorite)
+            .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }
 
-    func handleContent(_ content: CatalogItemContent) -> Effect<CatalogAction.HandleContentAction?, Never> {
-        switch content {
-        case let .link(url):
-            switch settings.linkTapBehaviour {
-            case "copy":
-                return copyContent(url.absoluteString)
-            case "follow":
-                return followLink(url)
-            default:
-                return Effect(value: nil)
-            }
-        case let .text(string):
-            return copyContent(string)
-        }
+    // MARK: Content handling
+
+    func followLink(item: LinkItem) -> Effect<Void, AppError> {
+        urlOpener
+            .open(item.urlString)
+            .eraseToEffect()
     }
 
-    func followLink(_ url: URL) -> Effect<CatalogAction.HandleContentAction?, Never> {
-        UIApplication.shared.open(url)
-        return Effect(value: .follow)
+    func copyLink(item: LinkItem) -> Effect<CatalogAction, AppError> {
+        pastboard.string = item.urlString
+
+        return Effect(
+            value: .handleActionCompletion(
+                action: .rowAction(id: item.id, action: .copy)
+            )
+        )
     }
 
-    func copyContent(_ content: String) -> Effect<CatalogAction.HandleContentAction?, Never> {
-        pastboard.string = content
-        return Effect(value: .copy)
-    }
+    // MARK: Routing
 
-    func showForm() -> Effect<CatalogAction, Never> {
-        guard
-            permissions.contains(.add),
-            // TODO: Resolving should not be inside this class
-            let interface = container.resolve(EditLinkFeatureInterface.self, argument: catalogSource)
-        else {
-            return .none
+    func showEditLinkForm(item: LinkItem?) -> Effect<CatalogAction, AppError> {
+        let item: LinkItem = item ?? .init(
+            name: "Untitled link",
+            urlString: "",
+            isFavorite: false
+        )
+
+        let input = EditLinkFeatureInterface.Input(
+            catalogSource: catalogSource,
+            item: item
+        )
+
+        guard let interface = container.resolve(EditLinkFeatureInterface.self, argument: input) else {
+            return Effect(error: .common(description: "Unable to resolve EditLink Feature interface"))
         }
 
         router.presentView(view: interface.view)
 
         return interface
             .onFinishPublisher
+            .setFailureType(to: AppError.self)
             .eraseToEffect { .dismissAddItemForm }
     }
 

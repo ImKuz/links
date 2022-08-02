@@ -2,6 +2,7 @@ import ComposableArchitecture
 import IdentifiedCollections
 import Combine
 import UIKit
+import ToolKit
 
 struct CatalogReducerFactory {
 
@@ -25,32 +26,15 @@ struct CatalogReducerFactory {
                 case .viewDidLoad:
                     setupState(state: &state, env: env)
                     return Effect(value: .suscribeToUpdates)
+
                 case .suscribeToUpdates:
-                    let itemsUpdates = env
-                        .subscribe()
-                        .receive(on: DispatchQueue.main)
-                        .catchToEffect(CatalogAction.itemsUpdated)
-                        .cancellable(id: ID.updates)
+                    return suscribeToUpdates(env: env)
 
-                    let connectivityUpdates = env
-                        .observeConnectivity()
-                        .receive(on: DispatchQueue.main)
-                        .eraseToEffect(CatalogAction.handleConnectionStateChange)
-                        .cancellable(id: ID.connectivity)
-
-                    let appUpdates = env
-                        .observeAppStateChanges()
-                        .receive(on: DispatchQueue.main)
-                        .eraseToEffect { CatalogAction.applicationStateUpdated }
-                        .cancellable(id: ID.appUpdates)
-
-                    return itemsUpdates
-                        .merge(with: connectivityUpdates, appUpdates)
-                        .eraseToEffect()
                 case .applicationStateUpdated:
                     return env
                         .reloadCatalog()
                         .fireAndForget()
+
                 case let .handleConnectionStateChange(connectionState):
                     switch connectionState {
                     case .failure:
@@ -67,30 +51,45 @@ struct CatalogReducerFactory {
                         state.rightButton = nil
                         return .none
                     }
+
                 case .connectionFailureInfo:
                     return env
                         .showConnectionErrorSheet()
                         .cancellable(id: ID.showErrorSheet, cancelInFlight: true)
-                case .addItem:
+
+                case .addLinkItem:
                     return env
-                        .showForm()
+                        .showEditLinkForm(item: nil)
                         .cancellable(id: ID.showForm, cancelInFlight: true)
+                        .catchToEffect {
+                            switch $0 {
+                            case let .success(action):
+                                return action
+                            case let .failure(error):
+                                return .handleError(error)
+                            }
+                        }
+
                 case .close:
                     return env
                         .close()
                         .fireAndForget()
+
                 case let .itemsUpdated(.success(items)):
                     state.items = items
                     return .none
+
                 case let .itemsUpdated(.failure(error)):
                     return env
                         .showErrorAlert(error: error)
                         .eraseToEffect { CatalogAction.suscribeToUpdates }
+
                 case let .moveItem(from, to):
                     return env
                         .move(from, to)
                         .receive(on: DispatchQueue.main)
                         .fireAndForget()
+
                 case let .titleMessage(text):
                     state.titleMessage = text
 
@@ -99,10 +98,12 @@ struct CatalogReducerFactory {
                         .catchToEffect { [title = state.title] _ in
                             return CatalogAction.titleMessage(text: title)
                         }
+
                 case .dismissAddItemForm:
                     return env
                         .dismissPresetnedView()
                         .fireAndForget()
+
                 case let .rowAction(id, action):
                     return handleRowAction(
                         state: &state,
@@ -110,18 +111,28 @@ struct CatalogReducerFactory {
                         action: action,
                         env: env
                     )
-                case let .contentHandleActionCompleted(handleAction):
-                    if case .copy = handleAction {
-                        return Effect(value: CatalogAction.titleMessage(text: "Copied to clipboard!"))
+                    .catch { Effect(value: CatalogAction.handleError($0)) }
+                    .flatMap { action -> Effect<CatalogAction, Never> in
+                        if let action = action {
+                            return Effect(value: action)
+                        } else {
+                            return Effect.none
+                        }
+                    }
+                    .eraseToEffect()
+                case let .handleActionCompletion(action):
+                    if case let .rowAction(_, rowAction) = action, case .copy = rowAction {
+                        return Effect(value: .titleMessage(text: "Copied to clipboard!"))
                     } else {
                         return .none
                     }
+                case let .handleError(error):
+                    // TODO: Error handling
+                    return .none
                 }
             }
         )
     }
-
-    // MARK: - Row action
 
     private func setupState(state: inout CatalogState, env: CatalogEnv) {
         state.canMoveItems = env.permissions.contains(.modify)
@@ -130,7 +141,7 @@ struct CatalogReducerFactory {
             state.rightButton = .init(
                 title: nil,
                 systemImageName: "plus",
-                action: .addItem
+                action: .addLinkItem
             )
         }
 
@@ -143,62 +154,80 @@ struct CatalogReducerFactory {
         }
     }
 
+    private func suscribeToUpdates(env: CatalogEnv) -> Effect<CatalogAction, Never> {
+        let itemsUpdates = env
+            .subscribeToCatalogUpdates()
+            .receive(on: DispatchQueue.main)
+            .catchToEffect(CatalogAction.itemsUpdated)
+            .cancellable(id: ID.updates)
+
+        let connectivityUpdates = env
+            .observeConnectivity()
+            .receive(on: DispatchQueue.main)
+            .eraseToEffect(CatalogAction.handleConnectionStateChange)
+            .cancellable(id: ID.connectivity)
+
+        let appUpdates = env
+            .observeAppStateChanges()
+            .receive(on: DispatchQueue.main)
+            .eraseToEffect { CatalogAction.applicationStateUpdated }
+            .cancellable(id: ID.appUpdates)
+
+        return Effect.merge(
+            itemsUpdates,
+            connectivityUpdates,
+            appUpdates
+        )
+    }
+
+    // MARK: - Row action
+
     private func handleRowAction(
         state: inout CatalogState,
         itemId: String,
         action: CatalogRowAction,
         env: CatalogEnv
-    ) -> Effect<CatalogAction, Never> {
+    ) -> Effect<CatalogAction?, AppError> {
         guard let index = state.items.index(id: itemId) else { return .none }
+        let item = state.items[index]
 
         switch action {
-        case .tap:
-            let content = state.items[index].content
-
-            return env
-                .handleContent(content)
-                .eraseToEffect {
-                    CatalogAction.contentHandleActionCompleted(action: $0)
-                }
-        case .follow:
-            guard case let .link(url) = state.items[index].content else { return .none }
-
-            return env
-                .followLink(url)
-                .eraseToEffect {
-                    CatalogAction.contentHandleActionCompleted(action: $0)
-                }
         case .copy:
-            let content = state.items[index].content
-
-            let string: String = {
-                switch content {
-                case let .link(url):
-                    return url.absoluteString
-                case let .text(text):
-                    return text
-                }
-            }()
-
             return env
-                .copyContent(string)
-                .eraseToEffect {
-                    CatalogAction.contentHandleActionCompleted(action: $0)
-                }
-        case .delete:
-            let temp = state.items.remove(at: index)
-
-            return env
-                .delete(temp)
+                .copyLink(item: item)
                 .receive(on: DispatchQueue.main)
-                .fireAndForget()
-        case let .setIsFavorite(isFaviorite):
-            let item = state.items[index]
+                .map { Optional($0)}
+                .eraseToEffect()
 
+        case .follow:
+            return env
+                .followLink(item: item)
+                .receive(on: DispatchQueue.main)
+                .catchToEmptyEffect { .handleError($0) }
+                .setFailureType(to: AppError.self)
+                .eraseToEffect()
+
+        case .edit:
+            return env
+                .showEditLinkForm(item: item)
+                .receive(on: DispatchQueue.main)
+                .map { Optional($0)}
+                .eraseToEffect()
+
+        case .tap:
+            return Effect(value: .rowAction(id: itemId, action: env.tapAction))
+
+        case .delete:
+            return env
+                .delete(state.items.remove(at: index))
+                .receive(on: DispatchQueue.main)
+                .eraseToEffect { .none }
+
+        case .setIsFavorite(let isFaviorite):
             return env
                 .setIsFavorite(item: item, isFavorite: isFaviorite)
                 .receive(on: DispatchQueue.main)
-                .fireAndForget()
+                .eraseToEffect { .none }
         }
     }
 }

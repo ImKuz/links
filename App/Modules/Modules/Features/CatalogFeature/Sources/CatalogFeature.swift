@@ -8,23 +8,19 @@ import UIKit
 
 // MARK: - Action
 
-enum CatalogAction: Equatable {
-
-    enum HandleContentAction: Equatable {
-        case follow, copy
-    }
-
+indirect enum CatalogAction: Equatable {
     case viewDidLoad
     case suscribeToUpdates
     case close
-    case addItem
+    case addLinkItem
     case connectionFailureInfo
     case handleConnectionStateChange(ConnectionState)
     case applicationStateUpdated
-    case itemsUpdated(Result<IdentifiedArrayOf<CatalogItem>, AppError>)
+    case itemsUpdated(Result<IdentifiedArrayOf<LinkItem>, AppError>)
+    case handleActionCompletion(action: CatalogAction)
+    case handleError(AppError)
     case moveItem(from: Int, to: Int)
-    case rowAction(id: CatalogItem.ID, action: CatalogRowAction)
-    case contentHandleActionCompleted(action: HandleContentAction?)
+    case rowAction(id: LinkItem.ID, action: CatalogRowAction)
     case titleMessage(text: String)
     case dismissAddItemForm
 }
@@ -32,24 +28,35 @@ enum CatalogAction: Equatable {
 // MARK: - Enviroment
 
 protocol CatalogEnv: AnyObject {
-    var permissions: CatalogDataSourcePermissions { get }
-    var linkTapAction: CatalogAction.HandleContentAction { get }
 
-    func reloadCatalog() -> Effect<Void, Never>
+    var permissions: CatalogDataSourcePermissions { get }
+    var configurableActions: [CatalogRowAction] { get }
+    var tapAction: CatalogRowAction { get }
+
+    // MARK: Updates subscription
+
     func observeAppStateChanges() -> Effect<Void, Never>
     func observeConnectivity() -> Effect<ConnectionState, Never>
-    func subscribe() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError>
-    func delete(_ item: CatalogItem) -> Effect<Void, AppError>
-    func move(_ from: Int, _ to: Int) -> Effect<Void, AppError>
-    func add(_ item: CatalogItem) -> Effect<Void, AppError>
-    func setIsFavorite(item: CatalogItem, isFavorite: Bool) -> Effect<Void, AppError>
+    func subscribeToCatalogUpdates() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError>
 
-    func handleContent(_ content: CatalogItemContent) -> Effect<CatalogAction.HandleContentAction?, Never>
-    func followLink(_ url: URL) -> Effect<CatalogAction.HandleContentAction?, Never>
-    func copyContent(_ content: String) -> Effect<CatalogAction.HandleContentAction?, Never>
-    func showForm() -> Effect<CatalogAction, Never>
-    func showErrorAlert(error: AppError) -> Effect<Void, Never>
+    // MARK: Catalog
+
+    func reloadCatalog() -> Effect<Void, Never>
+    func delete(_ item: LinkItem) -> Effect<Void, AppError>
+    func move(_ from: Int, _ to: Int) -> Effect<Void, AppError>
+    func add(_ item: LinkItem) -> Effect<Void, AppError>
+    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> Effect<Void, AppError>
+
+    // MARK: Content handling
+
+    func followLink(item: LinkItem) -> Effect<Void, AppError>
+    func copyLink(item: LinkItem) -> Effect<CatalogAction, AppError>
+
+    // MARK: Routing
+
+    func showEditLinkForm(item: LinkItem?) -> Effect<CatalogAction, AppError>
     func showConnectionErrorSheet() -> Effect<CatalogAction, Never>
+    func showErrorAlert(error: AppError) -> Effect<Void, Never>
     func dismissPresetnedView() -> Effect<Void, Never>
     func close() -> Effect<Void, Never>
 }

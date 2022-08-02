@@ -4,10 +4,10 @@ protocol CatalogRowMenuActionsProvider {
     func asyncActions(
         id: CatalogRowState.ID,
         state: CatalogState,
-        completion: @escaping ([CatalogState.RowMenuAction]) -> ()
+        completion: @escaping ([RowMenuAction]) -> ()
     )
 
-    func acitons(state: CatalogState, indexPath: IndexPath) -> [CatalogState.RowMenuAction]
+    func acitons(state: CatalogState, indexPath: IndexPath) -> [RowMenuAction]
 }
 
 final class CatalogRowMenuActionsProviderImpl: CatalogRowMenuActionsProvider {
@@ -21,71 +21,76 @@ final class CatalogRowMenuActionsProviderImpl: CatalogRowMenuActionsProvider {
     func asyncActions(
         id: CatalogRowState.ID,
         state: CatalogState,
-        completion: @escaping ([CatalogState.RowMenuAction]) -> ()
+        completion: @escaping ([RowMenuAction]) -> ()
     ) {
-        guard let item = state.items[id: id] else { return completion([]) }
-
-        var actions = [CatalogState.RowMenuAction]()
-
-        if case .link = item.content {
-            switch env.linkTapAction {
-            case .follow:
-                actions.append(
-                    .init(
-                        iconName: "doc.on.doc",
-                        title: "Copy link",
-                        action: .copy
-                    )
-                )
-            case .copy:
-                actions.append(
-                    .init(
-                        iconName: "link",
-                        title: "Follow link",
-                        action: .follow
-                    )
-                )
-            }
-        }
-
-        completion(actions)
+        completion(
+            env.configurableActions.compactMap(mapAction)
+        )
     }
 
-    func acitons(state: CatalogState, indexPath: IndexPath) -> [CatalogState.RowMenuAction] {
-        var menuActions = [CatalogState.RowMenuAction]()
+    func acitons(state: CatalogState, indexPath: IndexPath) -> [RowMenuAction] {
+        var actions = [CatalogRowAction]()
         let item = state.items[indexPath.row]
 
         if env.permissions.contains(.favorites) {
-            let action: CatalogState.RowMenuAction
+            actions.append(
+                .setIsFavorite(!item.isFavorite)
+            )
+        }
 
-            if item.isFavorite {
-                action = .init(
+        if env.permissions.contains(.modify) {
+            actions.append(.delete)
+        }
+
+        return actions.compactMap(mapAction)
+    }
+
+    private func mapAction(_ action: CatalogRowAction) -> RowMenuAction? {
+        switch action {
+        case .copy:
+            return .init(
+                iconName: "",
+                title: "Copy link",
+                action: action
+            )
+
+        case .follow:
+            return .init(
+                iconName: "link",
+                title: "Open URL",
+                action: action
+            )
+
+        case .edit:
+            return .init(
+                iconName: "square.and.pencil",
+                title: "Edit",
+                action: action
+            )
+
+        case .tap:
+            return .none
+
+        case .delete:
+            return .init(
+                iconName: "trash",
+                title: "Delete",
+                action: action,
+                isDestructive: true
+            )
+
+        case .setIsFavorite(let isFavorite):
+            return isFavorite
+                ? .init(
                     iconName: "star.slash",
                     title: "Remove from favorites",
                     action: .setIsFavorite(false)
                 )
-            } else {
-                action = .init(
+                : .init(
                     iconName: "star",
                     title: "Add to favorites",
                     action: .setIsFavorite(true)
                 )
-            }
-
-            menuActions.append(action)
         }
-
-        if env.permissions.contains(.modify) {
-            menuActions.append(
-                .init(
-                    iconName: "trash",
-                    title: "Delete",
-                    action: .delete,
-                    isDestructive: true
-                )
-            )
-        }
-
-        return menuActions
     }
 }

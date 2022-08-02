@@ -13,7 +13,7 @@ final class CatalogViewController: UICollectionViewController {
     private let catalogUpdatePublisher: AnyPublisher<Void, Never>
 
     private var cancellables = [AnyCancellable]()
-    private var currentItems = IdentifiedArrayOf<CatalogItem>()
+    private var currentItems = IdentifiedArrayOf<LinkItem>()
 
     // MARK: - Init
 
@@ -97,7 +97,7 @@ final class CatalogViewController: UICollectionViewController {
             .store(in: &cancellables)
     }
 
-    private func setupLeftButton(_ config: CatalogState.ButtonConfig?) {
+    private func setupLeftButton(_ config: ButtonConfig?) {
         if let  config = config {
             navigationItem.leftBarButtonItem = makeBarButton(config: config)
         } else {
@@ -105,7 +105,7 @@ final class CatalogViewController: UICollectionViewController {
         }
     }
 
-    private func setupRightButton(_ config: CatalogState.ButtonConfig?) {
+    private func setupRightButton(_ config: ButtonConfig?) {
         if let  config = config {
             navigationItem.rightBarButtonItem = makeBarButton(config: config)
         } else {
@@ -113,7 +113,7 @@ final class CatalogViewController: UICollectionViewController {
         }
     }
 
-    private func makeBarButton(config: CatalogState.ButtonConfig) -> UIBarButtonItem {
+    private func makeBarButton(config: ButtonConfig) -> UIBarButtonItem {
         var image: UIImage?
 
         if let imageName = config.systemImageName {
@@ -134,8 +134,8 @@ final class CatalogViewController: UICollectionViewController {
         return button
     }
 
-    private func apllyDiff(newItems: IdentifiedArrayOf<CatalogItem>) {
-        guard !isItemsEqual(current: currentItems, new: newItems) else { return }
+    private func apllyDiff(newItems: IdentifiedArrayOf<LinkItem>) {
+        guard zip(currentItems, newItems).allSatisfy({ $0 == $1 }) else { return }
 
         let diff = newItems.difference(from: currentItems)
 
@@ -161,13 +161,6 @@ final class CatalogViewController: UICollectionViewController {
                 collectionView.insertItems(at: insertIndexPaths)
             }
         }
-    }
-
-    private func isItemsEqual(
-        current: IdentifiedArrayOf<CatalogItem>,
-        new: IdentifiedArrayOf<CatalogItem>
-    ) -> Bool {
-        zip(current, new).allSatisfy { $0 == $1 }
     }
 
     // MARK: - UICollectionViewDataSource
@@ -198,9 +191,7 @@ final class CatalogViewController: UICollectionViewController {
         cell.set(
             store: store.scope(
                 state: { _ in state },
-                action: {
-                    CatalogAction.rowAction(id: item.id, action: $0)
-                }
+                action: { CatalogAction.rowAction(id: item.id, action: $0) }
             )
         )
 
@@ -245,7 +236,7 @@ extension CatalogViewController: CatalogRowCellAsyncAcitonsProvider {
 
     func catalogRowRequestsAsyncActions(
         id: CatalogRowState.ID,
-        completion: (([CatalogState.RowMenuAction]) -> ())?
+        completion: (([RowMenuAction]) -> ())?
     ) {
         rowMenuActionsProvider.asyncActions(id: id, state: viewStore.state) {
             completion?($0)

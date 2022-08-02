@@ -74,11 +74,12 @@ public struct CatalogFeatureAssembly: Assembly {
             catalogSource: source,
             pastboard: UIPasteboard.general,
             router: router,
+            urlOpener: container.resolve(URLOpener.self)!,
             settings: container.resolve(SettingsHelper.self)!
         )
 
         let store = Store(
-            initialState: .initial(hasCloseButton: !isLocal, title: title),
+            initialState: CatalogState(hasCloseButton: !isLocal, title: title),
             reducer: CatalogReducerFactory().make(),
             environment: environment
         )

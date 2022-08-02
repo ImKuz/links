@@ -47,7 +47,15 @@ public struct RootFeatureInterface: FeatureInterface {
 
 public struct EditLinkFeatureInterface: FeatureInterface {
 
-    public typealias Input = CatalogSource
+    public struct Input {
+        public let catalogSource: CatalogSource
+        public let item: LinkItem
+
+        public init(catalogSource: CatalogSource, item: LinkItem) {
+            self.catalogSource = catalogSource
+            self.item = item
+        }
+    }
 
     public var view: AnyView
     public var onFinishPublisher: AnyPublisher<Void, Never>
