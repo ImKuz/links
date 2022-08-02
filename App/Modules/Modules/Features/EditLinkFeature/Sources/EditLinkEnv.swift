@@ -8,11 +8,14 @@ import UIKit
 
 final class EditLinkEnvImpl: EditLinkEnv {
 
-    let onFinishSubject = PassthroughSubject<Void, Never>()
     private let catalogSource: CatalogSource
+    private let initialItem: LinkItem
 
-    init(catalogSource: CatalogSource) {
+    let onFinishSubject = PassthroughSubject<Void, Never>()
+
+    init(catalogSource: CatalogSource, initialItem: LinkItem) {
         self.catalogSource = catalogSource
+        self.initialItem = initialItem
     }
 
     func validateState(_ state: EditLinkState) -> Effect<Set<EditLinkState.ValidateableField>, Never> {
@@ -53,16 +56,16 @@ final class EditLinkEnvImpl: EditLinkEnv {
     }
 
     func done(state: EditLinkState) -> Effect<Void, AppError> {
-        guard let item = Self.map(state: state) else {
-            return Fail(error: AppError.mapping(description: "Unable to map state into CatalogItem")).eraseToEffect()
-        }
-
-        return catalogSource
-            .add(item: item)
-            .eraseToEffect()
+        // TODO: Implement edit/add of link item
+        .none
     }
 
-    private static func map(state: EditLinkState) -> CatalogItem? {
-        nil
+    private func map(state: EditLinkState) -> LinkItem {
+        .init(
+            id: initialItem.id,
+            name: state.name,
+            urlString: state.urlString,
+            isFavorite: initialItem.isFavorite
+        )
     }
 }

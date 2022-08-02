@@ -91,7 +91,7 @@ final class CatalogEnvImpl: CatalogEnv {
         }
     }
 
-    func subscribeToCatalogUpdates() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError> {
+    func subscribeToCatalogUpdates() -> Effect<IdentifiedArrayOf<LinkItem>, AppError> {
         catalogSource
             .subscribe()
             .removeDuplicates()
@@ -108,7 +108,7 @@ final class CatalogEnvImpl: CatalogEnv {
 
     func delete(_ item: LinkItem) -> Effect<Void, AppError> {
         catalogSource
-            .delete(item)
+            .delete(id: item.id)
             .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }
@@ -129,7 +129,7 @@ final class CatalogEnvImpl: CatalogEnv {
 
     func setIsFavorite(item: LinkItem, isFavorite: Bool) -> Effect<Void, AppError> {
         catalogSource
-            .setIsFavorite(item: item, isFavorite: isFavorite)
+            .setIsFavorite(id: item.id, isFavorite: isFavorite)
             .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }

@@ -37,7 +37,7 @@ protocol CatalogEnv: AnyObject {
 
     func observeAppStateChanges() -> Effect<Void, Never>
     func observeConnectivity() -> Effect<ConnectionState, Never>
-    func subscribeToCatalogUpdates() -> Effect<IdentifiedArrayOf<CatalogItem>, AppError>
+    func subscribeToCatalogUpdates() -> Effect<IdentifiedArrayOf<LinkItem>, AppError>
 
     // MARK: Catalog
 
