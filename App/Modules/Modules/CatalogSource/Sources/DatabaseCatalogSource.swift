@@ -49,7 +49,7 @@ final class DatabaseCatalogSource: CatalogSource {
             .eraseToAnyPublisher()
     }
 
-    func delete(_ item: Models.CatalogItem) -> AnyPublisher<Void, AppError> {
+    func delete(_ item: LinkItem) -> AnyPublisher<Void, AppError> {
         databaseService
             .write { context in
                 let items = try context.read(
@@ -102,7 +102,7 @@ final class DatabaseCatalogSource: CatalogSource {
             .eraseToAnyPublisher()
     }
 
-    func setIsFavorite(item: Models.CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         favoritesCatalogSourceHelper
             .setIsFavorite(item: item, isFavorite: isFavorite)
     }
@@ -196,34 +196,6 @@ private extension Database.Context {
             items: &array,
             offset: offset,
             indexOffset: indexOffset
-        )
-    }
-}
-
-// MARK: - Mapping
-
-extension LinkItem {
-
-    func convertToEntity(withIndex index: Int) -> LinkItemEntity {
-        LinkItemEntity(
-            storeId: UUID().uuidString,
-            itemId: id,
-            name: name,
-            urlString: urlString,
-            index: Int16(index),
-            isFavorite: isFavorite
-        )
-    }
-}
-
-extension LinkItemEntity {
-
-    func convertToModel() -> LinkItem {
-        LinkItem(
-            id: itemId,
-            name: name,
-            urlString: urlString,
-            isFavorite: isFavorite
         )
     }
 }

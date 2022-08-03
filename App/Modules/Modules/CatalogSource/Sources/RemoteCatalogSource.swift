@@ -48,7 +48,7 @@ final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
             )
     }
 
-    func subscribe() -> AnyPublisher<IdentifiedArrayOf<CatalogItem>, AppError> {
+    func subscribe() -> AnyPublisher<IdentifiedArrayOf<LinkItem>, AppError> {
         bindClientUpdates()
 
         return bus.output
@@ -56,7 +56,7 @@ final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
             .eraseToAnyPublisher()
     }
 
-    func setIsFavorite(item: CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         favoritesCatalogSourceHelper
             .setIsFavorite(item: item, isFavorite: isFavorite)
             .handleEvents(receiveOutput: { [weak bus] _ in

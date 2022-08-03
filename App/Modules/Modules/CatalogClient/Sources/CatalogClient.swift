@@ -5,7 +5,7 @@ import SharedInterfaces
 
 public protocol CatalogClient: ConnectionObservable {
     func disconnect()
-    func subscribe() -> AnyPublisher<[CatalogItem], AppError>
+    func subscribe() -> AnyPublisher<[LinkItem], AppError>
 }
 
 final class CatalogClientImpl: ConnectionObservable, CatalogClient {
@@ -36,7 +36,7 @@ final class CatalogClientImpl: ConnectionObservable, CatalogClient {
         provider.disconnect()
     }
 
-    func subscribe() -> AnyPublisher<[CatalogItem], AppError> {
+    func subscribe() -> AnyPublisher<[LinkItem], AppError> {
         configureIfNeeded(host: host, port: port)
         return self.provider.subscribe()
     }

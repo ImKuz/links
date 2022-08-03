@@ -16,7 +16,7 @@ final class LocalCatalogFavoritesProviderImpl: LocalCatalogFavoritesProvider {
     func favorites() -> AnyPublisher<Set<String>, Never> {
         database
             .fetch(
-                CatalogItem.self,
+                LinkItemEntity.self,
                 request: .init(predicate: .init(format: "isFavorite == YES"))
             )
             .map {

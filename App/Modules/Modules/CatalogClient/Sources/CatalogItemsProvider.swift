@@ -10,7 +10,7 @@ protocol CatalogItemsProvider {
 
     func configure(host: String, port: Int)
     func disconnect()
-    func subscribe() -> AnyPublisher<[CatalogItem], AppError>
+    func subscribe() -> AnyPublisher<[LinkItem], AppError>
     func connectivity() -> AnyPublisher<ConnectionState, Never>
 }
 
@@ -20,9 +20,9 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
     private let localCatalogFavoritesProvider: LocalCatalogFavoritesProvider
 
     private var client: Catalog_SourceClientProtocol?
-    private var itemsSubject = PassthroughSubject<[CatalogItem], AppError>()
+    private var itemsSubject = PassthroughSubject<[LinkItem], AppError>()
     private var connectivitySubject = PassthroughSubject<ConnectionState, Never>()
-    private var call: ServerStreamingCall<Catalog_Empty, Catalog_Catalog>?
+    private var call: ServerStreamingCall<Catalog_Empty, Catalog_LinkItemsList>?
     private var cancellables = [AnyCancellable]()
 
     // MARK: - Init
@@ -54,7 +54,7 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
         client = nil
     }
 
-    func subscribe() -> AnyPublisher<[CatalogItem], AppError> {
+    func subscribe() -> AnyPublisher<[LinkItem], AppError> {
         guard let client = client else {
             return Fail(error: AppError.common(description: Strings.clientIsNotConfigured)).eraseToAnyPublisher()
         }
@@ -145,31 +145,16 @@ final class CatalogItemsProviderImpl: CatalogItemsProvider, ConnectivityStateDel
     }
 
     private static func mapCatalog(
-        catalog: Catalog_Catalog,
+        catalog: Catalog_LinkItemsList,
         favorites: Set<String>
-    ) -> [CatalogItem] {
-        catalog.items.compactMap { item in
-            switch item.kind {
-            case .group:
-                return .none
-            case let .link(link):
-                guard let url = URL(string: link.link) else { return .none }
-                return .init(
-                    id: link.id,
-                    name: link.name,
-                    content: .link(url),
-                    isFavorite: favorites.contains(link.id)
-                )
-            case let .snippet(snippet):
-                return .init(
-                    id: snippet.id,
-                    name: snippet.name,
-                    content: .text(snippet.content),
-                    isFavorite: favorites.contains(snippet.id)
-                )
-            case .none:
-                return .none
-            }
+    ) -> [LinkItem] {
+        catalog.items.map {
+            LinkItem(
+                id: $0.id,
+                name: $0.name,
+                urlString: $0.urlString,
+                isFavorite: favorites.contains($0.id)
+            )
         }
     }
 }

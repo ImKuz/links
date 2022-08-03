@@ -12,12 +12,15 @@ public struct EditLinkFeatureAssembly: Assembly {
     public func assemble(container: Container) {
 
         let factory: (Resolver, EditLinkFeatureInterface.Input) -> EditLinkFeatureInterface = { _, input in
-            let environment = EditLinkEnvImpl(catalogSource: input.catalogSource)
+            let environment = EditLinkEnvImpl(
+                catalogSource: input.catalogSource,
+                initialItem: input.item
+            )
 
             let store = Store<EditLinkState, EditLinkAction>(
                 initialState: EditLinkState(
                     name: input.item.name,
-                    urlComponents: .init(input.item.urlString)
+                    urlComponents: URLComponents(string: input.item.urlString)
                 ),
                 reducer: editLinkReducer,
                 environment: environment

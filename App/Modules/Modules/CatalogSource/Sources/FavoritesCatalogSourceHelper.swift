@@ -4,7 +4,7 @@ import ToolKit
 import Combine
 
 protocol FavoritesCatalogSourceHelper {
-    func setIsFavorite(item: Models.CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError>
+    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError>
 }
 
 final class FavoritesCatalogSourceHelperImpl: FavoritesCatalogSourceHelper {
@@ -15,11 +15,11 @@ final class FavoritesCatalogSourceHelperImpl: FavoritesCatalogSourceHelper {
         self.databaseService = databaseService
     }
 
-    func setIsFavorite(item: Models.CatalogItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         databaseService
             .write { context in
                 let items = try context.read(
-                    type: Database.CatalogItem.self,
+                    type: LinkItemEntity.self,
                     request: .init(predicate: .init(format: "itemId == %@", item.id))
                 )
 

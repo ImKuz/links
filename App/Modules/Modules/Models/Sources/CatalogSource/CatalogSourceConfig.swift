@@ -23,16 +23,7 @@ public struct LocalCatalogSourceConfig {
     }
 }
 
-public struct RemoteCatalogSourceConfig {
-
-    public let host: String
-    public let port: Int
-
-    public init(host: String, port: Int) {
-        self.host = host
-        self.port = port
-    }
-}
+public typealias RemoteCatalogSourceConfig = ServerCredentials
 
 public enum CatalogSourceConfigTypeConfig {
     case local(LocalCatalogSourceConfig)

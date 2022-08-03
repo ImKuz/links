@@ -103,47 +103,18 @@ extension CatalogServerImpl: CatalogServer {
 
 extension CatalogServerImpl: CatalogSourceProviderDelegate {
 
-    func providerRequestsData() -> AnyPublisher<[Models.CatalogItem], AppError> {
+    func providerRequestsData() -> AnyPublisher<[LinkItem], AppError> {
         let request = FetchRequest(
             sortDescriptor: .init(key: "index", ascending: true)
         )
 
         return database
             .fetch(
-                Database.CatalogItem.self,
+                LinkItemEntity.self,
                 request: request
             )
             .map { items in items.map { $0.convertToModel() } }
             .mapError { _ in AppError.businessLogic("Unable to fetch items") }
             .eraseToAnyPublisher()
-    }
-}
-
-// MARK: - Mapping
-
-private extension Database.CatalogItem {
-
-    func convertToModel() -> Models.CatalogItem {
-        let itemContent: CatalogItemContent
-
-        switch contentType {
-        case "link":
-            if let url = URL(string: content) {
-                itemContent = .link(url)
-            } else {
-                itemContent = .text(content)
-            }
-        case "text":
-            itemContent = .text(content)
-        default:
-            fatalError("Unsupported content type!")
-        }
-
-        return .init(
-            id: itemId,
-            name: name,
-            content: itemContent,
-            isFavorite: isFavorite
-        )
     }
 }
