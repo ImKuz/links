@@ -9,10 +9,11 @@ public class LinkItemEntity: PersistableEntity {
 
     public let storeId: String
     public let itemId: String
-    public let name: String
-    public let urlString: String
-    public let index: Int16
-    public let isFavorite: Bool
+
+    public var name: String
+    public var urlString: String
+    public var index: Int16
+    public var isFavorite: Bool
 
     // MARK: - Init
 

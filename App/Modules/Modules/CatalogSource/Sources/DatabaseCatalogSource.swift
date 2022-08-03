@@ -10,7 +10,7 @@ final class DatabaseCatalogSource: CatalogSource {
 
     private(set) var permissions: CatalogDataSourcePermissions = .all
 
-    private var itemsSubject = PassthroughSubject<IdentifiedArrayOf<Database.CatalogItem>, AppError>()
+    private var entitiesSubject = PassthroughSubject<IdentifiedArrayOf<LinkItemEntity>, AppError>()
     private var cancellables = [AnyCancellable]()
     private let databaseService: DatabaseService
     private let topLevelPredicate: NSPredicate?
@@ -35,15 +35,15 @@ final class DatabaseCatalogSource: CatalogSource {
 
     // MARK: - CatalogSource
 
-    func subscribe() -> AnyPublisher<IdentifiedArrayOf<Models.CatalogItem>, AppError> {
+    func subscribe() -> AnyPublisher<IdentifiedArrayOf<LinkItem>, AppError> {
         defer { updateItems() }
 
-        itemsSubject = .init()
+        entitiesSubject = .init()
 
-        return itemsSubject
+        return entitiesSubject
             .map { items in
                 let mappedItems = items.map { $0.convertToModel() }
-                return IdentifiedArrayOf<Models.CatalogItem>(uniqueElements: mappedItems)
+                return IdentifiedArrayOf<LinkItem>(uniqueElements: mappedItems)
             }
             .share()
             .eraseToAnyPublisher()
@@ -53,7 +53,7 @@ final class DatabaseCatalogSource: CatalogSource {
         databaseService
             .write { context in
                 let items = try context.read(
-                    type: Database.CatalogItem.self,
+                    type: LinkItemEntity.self,
                     request: .init(predicate: .init(format: "itemId == %@", item.id))
                 )
 
@@ -89,7 +89,7 @@ final class DatabaseCatalogSource: CatalogSource {
             .eraseToAnyPublisher()
     }
 
-    func add(item: Models.CatalogItem) -> AnyPublisher<Void, AppError> {
+    func add(item: LinkItem) -> AnyPublisher<Void, AppError> {
         databaseService
             .write { context in
                 try context.updateIndices(from: 0, indexOffset: 1)
@@ -118,9 +118,9 @@ final class DatabaseCatalogSource: CatalogSource {
             .store(in: &cancellables)
     }
 
-    private func fetchItems() -> AnyPublisher<[Database.CatalogItem], Error> {
+    private func fetchItems() -> AnyPublisher<[LinkItemEntity], Error> {
         databaseService.fetch(
-            Database.CatalogItem.self,
+            LinkItemEntity.self,
             request: .init(
                 sortDescriptor: .init(key: "index", ascending: true),
                 predicate: topLevelPredicate
@@ -136,12 +136,12 @@ final class DatabaseCatalogSource: CatalogSource {
             .sink(
                 receiveCompletion: { [weak self] completion in
                     if case let .failure(error) = completion {
-                        self?.itemsSubject.send(completion: .failure(error))
+                        self?.entitiesSubject.send(completion: .failure(error))
                     }
                 },
                 receiveValue: { [weak self] items in
-                    let array = IdentifiedArrayOf<Database.CatalogItem>(uniqueElements: items)
-                    self?.itemsSubject.send(array)
+                    let array = IdentifiedArrayOf<LinkItemEntity>(uniqueElements: items)
+                    self?.entitiesSubject.send(array)
                 }
             )
             .store(in: &cancellables)
@@ -152,9 +152,9 @@ final class DatabaseCatalogSource: CatalogSource {
 
 private extension Database.Context {
 
-    func readCatalogItems(offset: Int = 0) throws -> [Database.CatalogItem] {
+    func readCatalogItems(offset: Int = 0) throws -> [LinkItemEntity] {
         try read(
-            type: Database.CatalogItem.self,
+            type: LinkItemEntity.self,
             request: .init(
                 sortDescriptor: .init(key: "index", ascending: true),
                 fetchOffset: offset
@@ -163,12 +163,12 @@ private extension Database.Context {
     }
 
     func updateIndices(
-        items: inout IdentifiedArrayOf<Database.CatalogItem>,
+        items: inout IdentifiedArrayOf<LinkItemEntity>,
         offset: Int = 0,
         indexOffset: Int = 0
     ) throws {
         guard !items.isEmpty else { return }
-        var sliceItems = [Database.CatalogItem]()
+        var sliceItems = [LinkItemEntity]()
 
         if items.count == 1, let first = items.first {
             sliceItems = [first]
@@ -190,7 +190,7 @@ private extension Database.Context {
         indexOffset: Int = 0
     ) throws {
         let items = try readCatalogItems(offset: offset)
-        var array = IdentifiedArrayOf<Database.CatalogItem>(uniqueElements: items)
+        var array = IdentifiedArrayOf<LinkItemEntity>(uniqueElements: items)
 
         try updateIndices(
             items: &array,
@@ -202,57 +202,27 @@ private extension Database.Context {
 
 // MARK: - Mapping
 
-extension Models.CatalogItem {
+extension LinkItem {
 
-    func convertToEntity(withIndex index: Int) -> Database.CatalogItem {
-        let contentString: String
-        let contentType: String
-
-        switch content {
-        case let .link(url):
-            contentString = url.absoluteString
-            contentType = "link"
-        case let .text(string):
-            contentString = string
-            contentType = "text"
-        }
-
-        return Database.CatalogItem(
+    func convertToEntity(withIndex index: Int) -> LinkItemEntity {
+        LinkItemEntity(
             storeId: UUID().uuidString,
             itemId: id,
-            name: _name,
-            content: contentString,
-            contentType: contentType,
-            isFavorite: false,
+            name: name,
+            urlString: urlString,
             index: Int16(index),
-            remoteServerId: nil,
-            params: nil
+            isFavorite: isFavorite
         )
     }
 }
 
-extension Database.CatalogItem {
+extension LinkItemEntity {
 
-    func convertToModel() -> Models.CatalogItem {
-        let itemContent: CatalogItemContent
-
-        switch contentType {
-        case "link":
-            if let url = URL(string: content) {
-                itemContent = .link(url)
-            } else {
-                itemContent = .text(content)
-            }
-        case "text":
-            itemContent = .text(content)
-        default:
-            fatalError("Unsupported content type!")
-        }
-
-        return .init(
+    func convertToModel() -> LinkItem {
+        LinkItem(
             id: itemId,
             name: name,
-            content: itemContent,
+            urlString: urlString,
             isFavorite: isFavorite
         )
     }
