@@ -7,21 +7,21 @@ import Foundation
 
 protocol RemoteCatalogSourceDatabaseBus: AnyObject {
 
-    var output: AnyPublisher<IdentifiedArrayOf<Models.CatalogItem>, AppError> { get }
+    var output: AnyPublisher<IdentifiedArrayOf<LinkItem>, AppError> { get }
 
     func reset()
     func pass(error: AppError)
-    func pass(items: IdentifiedArrayOf<Models.CatalogItem>)
+    func pass(items: IdentifiedArrayOf<LinkItem>)
     func synchronizeState()
 }
 
 final class RemoteCatalogSourceDatabaseBusImpl: RemoteCatalogSourceDatabaseBus {
 
     private let databaseService: DatabaseService
-    private var outputSubject = CurrentValueSubject<IdentifiedArrayOf<Models.CatalogItem>, AppError>([])
+    private var outputSubject = CurrentValueSubject<IdentifiedArrayOf<LinkItem>, AppError>([])
     private var cancellables = [AnyCancellable]()
 
-    var output: AnyPublisher<IdentifiedArrayOf<Models.CatalogItem>, AppError> {
+    var output: AnyPublisher<IdentifiedArrayOf<LinkItem>, AppError> {
         outputSubject
             .share()
             .eraseToAnyPublisher()
@@ -48,7 +48,7 @@ final class RemoteCatalogSourceDatabaseBusImpl: RemoteCatalogSourceDatabaseBus {
         outputSubject.send(completion: .failure(error))
     }
 
-    func pass(items: IdentifiedArrayOf<Models.CatalogItem>) {
+    func pass(items: IdentifiedArrayOf<LinkItem>) {
         synchronizeItems(items)
     }
 
@@ -57,19 +57,18 @@ final class RemoteCatalogSourceDatabaseBusImpl: RemoteCatalogSourceDatabaseBus {
         synchronizeItems(outputSubject.value)
     }
 
-    private func synchronizeItems(_ items: IdentifiedArrayOf<Models.CatalogItem>) {
-        let itemIds = items
-            .elements
-            .map(\.id)
-
-        let predicate = NSPredicate(format: "itemId IN %@", itemIds)
+    private func synchronizeItems(_ items: IdentifiedArrayOf<LinkItem>) {
+        let predicate = NSPredicate(
+            format: "itemId IN %@",
+            items.elements.map(\.id)
+        )
 
         databaseService
             .fetch(
-                Database.CatalogItem.self,
+                LinkItemEntity.self,
                 request: .init(predicate: predicate)
             )
-            .map { [items] storedItems -> IdentifiedArrayOf<Models.CatalogItem> in
+            .map { [items] storedItems -> IdentifiedArrayOf<LinkItem> in
                 var newItems = items
                 let storedItems = IdentifiedArray(uniqueElements: storedItems)
 
@@ -80,12 +79,14 @@ final class RemoteCatalogSourceDatabaseBusImpl: RemoteCatalogSourceDatabaseBus {
                         isFavorite = storedItem.isFavorite
                     }
 
-                    newItems.update(.init(
+                    let linkItem = LinkItem(
                         id: item.id,
                         name: item.name,
-                        content: item.content,
+                        urlString: item.urlString,
                         isFavorite: isFavorite
-                    ), at: index)
+                    )
+
+                    newItems.update(linkItem, at: index)
                 }
 
                 return newItems
