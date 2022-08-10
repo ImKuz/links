@@ -61,8 +61,8 @@ struct EditLinkView: View {
         Form {
             Section() {
                 HStack {
-                    TextField(
-                        "Name",
+                    textField(
+                        placeholder: "Name",
                         text: viewStore.binding(
                             get: \.name,
                             send: { .changeName($0) }
@@ -73,32 +73,32 @@ struct EditLinkView: View {
             }
 
             Section() {
-                TextField(
-                    "URL",
+                textField(
+                    placeholder: "URL",
                     text: viewStore.binding(
                         get: \.urlString,
-                        send: { .changeUrl($0) }
+                        send: { .changeUrlString($0) }
                     )
                 )
             }
 
             Section(header: Text("Query params")) {
-                ForEach(Array(viewStore.queryItems.enumerated()), id: \.offset) { index, item in
+                ForEach(Array(viewStore.queryParams.enumerated()), id: \.offset) { index, queryParam in
                     queryItemField(
                         viewStore: viewStore,
-                        queryItem: item,
+                        queryParam: queryParam,
                         index: index
                     )
                     .swipeActions {
                         Button(
-                            action: { viewStore.send(.deleteQueryItem(index: index)) },
+                            action: { viewStore.send(.deleteQueryParam(index: index)) },
                             label: { Labels.delete }
                         )
                         .tint(.red)
                     }
                 }
                 Button(
-                    action: { viewStore.send(.addQueryItem) },
+                    action: { viewStore.send(.appendQueryItem) },
                     label: { Labels.addParam }
                 )
             }
@@ -135,29 +135,40 @@ struct EditLinkView: View {
     @ViewBuilder
     private func queryItemField(
         viewStore: EditLinkViewStore,
-        queryItem: URLQueryItem,
+        queryParam: QueryParam,
         index: Int
     ) -> some View {
         HStack {
-            TextField(
-                "Key",
+            textField(
+                placeholder: "Key",
                 text: viewStore.binding(
-                    get: { _ in queryItem.name },
-                    send: { .changeQueryItemName(key: $0, index: index) }
+                    get: { _ in queryParam.key },
+                    send: { .changeQueryParamKey(key: $0, index: index) }
                 )
             )
-            TextField(
-                "Value",
+            textField(
+                placeholder: "Value",
                 text: viewStore.binding(
-                    get: { _ in queryItem.value ?? "" },
-                    send: { .changeQueryItemValue(value: $0, index: index) }
+                    get: { _ in queryParam.value },
+                    send: { .changeQueryParamValue(value: $0, index: index) }
                 )
             )
             Images.expandValue
                 .foregroundColor(.accentColor)
                 .onTapGesture {
-                    viewStore.send(.expandQueryItemValue(index: index))
+                    viewStore.send(.expandQueryParamValue(index: index))
                 }
         }
+    }
+
+    @ViewBuilder
+    private func textField(
+        placeholder: String,
+        text: Binding<String>
+    ) -> some View {
+        TextField(placeholder, text: text)
+            .textContentType(.URL)
+            .textInputAutocapitalization(.never)
+            .keyboardType(.URL)
     }
 }

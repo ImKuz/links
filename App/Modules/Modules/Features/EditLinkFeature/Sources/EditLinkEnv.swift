@@ -25,16 +25,16 @@ final class EditLinkEnvImpl: EditLinkEnv {
             invalidFields.insert(.name)
         }
 
-        if state.urlComponents?.url == nil {
+        if !state.urlString.isLink {
             invalidFields.insert(.url)
         }
 
-        state.urlComponents?.queryItems?.enumerated().forEach { index, item in
-            if item.name.isEmpty {
+        state.queryParams.enumerated().forEach { index, item in
+            if item.key.isEmpty {
                 invalidFields.insert(.key(index: index))
             }
 
-            if item.value == nil || item.value?.isEmpty == true {
+            if item.value.isEmpty {
                 invalidFields.insert(.value(index: index))
             }
         }
@@ -43,7 +43,7 @@ final class EditLinkEnvImpl: EditLinkEnv {
     }
 
     func followLink(state: EditLinkState) -> Effect<Void, AppError> {
-        if let url = state.urlComponents?.url, UIApplication.shared.canOpenURL(url) {
+        if let url = URL(string: state.urlString), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
             return Effect(value: ())
         } else {

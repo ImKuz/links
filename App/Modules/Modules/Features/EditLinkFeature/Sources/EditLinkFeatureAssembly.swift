@@ -20,7 +20,7 @@ public struct EditLinkFeatureAssembly: Assembly {
             let store = Store<EditLinkState, EditLinkAction>(
                 initialState: EditLinkState(
                     name: input.item.name,
-                    urlComponents: URLComponents(string: input.item.urlString)
+                    urlStringComponents: .deconstructed(from: input.item.urlString)
                 ),
                 reducer: editLinkReducer,
                 environment: environment

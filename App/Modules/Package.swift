@@ -88,7 +88,8 @@ let dependencyMap: [Module: [Dependency]] = [
 ]
 
 let unitTestCoveredModules: Set<Module> = [
-    .CatalogClient
+    .CatalogClient,
+    .EditLinkFeature
 ]
 
 let commonModuleDependencies: [Dependency] = [

@@ -21,25 +21,25 @@ struct EditLinkState: Equatable {
     // MARK: Properties
 
     var name: String
-    var urlComponents: URLComponents?
+    var urlStringComponents: URLStringComponents?
     var invalidFields = Set<ValidateableField>()
 
     var isFormValid: Bool { invalidFields.isEmpty }
-    var queryItems: [URLQueryItem] { urlComponents?.queryItems ?? [] }
-    var urlString: String { urlComponents?.string ?? "" }
+    var queryParams: [QueryParam] { urlStringComponents?.queryParams ?? [] }
+    var urlString: String { urlStringComponents?.constructUrlString() ?? "" }
 }
 
 // MARK: - Action
 
 enum EditLinkAction: Equatable {
     case changeName(String)
-    case changeUrl(String)
+    case changeUrlString(String)
 
-    case changeQueryItemName(key: String, index: Int)
-    case changeQueryItemValue(value: String, index: Int)
-    case expandQueryItemValue(index: Int)
-    case deleteQueryItem(index: Int)
-    case addQueryItem
+    case changeQueryParamKey(key: String, index: Int)
+    case changeQueryParamValue(value: String, index: Int)
+    case expandQueryParamValue(index: Int)
+    case deleteQueryParam(index: Int)
+    case appendQueryItem
 
     case done
     case delete
