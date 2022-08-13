@@ -175,6 +175,7 @@ final class CatalogEnvImpl: CatalogEnv {
         return interface
             .onFinishPublisher
             .setFailureType(to: AppError.self)
+            .receive(on: DispatchQueue.main)
             .eraseToEffect { .dismissAddItemForm }
     }
 

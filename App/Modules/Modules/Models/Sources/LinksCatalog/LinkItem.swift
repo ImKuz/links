@@ -16,7 +16,7 @@ public struct LinkItem:
         id: String = UUID().uuidString,
         name: String,
         urlString: String,
-        isFavorite: Bool
+        isFavorite: Bool = false
     ) {
         self.id = id
         self.name = name

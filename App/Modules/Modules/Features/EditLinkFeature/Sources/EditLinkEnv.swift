@@ -56,8 +56,17 @@ final class EditLinkEnvImpl: EditLinkEnv {
     }
 
     func done(state: EditLinkState) -> Effect<Void, AppError> {
-        // TODO: Implement edit/add of link item
-        .none
+        catalogSource
+            .add(item: LinkItem(
+                id: UUID().uuidString,
+                name: state.name,
+                urlString: state.urlString
+            ))
+            .handleEvents(receiveOutput: { [weak self] in
+                self?.onFinishSubject.send()
+            })
+            .receive(on: DispatchQueue.main)
+            .eraseToEffect()
     }
 
     private func map(state: EditLinkState) -> LinkItem {

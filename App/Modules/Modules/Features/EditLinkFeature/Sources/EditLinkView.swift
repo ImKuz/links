@@ -61,8 +61,8 @@ struct EditLinkView: View {
         Form {
             Section() {
                 HStack {
-                    textField(
-                        placeholder: "Name",
+                    TextField(
+                        "Name",
                         text: viewStore.binding(
                             get: \.name,
                             send: { .changeName($0) }
@@ -73,7 +73,7 @@ struct EditLinkView: View {
             }
 
             Section() {
-                textField(
+                urlComponentTextField(
                     placeholder: "URL",
                     text: viewStore.binding(
                         get: \.urlString,
@@ -98,7 +98,7 @@ struct EditLinkView: View {
                     }
                 }
                 Button(
-                    action: { viewStore.send(.appendQueryItem) },
+                    action: { viewStore.send(.appendQueryParam) },
                     label: { Labels.addParam }
                 )
             }
@@ -139,14 +139,14 @@ struct EditLinkView: View {
         index: Int
     ) -> some View {
         HStack {
-            textField(
+            urlComponentTextField(
                 placeholder: "Key",
                 text: viewStore.binding(
                     get: { _ in queryParam.key },
                     send: { .changeQueryParamKey(key: $0, index: index) }
                 )
             )
-            textField(
+            urlComponentTextField(
                 placeholder: "Value",
                 text: viewStore.binding(
                     get: { _ in queryParam.value },
@@ -162,13 +162,14 @@ struct EditLinkView: View {
     }
 
     @ViewBuilder
-    private func textField(
+    private func urlComponentTextField(
         placeholder: String,
         text: Binding<String>
     ) -> some View {
         TextField(placeholder, text: text)
             .textContentType(.URL)
             .textInputAutocapitalization(.never)
+            .disableAutocorrection(true)
             .keyboardType(.URL)
     }
 }

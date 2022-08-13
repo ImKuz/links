@@ -39,7 +39,7 @@ enum EditLinkAction: Equatable {
     case changeQueryParamValue(value: String, index: Int)
     case expandQueryParamValue(index: Int)
     case deleteQueryParam(index: Int)
-    case appendQueryItem
+    case appendQueryParam
 
     case done
     case delete

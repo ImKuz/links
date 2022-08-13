@@ -21,10 +21,12 @@ let editLinkReducer = EditLinkReducer { state, action, env in
             .eraseToEffect { EditLinkAction.changeQueryParamValue(value: $0, index: index) }
     case let .deleteQueryParam(index):
         state.urlStringComponents?.queryParams.remove(at: index)
-    case .appendQueryItem:
+    case .appendQueryParam:
         state.urlStringComponents?.queryParams.append(.empty)
     case .done:
-        return .none
+        return env
+            .done(state: state)
+            .fireAndForget()
     case .delete:
         return .none
     case .copy:

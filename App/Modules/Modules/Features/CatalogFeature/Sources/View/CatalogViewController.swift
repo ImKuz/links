@@ -135,9 +135,9 @@ final class CatalogViewController: UICollectionViewController {
     }
 
     private func apllyDiff(newItems: IdentifiedArrayOf<LinkItem>) {
-        guard zip(currentItems, newItems).allSatisfy({ $0 == $1 }) else { return }
-
         let diff = newItems.difference(from: currentItems)
+
+        guard !diff.isEmpty else { return }
 
         var removeIndexPaths = [IndexPath]()
         var insertIndexPaths = [IndexPath]()
