@@ -153,7 +153,7 @@ final class CatalogViewController: UICollectionViewController {
 
         currentItems = newItems
 
-        if insertIndexPaths.count > removeIndexPaths.count {
+        if insertIndexPaths.count != removeIndexPaths.count {
             collectionView.reloadData()
         } else {
             collectionView.performBatchUpdates {
