@@ -6,11 +6,13 @@ import ToolKit
 public protocol CatalogSource: AnyObject {
 
     var permissions: CatalogDataSourcePermissions { get }
+    var isPersistable: Bool { get }
 
     func subscribe() -> AnyPublisher<IdentifiedArrayOf<LinkItem>, AppError>
     func delete(itemId: LinkItem.ID) -> AnyPublisher<Void, AppError>
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError>
     func add(item: LinkItem) -> AnyPublisher<Void, AppError>
+    func contains(itemId: LinkItem.ID) -> AnyPublisher<Bool, AppError>
 
     func setIsFavorite(id: LinkItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError>
 }
