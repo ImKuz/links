@@ -9,20 +9,21 @@ import UIKit
 // MARK: - Action
 
 indirect enum CatalogAction: Equatable {
+
     case viewDidLoad
-    case suscribeToUpdates
     case close
+    case suscribeToUpdates
     case addLinkItem
     case connectionFailureInfo
     case handleConnectionStateChange(ConnectionState)
     case applicationStateUpdated
     case itemsUpdated(Result<IdentifiedArrayOf<LinkItem>, AppError>)
-    case handleActionCompletion(action: CatalogAction)
     case handleError(AppError)
-    case moveItem(from: Int, to: Int)
-    case rowAction(id: LinkItem.ID, action: CatalogRowAction)
     case titleMessage(text: String)
     case dismissAddItemForm
+    case moveItem(from: Int, to: Int)
+    case rowAction(id: LinkItem.ID, action: CatalogRowAction)
+    case handleActionCompletion(action: CatalogAction)
 }
 
 // MARK: - Enviroment

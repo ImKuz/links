@@ -49,12 +49,12 @@ final class DatabaseCatalogSource: CatalogSource {
             .eraseToAnyPublisher()
     }
 
-    func delete(_ item: LinkItem) -> AnyPublisher<Void, AppError> {
+    func delete(itemId: LinkItem.ID) -> AnyPublisher<Void, AppError> {
         databaseService
             .write { context in
                 let items = try context.read(
                     type: LinkItemEntity.self,
-                    request: .init(predicate: .init(format: "itemId == %@", item.id))
+                    request: .init(predicate: .init(format: "itemId == %@", itemId))
                 )
 
                 guard let item = items.first else { return }

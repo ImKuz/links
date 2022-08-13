@@ -108,7 +108,7 @@ final class CatalogEnvImpl: CatalogEnv {
 
     func delete(_ item: LinkItem) -> Effect<Void, AppError> {
         catalogSource
-            .delete(id: item.id)
+            .delete(itemId: item.id)
             .receive(on: DispatchQueue.main)
             .eraseToEffect()
     }

@@ -8,7 +8,7 @@ public protocol CatalogSource: AnyObject {
     var permissions: CatalogDataSourcePermissions { get }
 
     func subscribe() -> AnyPublisher<IdentifiedArrayOf<LinkItem>, AppError>
-    func delete(id: LinkItem.ID) -> AnyPublisher<Void, AppError>
+    func delete(itemId: LinkItem.ID) -> AnyPublisher<Void, AppError>
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError>
     func add(item: LinkItem) -> AnyPublisher<Void, AppError>
 
@@ -28,7 +28,7 @@ public extension CatalogSource {
         return Empty().eraseToAnyPublisher()
     }
 
-    func delete(id: LinkItem.ID) -> AnyPublisher<Void, AppError> {
+    func delete(itemId: LinkItem.ID) -> AnyPublisher<Void, AppError> {
         guard permissions.contains(.modify) else {
             return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
         }
