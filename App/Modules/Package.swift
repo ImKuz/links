@@ -17,6 +17,7 @@ enum Module: String, CaseIterable, Equatable, Hashable {
     case SharedInterfaces
     case ToolKit
     case SharedHelpers
+    case LinkItemActionsService
     // Features
     case EditLinkFeature
     case CatalogFeature
@@ -70,6 +71,10 @@ let dependencyMap: [Module: [Dependency]] = [
     ],
     .ToolKit: [
         .external(.product(name: "ComposableArchitecture", package: "swift-composable-architecture")),
+    ],
+    .LinkItemActionsService: [
+        .module(.Models),
+        .module(.SharedInterfaces),
     ],
     // Features
     .EditLinkFeature: [
