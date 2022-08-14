@@ -1,7 +1,6 @@
 import Swinject
 import CatalogClient
 import Database
-import SharedInterfaces
 import Foundation
 import Models
 

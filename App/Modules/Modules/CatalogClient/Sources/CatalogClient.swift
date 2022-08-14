@@ -1,7 +1,6 @@
 import Models
 import Combine
 import ToolKit
-import SharedInterfaces
 
 public protocol CatalogClient: ConnectionObservable {
     func disconnect()

@@ -3,7 +3,6 @@ import ToolKit
 import Models
 import Combine
 import CatalogClient
-import SharedInterfaces
 
 final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
 

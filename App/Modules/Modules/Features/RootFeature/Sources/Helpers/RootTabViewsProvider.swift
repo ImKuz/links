@@ -1,9 +1,11 @@
-import SharedInterfaces
+import FeatureSupport
 import SwiftUI
 import Swinject
 import Models
 import UIKit
 import ToolKit
+
+import RemoteFeatureInterfaces
 
 protocol RootTabViewsProvider {
 

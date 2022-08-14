@@ -14,10 +14,10 @@ enum Module: String, CaseIterable, Equatable, Hashable {
     case IPAddressProvider
     case Logger
     case Models
-    case SharedInterfaces
     case ToolKit
     case SharedHelpers
     case LinkItemActionsService
+    case FeatureSupport
     // Features
     case EditLinkFeature
     case CatalogFeature
@@ -33,18 +33,13 @@ enum Dependency {
 
 /// Modules has common dependency list, see below
 let dependencyMap: [Module: [Dependency]] = [
-    .SharedInterfaces: [
-        .module(.Models),
-        .external(.product(name: "IdentifiedCollections", package: "swift-identified-collections")),
-    ],
     .SharedHelpers: [
         .module(.Models),
     ],
     .CatalogClient: [
         .module(.Models),
         .module(.Contracts),
-        .module(.SharedInterfaces),
-        .module(.Database)
+        .module(.Database),
     ],
     .CatalogServer: [
         .module(.Models),
@@ -57,11 +52,13 @@ let dependencyMap: [Module: [Dependency]] = [
         .module(.Contracts),
         .module(.Database),
         .module(.CatalogClient),
-        .module(.SharedInterfaces),
         .external(.product(name: "IdentifiedCollections", package: "swift-identified-collections")),
     ],
     .Contracts: [
         .external(.product(name: "GRPC", package: "grpc-swift")),
+    ],
+    .Database: [
+        .module(.Models),
     ],
     .Logger: [
         .external(.product(name: "Logging", package: "swift-log")),
@@ -74,7 +71,11 @@ let dependencyMap: [Module: [Dependency]] = [
     ],
     .LinkItemActionsService: [
         .module(.Models),
-        .module(.SharedInterfaces),
+        .module(.CatalogSource),
+    ],
+    .FeatureSupport: [
+        .module(.Models),
+        .module(.CatalogSource),
     ],
     // Features
     .EditLinkFeature: [
@@ -98,15 +99,14 @@ let unitTestCoveredModules: Set<Module> = [
 ]
 
 let commonModuleDependencies: [Dependency] = [
+    .module(.ToolKit),
     .module(.Constants),
     .module(.Logger),
-    .module(.ToolKit),
-    .external("Swinject"),
 ]
 
 let commonFeatureDependencies: [Dependency] = [
-    .module(.SharedInterfaces),
     .module(.Models),
+    .module(.FeatureSupport),
     .external(.product(name: "ComposableArchitecture", package: "swift-composable-architecture")),
     .external(.product(name: "IdentifiedCollections", package: "swift-identified-collections")),
 ]
@@ -149,7 +149,10 @@ let packageContent: [(Product, [Target])] = {
         let moduleName = module.rawValue
         let isFeature = moduleName.hasSuffix("Feature")
         var targetDependencies = [Target.Dependency]()
-        var dependenciesToConvert = [Dependency]()
+
+        var dependenciesToConvert: [Dependency] = [
+            .external("Swinject")
+        ]
 
         if !commonModuleDependencies.contains(where: {
             if case let .module(currentModule) = $0 {
@@ -181,12 +184,13 @@ let packageContent: [(Product, [Target])] = {
         }
 
         let product = Product.library(name: moduleName, targets: [moduleName])
+        let baseModulePath = "Modules\(isFeature ? "/Features" : "")/\(moduleName)"
 
         var targets = [
             Target.target(
                 name: moduleName,
                 dependencies: targetDependencies,
-                path: "Modules\(isFeature ? "/Features" : "")/\(moduleName)/Sources"
+                path:  baseModulePath + "/Sources"
             )
         ]
 
@@ -195,7 +199,7 @@ let packageContent: [(Product, [Target])] = {
                 Target.testTarget(
                     name: moduleName + "UnitTests",
                     dependencies: targetDependencies + [.init(stringLiteral: moduleName)],
-                    path: "Modules\(isFeature ? "/Features" : "")/\(moduleName)/UnitTests"
+                    path: baseModulePath + "/UnitTests"
                 )
             )
         }

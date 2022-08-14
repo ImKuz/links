@@ -4,7 +4,6 @@ import ToolKit
 import Models
 import IdentifiedCollections
 import Foundation
-import SharedInterfaces
 
 final class DatabaseCatalogSource: CatalogSource {
 
