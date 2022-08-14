@@ -2,7 +2,8 @@ import ComposableArchitecture
 import Swinject
 import ToolKit
 import Models
-import SharedInterfaces
+import FeatureSupport
+import CatalogSource
 import SwiftUI
 import UIKit
 import SharedHelpers

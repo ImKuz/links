@@ -3,7 +3,7 @@ import ComposableArchitecture
 import Combine
 import CatalogServer
 import Swinject
-import SharedInterfaces
+import FeatureSupport
 import Foundation
 import Constants
 import Models

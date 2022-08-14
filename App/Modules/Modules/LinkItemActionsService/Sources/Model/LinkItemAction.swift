@@ -23,10 +23,6 @@ public struct LinkItemActionWithData: LinkItemActionRepresentable {
     public let action: LinkItemAction
     public let data: LinkItemActionData
 
-    public var action: LinkItemAction {
-        action
-    }
-
     public init(action: LinkItemAction, data: LinkItemActionData) {
         self.action = action
         self.data = data

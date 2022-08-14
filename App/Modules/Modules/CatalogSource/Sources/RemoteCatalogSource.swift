@@ -7,6 +7,7 @@ import CatalogClient
 final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
 
     let permissions: CatalogDataSourcePermissions = [.read, .favorites]
+    let isPersistable = false
 
     private let client: CatalogClient
     private let favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper

@@ -5,8 +5,6 @@ import Models
 import UIKit
 import ToolKit
 
-import RemoteFeatureInterfaces
-
 protocol RootTabViewsProvider {
 
     func view(for tabType: TabType) -> AnyView?

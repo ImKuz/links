@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import Swinject
-import SharedInterfaces
+import FeatureSupport
 import UIKit
 import SwiftUI
 import ToolKit

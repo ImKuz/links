@@ -1,6 +1,8 @@
 import CatalogSource
 import SwiftUI
 import UIKit
+import ToolKit
+import Models
 
 public struct CatalogFeatureInterface: FeatureInterface {
 
@@ -19,7 +21,7 @@ public struct CatalogFeatureInterface: FeatureInterface {
 
 public extension CatalogFeatureInterface {
 
-    public struct Input {
+    struct Input {
 
         public let router: Router
         public let title: String

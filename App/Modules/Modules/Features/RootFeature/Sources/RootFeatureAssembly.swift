@@ -1,5 +1,5 @@
 import Swinject
-import SharedInterfaces
+import FeatureSupport
 import ComposableArchitecture
 import ToolKit
 import SwiftUI

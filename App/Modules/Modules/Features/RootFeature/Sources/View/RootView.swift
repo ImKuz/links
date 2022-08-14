@@ -1,7 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
 import ToolKit
-import SharedInterfaces
 import Models
 
 struct RootView: View {

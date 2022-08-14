@@ -5,7 +5,8 @@ import Models
 import ToolKit
 import UIKit
 import Swinject
-import SharedInterfaces
+import CatalogSource
+import FeatureSupport
 import SharedHelpers
 
 final class CatalogEnvImpl: CatalogEnv {

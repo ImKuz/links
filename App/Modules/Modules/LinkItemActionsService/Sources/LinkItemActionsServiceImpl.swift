@@ -1,7 +1,6 @@
 import CatalogSource
 import Combine
 import Models
-import SharedInterfaces
 import ToolKit
 
 final class LinkItemActionsServiceImpl: LinkItemActionsService {
@@ -38,7 +37,12 @@ final class LinkItemActionsServiceImpl: LinkItemActionsService {
     // MARK: - Private methods
 
     private func isItemPersisted(id: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
-        guard catalogSource.isPersistable else { return Just(false).eraseToAnyPublisher() }
+        guard catalogSource.isPersistable else {
+            return Just(false)
+                .setFailureType(to: AppError.self)
+                .eraseToAnyPublisher()
+        }
+
         return catalogSource.contains(itemId: id)
     }
 

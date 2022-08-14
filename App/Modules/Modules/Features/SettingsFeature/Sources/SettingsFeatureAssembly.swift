@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import SharedInterfaces
+import FeatureSupport
 import SharedHelpers
 import Swinject
 import Database

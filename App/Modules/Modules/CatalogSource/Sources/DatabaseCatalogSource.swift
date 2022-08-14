@@ -8,12 +8,17 @@ import Foundation
 final class DatabaseCatalogSource: CatalogSource {
 
     private(set) var permissions: CatalogDataSourcePermissions = .all
+    let isPersistable = true
 
     private var entitiesSubject = PassthroughSubject<IdentifiedArrayOf<LinkItemEntity>, AppError>()
     private var cancellables = [AnyCancellable]()
     private let databaseService: DatabaseService
     private let topLevelPredicate: NSPredicate?
     private let favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
+
+    private var itemIdPredicate: (LinkItem.ID) -> NSPredicate = { itemId in
+        NSPredicate(format: "itemId == %@", itemId)
+    }
 
     init(
         databaseService: DatabaseService,
@@ -104,6 +109,17 @@ final class DatabaseCatalogSource: CatalogSource {
     func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         favoritesCatalogSourceHelper
             .setIsFavorite(item: item, isFavorite: isFavorite)
+    }
+
+    func contains(itemId: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
+        databaseService
+            .fetch(
+                LinkItemEntity.self,
+                request: .init(predicate: itemIdPredicate(itemId))
+            )
+            .map { !$0.isEmpty }
+            .mapError { _ in AppError.businessLogic("Unable to add item") }
+            .eraseToAnyPublisher()
     }
 
     // MARK: - Private methods

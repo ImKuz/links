@@ -1,7 +1,7 @@
 import UIKit
 import ToolKit
 import Swinject
-import SharedInterfaces
+import FeatureSupport
 
 public protocol AppAssembler: AnyObject {
 

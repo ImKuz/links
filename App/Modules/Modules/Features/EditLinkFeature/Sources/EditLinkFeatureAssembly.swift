@@ -2,7 +2,7 @@ import ComposableArchitecture
 import Database
 import Swinject
 import ToolKit
-import SharedInterfaces
+import FeatureSupport
 import SwiftUI
 
 public struct EditLinkFeatureAssembly: Assembly {

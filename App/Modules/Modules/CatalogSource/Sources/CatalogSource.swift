@@ -65,4 +65,13 @@ public extension CatalogSource {
         assertionFailure("method \(#function) should be implemented in \(self) accoding to its permissions")
         return Empty().eraseToAnyPublisher()
     }
+
+    func contains(itemId: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
+        guard isPersistable else {
+            return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
+        }
+
+        assertionFailure("method \(#function) should be implemented in \(self) accoding to isPersistable flag")
+        return Empty().eraseToAnyPublisher()
+    }
 }
