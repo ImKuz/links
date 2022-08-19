@@ -4,6 +4,7 @@ import Swinject
 import ToolKit
 import FeatureSupport
 import SwiftUI
+import LinkItemActionsService
 
 public struct EditLinkFeatureAssembly: Assembly {
 
@@ -11,10 +12,15 @@ public struct EditLinkFeatureAssembly: Assembly {
 
     public func assemble(container: Container) {
 
-        let factory: (Resolver, EditLinkFeatureInterface.Input) -> EditLinkFeatureInterface = { _, input in
+        let factory: (Resolver, EditLinkFeatureInterface.Input) -> EditLinkFeatureInterface = { resolver, input in
             let environment = EditLinkEnvImpl(
                 catalogSource: input.catalogSource,
-                initialItem: input.item
+                initialItem: input.item,
+                linkItemActionsService: resolver.resolve(
+                    LinkItemActionsService.self,
+                    arguments: input.catalogSource,
+                    input.router
+                )!
             )
 
             let store = Store<EditLinkState, EditLinkAction>(
@@ -26,10 +32,12 @@ public struct EditLinkFeatureAssembly: Assembly {
                 environment: environment
             )
 
-            let view = AnyView(EditLinkView(store: store))
+            var view = EditLinkView(store: store)
+            view.linkItemActionsMenuViewDelegate = environment
+            let anyView = AnyView(view)
 
             return EditLinkFeatureInterface(
-                view: view,
+                view: anyView,
                 onFinishPublisher: environment.onFinishSubject.eraseToAnyPublisher()
             )
         }

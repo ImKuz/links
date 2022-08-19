@@ -23,16 +23,14 @@ let editLinkReducer = EditLinkReducer { state, action, env in
         state.urlStringComponents?.queryParams.remove(at: index)
     case .appendQueryParam:
         state.urlStringComponents?.queryParams.append(.empty)
+    case let .onLinkItemAction(action):
+        return .none
+    case .open:
+        return .none
     case .done:
         return env
             .done(state: state)
             .fireAndForget()
-    case .delete:
-        return .none
-    case .copy:
-        return .none
-    case .follow:
-        return .none
     }
 
     return .none

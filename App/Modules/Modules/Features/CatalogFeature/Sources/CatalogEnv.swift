@@ -164,7 +164,8 @@ final class CatalogEnvImpl: CatalogEnv {
 
         let input = EditLinkFeatureInterface.Input(
             catalogSource: catalogSource,
-            item: item
+            item: item,
+            router: router
         )
 
         guard let interface = container.resolve(EditLinkFeatureInterface.self, argument: input) else {

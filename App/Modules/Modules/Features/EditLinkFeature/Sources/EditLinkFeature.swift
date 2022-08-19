@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Models
 import ToolKit
+import LinkItemActionsService
 
 // MARK: - Aliases
 
@@ -40,11 +41,9 @@ enum EditLinkAction: Equatable {
     case expandQueryParamValue(index: Int)
     case deleteQueryParam(index: Int)
     case appendQueryParam
-
+    case onLinkItemAction(action: LinkItemAction.WithData)
+    case open
     case done
-    case delete
-    case copy
-    case follow
 }
 
 // MARK: - Enviroment

@@ -4,17 +4,24 @@ import ToolKit
 import Combine
 import CatalogSource
 import UIKit
+import LinkItemActionsService
 
 final class EditLinkEnvImpl: EditLinkEnv {
 
     private let catalogSource: CatalogSource
     private let initialItem: LinkItem
+    private let linkItemActionsService: LinkItemActionsService
 
     let onFinishSubject = PassthroughSubject<Void, Never>()
 
-    init(catalogSource: CatalogSource, initialItem: LinkItem) {
+    init(
+        catalogSource: CatalogSource,
+        initialItem: LinkItem,
+        linkItemActionsService: LinkItemActionsService
+    ) {
         self.catalogSource = catalogSource
         self.initialItem = initialItem
+        self.linkItemActionsService = linkItemActionsService
     }
 
     func validateState(_ state: EditLinkState) -> Effect<Set<EditLinkState.ValidateableField>, Never> {
@@ -75,5 +82,16 @@ final class EditLinkEnvImpl: EditLinkEnv {
             urlString: state.urlString,
             isFavorite: initialItem.isFavorite
         )
+    }
+}
+
+extension EditLinkEnvImpl: LinkItemActionsMenuViewDelegate {
+
+    func linkItemActionsMenuViewRequestsAcitons(view: LinkItemActionsMenuView) async -> [LinkItemAction.WithData] {
+        do {
+            return try await linkItemActionsService.actions(itemID: initialItem.id, shouldShowEditAction: false)
+        } catch {
+            return []
+        }
     }
 }

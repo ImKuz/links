@@ -1,6 +1,7 @@
 import UIKit
 import SwiftUI
 import ComposableArchitecture
+import LinkItemActionsService
 
 struct EditLinkView: View {
 
@@ -17,6 +18,7 @@ struct EditLinkView: View {
     }
 
     // MARK: - Properties
+    weak var linkItemActionsMenuViewDelegate: LinkItemActionsMenuViewDelegate?
     let store: Store<EditLinkState, EditLinkAction>
 
     // MARK: - View
@@ -44,7 +46,7 @@ struct EditLinkView: View {
                 .tint(.accentColor)
                 Spacer()
 
-                Button(action: { viewStore.send(.follow) }) {
+                Button(action: { viewStore.send(.open) }) {
                     Images.followLink
                         .resizable()
                         .frame(width: 16, height: 16)
@@ -69,6 +71,7 @@ struct EditLinkView: View {
                         )
                     )
                     menu(viewStore: viewStore)
+                        .frame(width: 44, height: 44, alignment: .center)
                 }
             }
 
@@ -107,29 +110,34 @@ struct EditLinkView: View {
 
     @ViewBuilder
     private func menu(viewStore: EditLinkViewStore) -> some View {
-        Menu(
-            content: {
-                Button(
-                    action: { viewStore.send(.copy) },
-                    label: { Labels.copyLink }
-                )
-                Button(
-                    role: .destructive,
-                    action: { viewStore.send(.delete) },
-                    label: { Labels.delete }
-                )
-            },
-            label: {
-                Images.actionsMenu
-                    .padding(.all, 8)
-                    .tint(.accentColor)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(Color.accentColor)
-                            .opacity(0.25)
-                    }
-            }
-        )
+        LinkItemActionsMenuViewRepresentable(
+            delegate: linkItemActionsMenuViewDelegate
+        ) { [weak viewStore] in
+            viewStore?.send(.onLinkItemAction(action: $0))
+        }
+//        Menu (
+//            content: {
+//                Button(
+//                    action: { viewStore.send(.copy) },
+//                    label: { Labels.copyLink }
+//                )
+//                Button(
+//                    role: .destructive,
+//                    action: { viewStore.send(.delete) },
+//                    label: { Labels.delete }
+//                )
+//            },
+//            label: {
+//                Images.actionsMenu
+//                    .padding(.all, 8)
+//                    .tint(.accentColor)
+//                    .overlay {
+//                        RoundedRectangle(cornerRadius: 6)
+//                            .fill(Color.accentColor)
+//                            .opacity(0.25)
+//                    }
+//            }
+//        )
     }
 
     @ViewBuilder
