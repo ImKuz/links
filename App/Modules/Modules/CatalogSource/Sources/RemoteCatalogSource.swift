@@ -64,4 +64,8 @@ final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
             })
             .eraseToAnyPublisher()
     }
+
+    func isItemFavorite(id: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
+        favoritesCatalogSourceHelper.isItemFavorite(id: id)
+    }
 }

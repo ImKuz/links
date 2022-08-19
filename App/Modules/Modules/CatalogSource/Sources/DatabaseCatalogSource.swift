@@ -111,6 +111,10 @@ final class DatabaseCatalogSource: CatalogSource {
             .setIsFavorite(item: item, isFavorite: isFavorite)
     }
 
+    func isItemFavorite(id: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
+        favoritesCatalogSourceHelper.isItemFavorite(id: id)
+    }
+
     func contains(itemId: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
         databaseService
             .fetch(

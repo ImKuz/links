@@ -6,6 +6,8 @@ import CatalogClient
 import CatalogSource
 import Logger
 import SharedHelpers
+import LinkItemActionsService
+import FeatureSupport
 
 import RootFeature
 import CatalogFeature
@@ -34,6 +36,8 @@ public enum DIAssemblerFactory {
             CatalogServerAssembly(),
             CatalogClientAssembly(),
             CatalogSourceAssembly(),
+            FeatureResolverAssembly(),
+            LinkItemActionsServiceAssembly(),
 
             // MARK: - Features
 

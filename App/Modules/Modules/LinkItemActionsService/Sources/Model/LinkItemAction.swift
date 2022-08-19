@@ -1,4 +1,6 @@
-public enum LinkItemAction: LinkItemActionRepresentable {
+import Models
+
+public enum LinkItemAction: LinkItemActionRepresentable, Equatable {
 
     public typealias Data = LinkItemActionData
     public typealias WithData = LinkItemActionWithData
@@ -18,7 +20,7 @@ public enum LinkItemAction: LinkItemActionRepresentable {
     }
 }
 
-public struct LinkItemActionWithData: LinkItemActionRepresentable {
+public struct LinkItemActionWithData: LinkItemActionRepresentable, Equatable {
 
     public let action: LinkItemAction
     public let data: LinkItemActionData
@@ -26,6 +28,11 @@ public struct LinkItemActionWithData: LinkItemActionRepresentable {
     public init(action: LinkItemAction, data: LinkItemActionData) {
         self.action = action
         self.data = data
+    }
+
+    public init(action: LinkItemAction, itemId: LinkItem.ID) {
+        self.action = action
+        self.data = .init(itemId: itemId)
     }
 }
 

@@ -5,6 +5,7 @@ import Combine
 
 protocol FavoritesCatalogSourceHelper {
     func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError>
+    func isItemFavorite(id: LinkItem.ID) -> AnyPublisher<Bool, AppError>
 }
 
 final class FavoritesCatalogSourceHelperImpl: FavoritesCatalogSourceHelper {
@@ -35,6 +36,17 @@ final class FavoritesCatalogSourceHelperImpl: FavoritesCatalogSourceHelper {
                 try context.save()
             }
             .mapError { _ in AppError.businessLogic("Unable to make item favorite") }
+            .eraseToAnyPublisher()
+    }
+
+    func isItemFavorite(id: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
+        databaseService
+            .fetch(
+                LinkItemEntity.self,
+                request: .init(predicate: .init(format: "itemId == %@", id))
+            )
+            .mapError { _ in AppError.businessLogic("Unable to check item isFavorite status") }
+            .map { !$0.isEmpty }
             .eraseToAnyPublisher()
     }
 }

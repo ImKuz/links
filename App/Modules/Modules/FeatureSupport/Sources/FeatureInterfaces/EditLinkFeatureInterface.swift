@@ -2,6 +2,7 @@ import Combine
 import SwiftUI
 import CatalogSource
 import Models
+import ToolKit
 
 public struct EditLinkFeatureInterface: FeatureInterface {
 
@@ -20,12 +21,19 @@ public struct EditLinkFeatureInterface: FeatureInterface {
 public extension EditLinkFeatureInterface {
 
     struct Input {
+
         public let catalogSource: CatalogSource
         public let item: LinkItem
+        public let router: Router
 
-        public init(catalogSource: CatalogSource, item: LinkItem) {
+        public init(
+            catalogSource: CatalogSource,
+            item: LinkItem,
+            router: Router
+        ) {
             self.catalogSource = catalogSource
             self.item = item
+            self.router = router
         }
     }
 }

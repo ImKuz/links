@@ -13,7 +13,9 @@ public protocol CatalogSource: AnyObject {
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError>
     func add(item: LinkItem) -> AnyPublisher<Void, AppError>
     func contains(itemId: LinkItem.ID) -> AnyPublisher<Bool, AppError>
+    func fetchItem(itemId: LinkItem.ID) -> AnyPublisher<LinkItem, AppError>
 
+    func isItemFavorite(id: LinkItem.ID) -> AnyPublisher<Bool, AppError>
     func setIsFavorite(id: LinkItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError>
 }
 
@@ -67,6 +69,15 @@ public extension CatalogSource {
     }
 
     func contains(itemId: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
+        guard isPersistable else {
+            return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
+        }
+
+        assertionFailure("method \(#function) should be implemented in \(self) accoding to isPersistable flag")
+        return Empty().eraseToAnyPublisher()
+    }
+
+    func fetchItem(itemId: LinkItem.ID) -> AnyPublisher<LinkItem, AppError> {
         guard isPersistable else {
             return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
         }
