@@ -3,6 +3,7 @@ import IdentifiedCollections
 import Combine
 import UIKit
 import ToolKit
+import Models
 
 struct CatalogReducerFactory {
 
@@ -16,7 +17,7 @@ struct CatalogReducerFactory {
 
     func make() -> CatalogReducerType {
         CatalogReducerType.combine(
-            catalogRowReducer.forEach(
+            Reducer<LinkItem, CatalogRowAction, Void>.empty.forEach(
                 state: \.items,
                 action: /CatalogAction.rowAction,
                 environment: { _ in }
@@ -112,21 +113,18 @@ struct CatalogReducerFactory {
                         env: env
                     )
                     .catch { Effect(value: CatalogAction.handleError($0)) }
-                    .flatMap { action -> Effect<CatalogAction, Never> in
-                        if let action = action {
-                            return Effect(value: action)
-                        } else {
-                            return Effect.none
-                        }
-                    }
                     .eraseToEffect()
                 case let .handleActionCompletion(action):
-                    if case let .rowAction(_, rowAction) = action, case .copy = rowAction {
+                    if
+                        case let .rowAction(_, rowAction) = action,
+                        case let .linkItemAction(linkItemAction) = rowAction,
+                        case .copy = linkItemAction
+                    {
                         return Effect(value: .titleMessage(text: "Copied to clipboard!"))
                     } else {
                         return .none
                     }
-                case let .handleError(error):
+                case .handleError:
                     // TODO: Error handling
                     return .none
                 }
@@ -187,47 +185,15 @@ struct CatalogReducerFactory {
         itemId: String,
         action: CatalogRowAction,
         env: CatalogEnv
-    ) -> Effect<CatalogAction?, AppError> {
+    ) -> Effect<CatalogAction, AppError> {
         guard let index = state.items.index(id: itemId) else { return .none }
         let item = state.items[index]
 
         switch action {
-        case .copy:
-            return env
-                .copyLink(item: item)
-                .receive(on: DispatchQueue.main)
-                .map { Optional($0)}
-                .eraseToEffect()
-
-        case .follow:
-            return env
-                .followLink(item: item)
-                .receive(on: DispatchQueue.main)
-                .catchToEmptyEffect { .handleError($0) }
-                .setFailureType(to: AppError.self)
-                .eraseToEffect()
-
-        case .edit:
-            return env
-                .showEditLinkForm(item: item)
-                .receive(on: DispatchQueue.main)
-                .map { Optional($0)}
-                .eraseToEffect()
-
         case .tap:
             return Effect(value: .rowAction(id: itemId, action: env.tapAction))
-
-        case .delete:
-            return env
-                .delete(state.items.remove(at: index))
-                .receive(on: DispatchQueue.main)
-                .eraseToEffect { .none }
-
-        case .setIsFavorite(let isFaviorite):
-            return env
-                .setIsFavorite(item: item, isFavorite: isFaviorite)
-                .receive(on: DispatchQueue.main)
-                .eraseToEffect { .none }
+        case let .linkItemAction(linkItemAction):
+            return env.handleLinkItemAction(linkItemAction, item: item)
         }
     }
 }

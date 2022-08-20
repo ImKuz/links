@@ -10,8 +10,7 @@ enum CatalogRowDataMapper {
         return .init(
             id: item.id,
             title: item.name,
-            contentPreview: String(item.urlString.prefix(25)),
-            actions: actions
+            contentPreview: String(item.urlString.prefix(25))
         )
     }
 }

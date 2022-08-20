@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Models
 import ToolKit
-import LinkItemActionsService
+import LinkItemActions
 
 // MARK: - Aliases
 
@@ -21,6 +21,7 @@ struct EditLinkState: Equatable {
 
     // MARK: Properties
 
+    var itemId: String
     var name: String
     var urlStringComponents: URLStringComponents?
     var invalidFields = Set<ValidateableField>()

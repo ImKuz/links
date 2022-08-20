@@ -6,7 +6,7 @@ import CatalogClient
 import CatalogSource
 import Logger
 import SharedHelpers
-import LinkItemActionsService
+import LinkItemActions
 import FeatureSupport
 
 import RootFeature

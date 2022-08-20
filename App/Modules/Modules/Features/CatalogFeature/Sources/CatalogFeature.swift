@@ -5,6 +5,7 @@ import ToolKit
 import Foundation
 import Models
 import UIKit
+import LinkItemActions
 
 // MARK: - Action
 
@@ -31,7 +32,6 @@ indirect enum CatalogAction: Equatable {
 protocol CatalogEnv: AnyObject {
 
     var permissions: CatalogDataSourcePermissions { get }
-    var configurableActions: [CatalogRowAction] { get }
     var tapAction: CatalogRowAction { get }
 
     // MARK: Updates subscription
@@ -43,15 +43,9 @@ protocol CatalogEnv: AnyObject {
     // MARK: Catalog
 
     func reloadCatalog() -> Effect<Void, Never>
-    func delete(_ item: LinkItem) -> Effect<Void, AppError>
     func move(_ from: Int, _ to: Int) -> Effect<Void, AppError>
-    func add(_ item: LinkItem) -> Effect<Void, AppError>
-    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> Effect<Void, AppError>
-
-    // MARK: Content handling
-
-    func followLink(item: LinkItem) -> Effect<Void, AppError>
-    func copyLink(item: LinkItem) -> Effect<CatalogAction, AppError>
+    func handleLinkItemAction(_ action: LinkItemAction, item: LinkItem) -> Effect<CatalogAction, AppError>
+    func actionsProvider(itemId: LinkItem.ID) async -> [LinkItemAction.WithData]
 
     // MARK: Routing
 

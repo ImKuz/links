@@ -5,7 +5,7 @@ public protocol LinkItemActionsMenuViewDelegate: AnyObject {
 
     func linkItemActionsMenuViewRequestsAcitons(
         view: LinkItemActionsMenuView
-    ) async -> [LinkItemAction.WithData]
+    )
 }
 
 public final class LinkItemActionsMenuView: UIButton {
@@ -17,8 +17,9 @@ public final class LinkItemActionsMenuView: UIButton {
 
     // MARK: - Public properties
 
-    public weak var delegate: LinkItemActionsMenuViewDelegate?
+    public var actionsProvider: ((String) async -> [LinkItemAction.WithData])?
     public var onAction: ((LinkItemAction.WithData) -> ())?
+    public var itemId: String?
 
     // MARK: - Subviews
 
@@ -43,10 +44,12 @@ public final class LinkItemActionsMenuView: UIButton {
     // MARK: - Init
 
     public init(
-        delegate: LinkItemActionsMenuViewDelegate?,
+        itemId: String?,
+        actionsProvider: ((String) async -> [LinkItemAction.WithData])?,
     	onAction: ((LinkItemAction.WithData) -> ())?
     ) {
-        self.delegate = delegate
+        self.itemId = itemId
+        self.actionsProvider = actionsProvider
         self.onAction = onAction
         super.init(frame: .zero)
 
@@ -64,30 +67,35 @@ public final class LinkItemActionsMenuView: UIButton {
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        iconView.frame.size = Spec.iconSize
-        iconView.center = center
+        iconView.frame = CGRect(
+            x: bounds.midX - Spec.iconSize.width / 2,
+            y: bounds.midY - Spec.iconSize.height / 2,
+            width: Spec.iconSize.width,
+            height: Spec.iconSize.height
+        )
 
-        overlayView.frame.size = CGSize(
+        let overlaySize = CGSize(
             width: Spec.iconSize.width + Spec.iconOverlayPadding,
             height: Spec.iconSize.height + Spec.iconOverlayPadding
         )
-        overlayView.center = center
-    }
 
-    public override func sizeThatFits(_ size: CGSize) -> CGSize {
-        CGSize(
-            width: Spec.iconSize.width + Spec.iconOverlayPadding,
-            height: Spec.iconSize.height + Spec.iconOverlayPadding
+        overlayView.frame = CGRect(
+            x: bounds.midX - overlaySize.width / 2,
+            y: bounds.midY - overlaySize.height / 2,
+            width: overlaySize.width,
+            height: overlaySize.height
         )
     }
 
     // MARK: - Private methods
 
     private func loadMenuElements(completion: @escaping ([UIMenuElement]) -> ()) {
-        guard let delegate = delegate else { return }
+        Task { () -> () in
+            guard let itemId = itemId else { return completion([]) }
 
-        Task {
-            let actions = await delegate.linkItemActionsMenuViewRequestsAcitons(view: self)
+            let actions = await actionsProvider?(itemId) ?? []
+
+            print(actions)
 
             let menuItems: [UIMenuElement] = actions.map { action in
                 let label = action.data.label
@@ -108,9 +116,11 @@ public final class LinkItemActionsMenuView: UIButton {
 
     private func makeMenu() -> UIMenu? {
         UIMenu(
-            options: .displayInline,
+            options: .singleSelection,
             children: [
-                UIDeferredMenuElement(loadMenuElements)
+                UIDeferredMenuElement { [weak self] in
+                    self?.loadMenuElements(completion: $0)
+                }
             ]
         )
     }
@@ -118,20 +128,26 @@ public final class LinkItemActionsMenuView: UIButton {
 
 public struct LinkItemActionsMenuViewRepresentable: UIViewRepresentable {
 
-    public weak var delegate: LinkItemActionsMenuViewDelegate?
+    public var actionsProvider: ((String) async -> [LinkItemAction.WithData])?
     public var onAction: ((LinkItemAction.WithData) -> ())?
+    public var itemId: String?
 
     public init(
-        delegate: LinkItemActionsMenuViewDelegate? = nil,
+        itemId: String?,
+        actionsProvider: ((String) async -> [LinkItemAction.WithData])? = nil,
         onAction: ((LinkItemAction.WithData) -> ())? = nil
     ) {
-        self.delegate = delegate
+        self.actionsProvider = actionsProvider
         self.onAction = onAction
+        self.itemId = itemId
     }
 
-
     public func makeUIView(context: Context) -> LinkItemActionsMenuView {
-        LinkItemActionsMenuView(delegate: delegate, onAction: onAction)
+        LinkItemActionsMenuView(
+            itemId: itemId,
+            actionsProvider: actionsProvider,
+            onAction: onAction
+        )
     }
 
     public func updateUIView(_ uiView: LinkItemActionsMenuView, context: Context) {

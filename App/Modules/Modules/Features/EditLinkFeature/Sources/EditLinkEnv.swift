@@ -4,7 +4,7 @@ import ToolKit
 import Combine
 import CatalogSource
 import UIKit
-import LinkItemActionsService
+import LinkItemActions
 
 final class EditLinkEnvImpl: EditLinkEnv {
 
@@ -82,16 +82,5 @@ final class EditLinkEnvImpl: EditLinkEnv {
             urlString: state.urlString,
             isFavorite: initialItem.isFavorite
         )
-    }
-}
-
-extension EditLinkEnvImpl: LinkItemActionsMenuViewDelegate {
-
-    func linkItemActionsMenuViewRequestsAcitons(view: LinkItemActionsMenuView) async -> [LinkItemAction.WithData] {
-        do {
-            return try await linkItemActionsService.actions(itemID: initialItem.id, shouldShowEditAction: false)
-        } catch {
-            return []
-        }
     }
 }

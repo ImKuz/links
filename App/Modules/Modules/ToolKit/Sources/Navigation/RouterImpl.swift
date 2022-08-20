@@ -30,39 +30,48 @@ public final class RouterImpl: Router {
         presentStyle: UIModalPresentationStyle,
         isAnimated: Bool
     ) {
-        viewController.modalTransitionStyle = transitionStyle
-        viewController.modalPresentationStyle = presentStyle
+        DispatchQueue.main.async { [self] in
+            viewController.modalTransitionStyle = transitionStyle
+            viewController.modalPresentationStyle = presentStyle
 
-        navigationController.present(
-            viewController,
-            animated: isAnimated,
-            completion: nil
-        )
+            navigationController.present(
+                viewController,
+                animated: isAnimated,
+                completion: nil
+            )
+        }
     }
 
     public func pushToView<T: View>(view: T, isAnimated: Bool) {
-        navigationController
-            .pushViewController(
-                UIHostingController(rootView: view),
-                animated: isAnimated
-            )
+        DispatchQueue.main.async { [self] in
+            navigationController
+                .pushViewController(
+                    UIHostingController(rootView: view),
+                    animated: isAnimated
+                )
+        }
     }
 
     public func pushToView(viewController: UIViewController, isAnimated: Bool) {
-        navigationController.pushViewController(viewController, animated: isAnimated)
+        DispatchQueue.main.async { [self] in
+            navigationController.pushViewController(viewController, animated: isAnimated)
+        }
     }
 
     public func dismiss(isAnimated: Bool, completion: (() -> ())?) {
-        navigationController
-            .dismiss(
-                animated: isAnimated,
-                completion: completion
-            )
+        DispatchQueue.main.async { [self] in
+            navigationController
+                .dismiss(
+                    animated: isAnimated,
+                    completion: completion
+                )
+        }
     }
 
     public func pop(isAnimated: Bool) {
-        navigationController
-            .popViewController(animated: isAnimated)
+        DispatchQueue.main.async { [self] in
+            navigationController.popViewController(animated: isAnimated)
+        }
     }
 
     public func popToView<T: View>(
@@ -70,24 +79,30 @@ public final class RouterImpl: Router {
         isAnimated: Bool,
         inPosition: PopPositionType
     ) {
-        switch inPosition {
-        case .last:
-            if let vc = navigationController.viewControllers.last(where: { $0 is UIHostingController<T> }) {
-                navigationController.popToViewController(vc, animated: isAnimated)
-            }
-        case .first:
-            if let vc = navigationController.viewControllers.first(where: { $0 is UIHostingController<T> }) {
-                navigationController.popToViewController(vc, animated: isAnimated)
+        DispatchQueue.main.async { [self] in
+            switch inPosition {
+            case .last:
+                if let vc = navigationController.viewControllers.last(where: { $0 is UIHostingController<T> }) {
+                    navigationController.popToViewController(vc, animated: isAnimated)
+                }
+            case .first:
+                if let vc = navigationController.viewControllers.first(where: { $0 is UIHostingController<T> }) {
+                    navigationController.popToViewController(vc, animated: isAnimated)
+                }
             }
         }
     }
 
     public func popToRootView(isAnimated: Bool) {
-        navigationController
-            .popToRootViewController(animated: isAnimated)
+        DispatchQueue.main.async { [self] in
+            navigationController
+                .popToRootViewController(animated: isAnimated)
+        }
     }
 
     public func presentAlert(controller: UIAlertController, isAnimated: Bool = true) {
-        navigationController.present(controller, animated: isAnimated)
+        DispatchQueue.main.async { [self] in
+            navigationController.present(controller, animated: isAnimated)
+        }
     }
 }

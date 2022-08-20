@@ -4,27 +4,27 @@ import UIKit
 import Models
 import Combine
 import Foundation
+import LinkItemActions
 
 final class CatalogViewController: UICollectionViewController {
 
     private let store: Store<CatalogState, CatalogAction>
     private let viewStore: ViewStore<CatalogState, CatalogAction>
-    private let rowMenuActionsProvider: CatalogRowMenuActionsProvider
     private let catalogUpdatePublisher: AnyPublisher<Void, Never>
 
     private var cancellables = [AnyCancellable]()
     private var currentItems = IdentifiedArrayOf<LinkItem>()
 
+    var actionsProvider: ((LinkItem.ID) async -> [LinkItemAction.WithData])?
+
     // MARK: - Init
 
     init(
         store: Store<CatalogState, CatalogAction>,
-        rowMenuActionsProvider: CatalogRowMenuActionsProvider,
         catalogUpdatePublisher: AnyPublisher<Void, Never>
     ) {
         self.store = store
         self.viewStore = ViewStore(store)
-        self.rowMenuActionsProvider = rowMenuActionsProvider
         self.catalogUpdatePublisher = catalogUpdatePublisher
         super.init(collectionViewLayout: .init())
         collectionView.setCollectionViewLayout(makeCollectionViewLayout(), animated: false)
@@ -184,10 +184,23 @@ final class CatalogViewController: UICollectionViewController {
         guard let cell = cell else { fatalError("Unable to dequeue cell") }
 
         let item = currentItems[indexPath.row]
-        let actions = rowMenuActionsProvider.acitons(state: viewStore.state, indexPath: indexPath)
-        let state = CatalogRowDataMapper.map(item: item, actions: actions)
 
-        cell.asyncActionsProvider = self
+        let state = CatalogRowState(
+            id: item.id,
+            title: item.name,
+            contentPreview: item.urlString
+        )
+
+        cell.set(
+            linkItemActionsMenuView: .init(
+                itemId: item.id,
+                actionsProvider: actionsProvider,
+                onAction: { [weak viewStore] actionWithData in
+                    viewStore?.send(.rowAction(id: item.id, action: .linkItemAction(actionWithData.action)))
+                }
+            )
+        )
+
         cell.set(
             store: store.scope(
                 state: { _ in state },
@@ -229,17 +242,5 @@ final class CatalogViewController: UICollectionViewController {
                 to: destinationIndexPath.row
             )
         )
-    }
-}
-
-extension CatalogViewController: CatalogRowCellAsyncAcitonsProvider {
-
-    func catalogRowRequestsAsyncActions(
-        id: CatalogRowState.ID,
-        completion: (([RowMenuAction]) -> ())?
-    ) {
-        rowMenuActionsProvider.asyncActions(id: id, state: viewStore.state) {
-            completion?($0)
-        }
     }
 }

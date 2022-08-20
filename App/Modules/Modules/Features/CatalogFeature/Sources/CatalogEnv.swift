@@ -8,6 +8,7 @@ import Swinject
 import CatalogSource
 import FeatureSupport
 import SharedHelpers
+import LinkItemActions
 
 final class CatalogEnvImpl: CatalogEnv {
 
@@ -16,9 +17,8 @@ final class CatalogEnvImpl: CatalogEnv {
     private let container: Container
     private let catalogSource: CatalogSource
     private let settings: SettingsHelper
-    private let pastboard: UIPasteboard
     private let router: Router
-    private let urlOpener: URLOpener
+    private let linkItemActionsService: LinkItemActionsService
 
     private let catalogUpdateSubject = PassthroughSubject<Void, Never>()
     private var cancellables = [AnyCancellable]()
@@ -35,25 +35,14 @@ final class CatalogEnvImpl: CatalogEnv {
             .eraseToAnyPublisher()
     }
 
-    var configurableActions: [CatalogRowAction] {
-        switch settings.linkTapBehaviour {
-        case "edit":
-            return [.follow]
-        case "follow":
-            return [.edit]
-        default:
-            return [.follow]
-        }
-    }
-
     var tapAction: CatalogRowAction {
         switch settings.linkTapBehaviour {
         case "edit":
-            return .edit
+            return .linkItemAction(.edit)
         case "follow":
-            return .follow
+            return .linkItemAction(.open)
         default:
-            return .edit
+            return .linkItemAction(.edit)
         }
     }
 
@@ -62,17 +51,15 @@ final class CatalogEnvImpl: CatalogEnv {
     init(
         container: Container,
         catalogSource: CatalogSource,
-        pastboard: UIPasteboard,
         router: Router,
-        urlOpener: URLOpener,
-        settings: SettingsHelper
+        settings: SettingsHelper,
+        linkItemActionsService: LinkItemActionsService
     ) {
         self.container = container
         self.catalogSource = catalogSource
-        self.pastboard = pastboard
         self.router = router
-        self.urlOpener = urlOpener
         self.settings = settings
+        self.linkItemActionsService = linkItemActionsService
     }
 
     // MARK: Updates subscription
@@ -107,13 +94,6 @@ final class CatalogEnvImpl: CatalogEnv {
         return .none
     }
 
-    func delete(_ item: LinkItem) -> Effect<Void, AppError> {
-        catalogSource
-            .delete(itemId: item.id)
-            .receive(on: DispatchQueue.main)
-            .eraseToEffect()
-    }
-
     func move(_ from: Int, _ to: Int) -> Effect<Void, AppError> {
         catalogSource
             .move(from: from, to: to)
@@ -121,36 +101,28 @@ final class CatalogEnvImpl: CatalogEnv {
             .eraseToEffect()
     }
 
-    func add(_ item: LinkItem) -> Effect<Void, AppError> {
-        catalogSource
-            .add(item: item)
-            .receive(on: DispatchQueue.main)
-            .eraseToEffect()
-    }
-
-    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> Effect<Void, AppError> {
-        catalogSource
-            .setIsFavorite(id: item.id, isFavorite: isFavorite)
-            .receive(on: DispatchQueue.main)
-            .eraseToEffect()
-    }
-
-    // MARK: Content handling
-
-    func followLink(item: LinkItem) -> Effect<Void, AppError> {
-        urlOpener
-            .open(item.urlString)
-            .eraseToEffect()
-    }
-
-    func copyLink(item: LinkItem) -> Effect<CatalogAction, AppError> {
-        pastboard.string = item.urlString
-
-        return Effect(
-            value: .handleActionCompletion(
-                action: .rowAction(id: item.id, action: .copy)
+    func handleLinkItemAction(_ action: LinkItemAction, item: LinkItem) -> Effect<CatalogAction, AppError> {
+        linkItemActionsService
+            .handle(
+                action.withData(.init(itemId: item.id))
             )
-        )
+            .map {
+                CatalogAction.handleActionCompletion(
+                    action: .rowAction(id: item.id, action: .linkItemAction($0.action))
+                )
+            }
+            .receive(on: DispatchQueue.main)
+            .eraseToEffect()
+    }
+
+    @MainActor
+    func actionsProvider(itemId: LinkItem.ID) async -> [LinkItemAction.WithData] {
+        do {
+            return try await linkItemActionsService.actions(itemID: itemId, shouldShowEditAction: true)
+        } catch {
+            // TODO: Error handling
+            return []
+        }
     }
 
     // MARK: Routing

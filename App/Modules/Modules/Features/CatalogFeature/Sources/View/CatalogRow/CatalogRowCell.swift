@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import UIKit
+import LinkItemActions
 
 protocol CatalogRowCellAsyncAcitonsProvider: AnyObject {
 
@@ -12,10 +13,6 @@ protocol CatalogRowCellAsyncAcitonsProvider: AnyObject {
 final class CatalogRowCell: UICollectionViewCell {
 
     static var reuseId = "CatalogRowCell"
-
-    // MARK: - Internal properties
-
-    weak var asyncActionsProvider: CatalogRowCellAsyncAcitonsProvider?
 
     // MARK: - Subviews
 
@@ -48,18 +45,7 @@ final class CatalogRowCell: UICollectionViewCell {
         return imageView
     }()
 
-    private lazy var showMoreButton: UIButton = {
-        let button = UIButton()
-
-        button.setImage(
-            UIImage(systemName: "ellipsis"),
-            for: .normal
-        )
-
-        button.showsMenuAsPrimaryAction = true
-
-        return button
-    }()
+    private var linkItemActionsMenuView: LinkItemActionsMenuView?
 
     // MARK: - Private properties
 
@@ -76,8 +62,8 @@ final class CatalogRowCell: UICollectionViewCell {
         contentView.addSubview(iconImageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(contentLabel)
-        contentView.addSubview(showMoreButton)
     }
+
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -119,7 +105,7 @@ final class CatalogRowCell: UICollectionViewCell {
             ).height
         )
 
-        showMoreButton.frame = CGRect(
+        linkItemActionsMenuView?.frame = CGRect(
             x: contentFrame.maxX - buttonSize.width,
             y: contentFrame.midY - buttonSize.height / 2,
             width: buttonSize.width,
@@ -128,6 +114,15 @@ final class CatalogRowCell: UICollectionViewCell {
     }
 
     // MARK: - State
+
+    func set(linkItemActionsMenuView: LinkItemActionsMenuView) {
+        defer { setNeedsLayout() }
+
+        self.linkItemActionsMenuView?.removeFromSuperview()
+        self.linkItemActionsMenuView = linkItemActionsMenuView
+        addSubview(linkItemActionsMenuView)
+        bringSubviewToFront(linkItemActionsMenuView)
+    }
 
     func set(store: Store<CatalogRowState, CatalogRowAction>) {
         self.viewStore = ViewStore(store)
@@ -139,47 +134,5 @@ final class CatalogRowCell: UICollectionViewCell {
 
         titleLabel.text = viewStore.title
         contentLabel.text = viewStore.contentPreview
-        showMoreButton.isHidden = viewStore.actions.isEmpty
-        showMoreButton.menu = makeMenu()
-    }
-
-    // MARK: - Context menu
-
-    private func loadAsyncMenuElements(completion: @escaping ([UIMenuElement]) -> ()) {
-        guard let id = viewStore?.id else { return }
-
-        asyncActionsProvider?.catalogRowRequestsAsyncActions(id: id) { [weak self] actions in
-            let elements = actions.compactMap { action in
-                self?.convertAciton(action)
-            }
-
-            completion(elements)
-        }
-    }
-
-    private func makeMenu() -> UIMenu? {
-        guard let viewStore = viewStore else { return nil }
-
-        var children: [UIMenuElement] = [
-            UIDeferredMenuElement(loadAsyncMenuElements)
-        ]
-
-        children.append(contentsOf: viewStore.actions.map { convertAciton($0) })
-
-        return UIMenu(
-            options: .displayInline,
-            children: children
-        )
-    }
-
-    private func convertAciton(_ action: RowMenuAction) -> UIAction {
-        UIAction(
-            title: action.title,
-            image: UIImage(systemName: action.iconName),
-            attributes: action.isDestructive ? .destructive : [],
-            handler: { [weak self] _ in
-                self?.viewStore?.send(action.action)
-            }
-        )
     }
 }

@@ -15,7 +15,7 @@ public enum LinkItemAction: LinkItemActionRepresentable, Equatable {
         self
     }
 
-    func withData(_ data: Data) -> WithData {
+    public func withData(_ data: Data) -> WithData {
         WithData(action: self, data: data)
     }
 }

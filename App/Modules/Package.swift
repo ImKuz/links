@@ -16,7 +16,7 @@ enum Module: String, CaseIterable, Equatable, Hashable {
     case Models
     case ToolKit
     case SharedHelpers
-    case LinkItemActionsService
+    case LinkItemActions
     case FeatureSupport
     // Features
     case EditLinkFeature
@@ -69,9 +69,10 @@ let dependencyMap: [Module: [Dependency]] = [
     .ToolKit: [
         .external(.product(name: "ComposableArchitecture", package: "swift-composable-architecture")),
     ],
-    .LinkItemActionsService: [
+    .LinkItemActions: [
         .module(.Models),
         .module(.CatalogSource),
+        .module(.FeatureSupport),
     ],
     .FeatureSupport: [
         .module(.Models),
@@ -80,9 +81,11 @@ let dependencyMap: [Module: [Dependency]] = [
     // Features
     .EditLinkFeature: [
         .module(.CatalogSource),
+        .module(.LinkItemActions),
     ],
     .CatalogFeature: [
-        .module(.SharedHelpers)
+        .module(.LinkItemActions),
+        .module(.SharedHelpers),
     ],
     .RemoteFeature: [
         .module(.CatalogServer),
@@ -92,6 +95,8 @@ let dependencyMap: [Module: [Dependency]] = [
         .module(.Database),
     ],
 ]
+
+// MARK: Lists
 
 let unitTestCoveredModules: Set<Module> = [
     .CatalogClient,

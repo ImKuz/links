@@ -126,6 +126,17 @@ final class DatabaseCatalogSource: CatalogSource {
             .eraseToAnyPublisher()
     }
 
+    func fetchItem(itemId: LinkItem.ID) -> AnyPublisher<LinkItem?, AppError> {
+        databaseService
+            .fetch(
+                LinkItemEntity.self,
+                request: .init(predicate: itemIdPredicate(itemId))
+            )
+            .map { $0.first?.convertToModel() }
+            .mapError { _ in AppError.businessLogic("Unable to fetch item") }
+            .eraseToAnyPublisher()
+    }
+
     // MARK: - Private methods
 
     private func subscribeToDatabaseUpdates() {

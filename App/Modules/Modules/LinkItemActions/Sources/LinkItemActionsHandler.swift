@@ -44,9 +44,9 @@ final class LinkItemActionsHandlerImpl: LinkItemActionsHandler {
     ) -> AnyPublisher<LinkItemAction.WithData, AppError> {
         let itemId = actionWithData.data.itemId
 
+        // TODO: Handle errors
         return catalogSource
             .fetchItem(itemId: itemId)
-            .map { Optional($0) }
             .replaceError(with: nil)
             .withUnretained(self)
             .flatMap { ref, item -> AnyPublisher<Void, AppError> in

@@ -7,6 +7,7 @@ import CatalogSource
 import SwiftUI
 import UIKit
 import SharedHelpers
+import LinkItemActions
 
 public struct CatalogFeatureAssembly: Assembly {
 
@@ -73,10 +74,9 @@ public struct CatalogFeatureAssembly: Assembly {
         let environment = CatalogEnvImpl(
             container: container,
             catalogSource: source,
-            pastboard: UIPasteboard.general,
             router: router,
-            urlOpener: container.resolve(URLOpener.self)!,
-            settings: container.resolve(SettingsHelper.self)!
+            settings: container.resolve(SettingsHelper.self)!,
+            linkItemActionsService: container.resolve(LinkItemActionsService.self, arguments: source, router)!
         )
 
         let store = Store(
@@ -85,13 +85,14 @@ public struct CatalogFeatureAssembly: Assembly {
             environment: environment
         )
 
-        let rowMenuActionsProvider = CatalogRowMenuActionsProviderImpl(env: environment)
-
         let viewController = CatalogViewController(
             store: store,
-            rowMenuActionsProvider: rowMenuActionsProvider,
             catalogUpdatePublisher: environment.catalogUpdatePublisher
         )
+
+        viewController.actionsProvider = { [weak environment] itemId in
+            await environment?.actionsProvider(itemId: itemId) ?? []
+        }
 
         return CatalogFeatureInterface(viewController: viewController)
     }

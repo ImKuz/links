@@ -65,6 +65,7 @@ extension LinkItemActionsServiceImpl: LinkItemActionsService {
     ) -> [LinkItemAction.WithData] {
         actions.map {
             let label: LinkItemAction.Data.Label
+            var isDestructive = false
 
             switch $0 {
             case .open:
@@ -73,6 +74,7 @@ extension LinkItemActionsServiceImpl: LinkItemActionsService {
                 label = ("Edit", "square.and.pencil")
             case .delete:
                 label = ("Delete", "trash")
+                isDestructive = true
             case .copy:
                 label = ("Copy", "doc.on.doc")
             case .setIsFavorite(let isFavorite):
@@ -81,7 +83,13 @@ extension LinkItemActionsServiceImpl: LinkItemActionsService {
                     : ("Add to favorites", "star")
             }
 
-            return $0.withData(.init(itemId: itemId, label: label))
+            return $0.withData(
+                .init(
+                    itemId: itemId,
+                    label: label,
+                    isDestructive: isDestructive
+                )
+            )
         }
     }
 }

@@ -1,7 +1,7 @@
 import UIKit
 import SwiftUI
 import ComposableArchitecture
-import LinkItemActionsService
+import LinkItemActions
 
 struct EditLinkView: View {
 
@@ -18,8 +18,8 @@ struct EditLinkView: View {
     }
 
     // MARK: - Properties
-    weak var linkItemActionsMenuViewDelegate: LinkItemActionsMenuViewDelegate?
     let store: Store<EditLinkState, EditLinkAction>
+    var actionsProvider: ((String) async -> [LinkItemAction.WithData])?
 
     // MARK: - View
 
@@ -111,33 +111,12 @@ struct EditLinkView: View {
     @ViewBuilder
     private func menu(viewStore: EditLinkViewStore) -> some View {
         LinkItemActionsMenuViewRepresentable(
-            delegate: linkItemActionsMenuViewDelegate
-        ) { [weak viewStore] in
-            viewStore?.send(.onLinkItemAction(action: $0))
-        }
-//        Menu (
-//            content: {
-//                Button(
-//                    action: { viewStore.send(.copy) },
-//                    label: { Labels.copyLink }
-//                )
-//                Button(
-//                    role: .destructive,
-//                    action: { viewStore.send(.delete) },
-//                    label: { Labels.delete }
-//                )
-//            },
-//            label: {
-//                Images.actionsMenu
-//                    .padding(.all, 8)
-//                    .tint(.accentColor)
-//                    .overlay {
-//                        RoundedRectangle(cornerRadius: 6)
-//                            .fill(Color.accentColor)
-//                            .opacity(0.25)
-//                    }
-//            }
-//        )
+            itemId: viewStore.itemId,
+            actionsProvider: actionsProvider,
+            onAction: { [weak viewStore] action in
+                viewStore?.send(.onLinkItemAction(action: action))
+            }
+        )
     }
 
     @ViewBuilder
