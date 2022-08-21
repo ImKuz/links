@@ -9,7 +9,7 @@ public final class ActionsButton: UIButton {
 
     // MARK: - Public properties
 
-    public var onTap: (() -> ())?
+    public var onTap: ((ActionsButton) -> ())?
 
     // MARK: - Subviews
 
@@ -33,7 +33,7 @@ public final class ActionsButton: UIButton {
 
     // MARK: - Init
 
-    public init(onTap: (() -> ())? = nil) {
+    public init(onTap: ((ActionsButton) -> ())? = nil) {
         self.onTap = onTap
         super.init(frame: .zero)
 
@@ -78,6 +78,6 @@ public final class ActionsButton: UIButton {
 
     @objc
     private func didTap() {
-        onTap?()
+        onTap?(self)
     }
 }

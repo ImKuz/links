@@ -33,8 +33,18 @@ public struct EditLinkFeatureAssembly: Assembly {
                 environment: environment
             )
 
+            var view = EditLinkView(store: store)
+
+            view.actionsProvider = { [weak environment] itemId in
+                await environment?.actionsProvider(itemId: itemId) ?? []
+            }
+
+            view.menuViewControllerProvider = { [weak environment] in
+                environment?.menuViewController
+            }
+
             return EditLinkFeatureInterface(
-                view: AnyView(EditLinkView(store: store)),
+                view: AnyView(view),
                 onFinishPublisher: environment.onFinishSubject.eraseToAnyPublisher()
             )
         }

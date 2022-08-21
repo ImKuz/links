@@ -68,8 +68,8 @@ final class CatalogRowCell: UICollectionViewCell {
         contentView.addSubview(contentLabel)
         contentView.addSubview(actionsButton)
 
-        actionsButton.onTap = { [unowned self] in
-            self.onActionButtonTap?(self.actionsButton)
+        actionsButton.onTap = { [weak self] button in
+            self?.onActionButtonTap?(button)
         }
     }
 

@@ -2,6 +2,7 @@ import UIKit
 import SwiftUI
 import ComposableArchitecture
 import LinkItemActions
+import UIComponents
 
 struct EditLinkView: View {
 
@@ -20,6 +21,7 @@ struct EditLinkView: View {
     // MARK: - Properties
     let store: Store<EditLinkState, EditLinkAction>
     var actionsProvider: ((String) async -> [LinkItemAction.WithData])?
+    var menuViewControllerProvider: (() -> MenuViewController?)?
 
     // MARK: - View
 
@@ -110,13 +112,38 @@ struct EditLinkView: View {
 
     @ViewBuilder
     private func menu(viewStore: EditLinkViewStore) -> some View {
-        LinkItemActionsMenuViewRepresentable(
-            itemId: viewStore.itemId,
-            actionsProvider: actionsProvider,
-            onAction: { [weak viewStore] action in
-                viewStore?.send(.onLinkItemAction(action: action))
+        ActionsButtonViewRepresentable(onTap: { button in
+            guard let menuViewController = menuViewControllerProvider?() else { return }
+
+            menuViewController.present(
+                onto: button,
+                initialActions: [
+                    .init(id: "loader", name: "Loading", iconName: "rays")
+                ]
+            )
+
+            menuViewController.onActionTap = { [weak menuViewController] action in
+                guard let action = LinkItemAction(rawValue: action.id) else { return }
+                let actionWithData = action.withData(.init(itemId: viewStore.itemId))
+                menuViewController?.dismiss()
+                viewStore.send(.onLinkItemAction(action: actionWithData))
             }
-        )
+
+            Task {
+                guard let actions = await actionsProvider?(viewStore.itemId) else { return }
+
+                let menuActions = actions.map {
+                    MenuAction(
+                        id: $0.action.rawValue,
+                        name: $0.data.label?.title ?? "",
+                        iconName: $0.data.label?.iconName ?? "",
+                        isDestructive: $0.data.isDestructive
+                    )
+                }
+
+                await menuViewController.updateMenuActions(menuActions)
+            }
+        })
     }
 
     @ViewBuilder

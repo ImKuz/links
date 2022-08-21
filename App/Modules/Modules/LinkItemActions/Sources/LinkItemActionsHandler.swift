@@ -59,16 +59,18 @@ final class LinkItemActionsHandlerImpl: LinkItemActionsHandler {
                 case .edit:
                     guard let item = item else { return Self.failure("Unable to fetch item") }
 
-                    let editLinkFeature = ref.featureResolver.resolve(
-                        feature: EditLinkFeatureInterface.self,
-                        input: .init(
-                            catalogSource: ref.catalogSource,
-                            item: item,
-                            router: ref.router
+                    DispatchQueue.main.async {
+                        let editLinkFeature = ref.featureResolver.resolve(
+                            feature: EditLinkFeatureInterface.self,
+                            input: .init(
+                                catalogSource: ref.catalogSource,
+                                item: item,
+                                router: ref.router
+                            )
                         )
-                    )
 
-                    ref.router.presentView(view: editLinkFeature.view)
+                        ref.router.presentView(view: editLinkFeature.view)
+                    }
 
                     return Just(())
                         .setFailureType(to: AppError.self)
@@ -93,6 +95,7 @@ final class LinkItemActionsHandlerImpl: LinkItemActionsHandler {
                 }
             }
             .map { actionWithData }
+            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 

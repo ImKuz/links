@@ -43,6 +43,7 @@ enum EditLinkAction: Equatable {
     case deleteQueryParam(index: Int)
     case appendQueryParam
     case onLinkItemAction(action: LinkItemAction.WithData)
+    case onLinkItemActionCompletion(result: Result<LinkItemAction.WithData, AppError>)
     case open
     case done
 }
@@ -55,4 +56,5 @@ protocol EditLinkEnv: AnyObject {
     func done(state: EditLinkState) -> Effect<Void, AppError>
     func followLink(state: EditLinkState) -> Effect<Void, AppError>
     func expandQueryItemValue(value: String) -> Effect<String, Never>
+    func handle(action: LinkItemAction.WithData) -> Effect<LinkItemAction.WithData, AppError>
 }

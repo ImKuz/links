@@ -2,9 +2,9 @@ import SwiftUI
 
 public struct ActionsButtonViewRepresentable: UIViewRepresentable {
 
-    public var onTap: (() -> ())?
+    public var onTap: ((ActionsButton) -> ())?
 
-    public init(onTap: (() -> ())?) {
+    public init(onTap: ((ActionsButton) -> ())?) {
         self.onTap = onTap
     }
 

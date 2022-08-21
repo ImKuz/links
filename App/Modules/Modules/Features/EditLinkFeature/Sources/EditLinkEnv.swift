@@ -5,6 +5,7 @@ import Combine
 import CatalogSource
 import UIKit
 import LinkItemActions
+import UIComponents
 
 final class EditLinkEnvImpl: EditLinkEnv {
 
@@ -12,6 +13,7 @@ final class EditLinkEnvImpl: EditLinkEnv {
     private let initialItem: LinkItem
     private let linkItemActionsService: LinkItemActionsService
 
+    let menuViewController = MenuViewController()
     let onFinishSubject = PassthroughSubject<Void, Never>()
 
     init(
@@ -73,6 +75,23 @@ final class EditLinkEnvImpl: EditLinkEnv {
             })
             .receive(on: DispatchQueue.main)
             .eraseToEffect()
+    }
+
+    func handle(action: LinkItemAction.WithData) -> Effect<LinkItemAction.WithData, AppError> {
+        linkItemActionsService
+            .handle(action)
+            .receive(on: DispatchQueue.main)
+            .eraseToEffect()
+    }
+
+    @MainActor
+    func actionsProvider(itemId: LinkItem.ID) async -> [LinkItemAction.WithData] {
+        do {
+            return try await linkItemActionsService.actions(itemID: itemId, shouldShowEditAction: false)
+        } catch {
+            // TODO: Error handling
+            return []
+        }
     }
 
     private func map(state: EditLinkState) -> LinkItem {

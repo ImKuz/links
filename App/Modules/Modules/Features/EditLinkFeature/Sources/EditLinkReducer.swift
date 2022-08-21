@@ -6,12 +6,16 @@ let editLinkReducer = EditLinkReducer { state, action, env in
     switch action {
     case let .changeName(name):
         state.name = name
+
     case let .changeUrlString(string):
         state.urlStringComponents = .deconstructed(from: string)
+
     case let .changeQueryParamKey(key, index):
         state.urlStringComponents?.queryParams[index].key = key
+
     case let .changeQueryParamValue(value, index):
         state.urlStringComponents?.queryParams[index].value = value
+
     case let .expandQueryParamValue(index):
         guard let value = state.urlStringComponents?.queryParams[index].value else { return .none }
 
@@ -19,14 +23,37 @@ let editLinkReducer = EditLinkReducer { state, action, env in
             .expandQueryItemValue(value: value)
             .receive(on: DispatchQueue.main)
             .eraseToEffect { EditLinkAction.changeQueryParamValue(value: $0, index: index) }
+
     case let .deleteQueryParam(index):
         state.urlStringComponents?.queryParams.remove(at: index)
+
     case .appendQueryParam:
         state.urlStringComponents?.queryParams.append(.empty)
+
     case let .onLinkItemAction(action):
-        return .none
+        return env
+            .handle(action: action)
+            .catchToEffect { .onLinkItemActionCompletion(result: $0) }
+
+    case let .onLinkItemActionCompletion(result):
+        switch result {
+        case let .success(actionWithData):
+            switch actionWithData.action {
+            case .delete:
+                return env
+                    .done(state: state)
+                    .fireAndForget()
+            default:
+                return .none
+            }
+        case let .failure(error):
+            // TODO: Error handling
+            return .none
+        }
+
     case .open:
         return .none
+
     case .done:
         return env
             .done(state: state)
