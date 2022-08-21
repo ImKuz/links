@@ -16,8 +16,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "74EEC7B4282FB41C0013CC3F"
                BuildableName = "CopyPasta.app"
-               BlueprintName = "CopyPasta"
-               ReferencedContainer = "container:CopyPasta.xcodeproj">
+               BlueprintName = "Links"
+               ReferencedContainer = "container:Links.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,8 +46,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "74EEC7B4282FB41C0013CC3F"
             BuildableName = "CopyPasta.app"
-            BlueprintName = "CopyPasta"
-            ReferencedContainer = "container:CopyPasta.xcodeproj">
+            BlueprintName = "Links"
+            ReferencedContainer = "container:Links.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -63,8 +63,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "74EEC7B4282FB41C0013CC3F"
             BuildableName = "CopyPasta.app"
-            BlueprintName = "CopyPasta"
-            ReferencedContainer = "container:CopyPasta.xcodeproj">
+            BlueprintName = "Links"
+            ReferencedContainer = "container:Links.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

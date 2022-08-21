@@ -16,13 +16,13 @@
 
 /* Begin PBXFileReference section */
 		7456A1B9283530EC00C2DF3A /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
-		746A4075284BD66200EF88D7 /* CopyPasta-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CopyPasta-Bridging-Header.h"; sourceTree = "<group>"; };
-		74EEC7B5282FB41C0013CC3F /* CopyPasta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CopyPasta.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		746A4075284BD66200EF88D7 /* Links-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Links-Bridging-Header.h"; sourceTree = "<group>"; };
+		74EEC7B5282FB41C0013CC3F /* Links.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Links.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74EEC7C1282FB41D0013CC3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		74EEC7C4282FB41D0013CC3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		74EEC7C6282FB41D0013CC3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		74EEC7CC282FB4220013CC3F /* CopyPasta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CopyPasta.entitlements; sourceTree = "<group>"; };
+		74EEC7CC282FB4220013CC3F /* Links.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Links.entitlements; sourceTree = "<group>"; };
 		74EEC8C7282FB8310013CC3F /* Modules */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Modules; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -42,7 +42,7 @@
 			isa = PBXGroup;
 			children = (
 				74EEC8C7282FB8310013CC3F /* Modules */,
-				74EEC7B7282FB41C0013CC3F /* CopyPasta */,
+				74EEC7B7282FB41C0013CC3F /* Links */,
 				74EEC7B6282FB41C0013CC3F /* Products */,
 				74EEC8C8282FB85D0013CC3F /* Frameworks */,
 			);
@@ -51,21 +51,21 @@
 		74EEC7B6282FB41C0013CC3F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				74EEC7B5282FB41C0013CC3F /* CopyPasta.app */,
+				74EEC7B5282FB41C0013CC3F /* Links.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		74EEC7B7282FB41C0013CC3F /* CopyPasta */ = {
+		74EEC7B7282FB41C0013CC3F /* Links */ = {
 			isa = PBXGroup;
 			children = (
 				7456A1B8283530EC00C2DF3A /* CoreData.xcdatamodeld */,
 				74EEC7CE282FB4D00013CC3F /* Config */,
 				74EEC7CD282FB4BD0013CC3F /* Resources */,
 				74EEC7B8282FB41C0013CC3F /* AppDelegate.swift */,
-				746A4075284BD66200EF88D7 /* CopyPasta-Bridging-Header.h */,
+				746A4075284BD66200EF88D7 /* Links-Bridging-Header.h */,
 			);
-			path = CopyPasta;
+			path = Links;
 			sourceTree = "<group>";
 		};
 		74EEC7CD282FB4BD0013CC3F /* Resources */ = {
@@ -81,7 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				74EEC7C6282FB41D0013CC3F /* Info.plist */,
-				74EEC7CC282FB4220013CC3F /* CopyPasta.entitlements */,
+				74EEC7CC282FB4220013CC3F /* Links.entitlements */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -96,9 +96,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		74EEC7B4282FB41C0013CC3F /* CopyPasta */ = {
+		74EEC7B4282FB41C0013CC3F /* Links */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 74EEC7C9282FB41D0013CC3F /* Build configuration list for PBXNativeTarget "CopyPasta" */;
+			buildConfigurationList = 74EEC7C9282FB41D0013CC3F /* Build configuration list for PBXNativeTarget "Links" */;
 			buildPhases = (
 				74EEC7B1282FB41C0013CC3F /* Sources */,
 				74EEC7B2282FB41C0013CC3F /* Frameworks */,
@@ -108,12 +108,12 @@
 			);
 			dependencies = (
 			);
-			name = CopyPasta;
+			name = Links;
 			packageProductDependencies = (
 				74A1A59D2858E03A0079196B /* AppAssembler */,
 			);
 			productName = CopyPasta;
-			productReference = 74EEC7B5282FB41C0013CC3F /* CopyPasta.app */;
+			productReference = 74EEC7B5282FB41C0013CC3F /* Links.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -131,7 +131,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 74EEC7B0282FB41C0013CC3F /* Build configuration list for PBXProject "CopyPasta" */;
+			buildConfigurationList = 74EEC7B0282FB41C0013CC3F /* Build configuration list for PBXProject "Links" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -147,7 +147,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				74EEC7B4282FB41C0013CC3F /* CopyPasta */,
+				74EEC7B4282FB41C0013CC3F /* Links */,
 			);
 		};
 /* End PBXProject section */
@@ -311,12 +311,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CopyPasta/Config/CopyPasta.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Links/Config/Links.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4BLYS95997;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CopyPasta/Config/Info.plist;
+				INFOPLIST_FILE = Links/Config/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -327,10 +327,11 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = tech.polysander.CopyPasta;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.polysander.Links;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Links/Links-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -341,12 +342,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CopyPasta/Config/CopyPasta.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Links/Config/Links.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4BLYS95997;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CopyPasta/Config/Info.plist;
+				INFOPLIST_FILE = Links/Config/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -357,10 +358,11 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = tech.polysander.CopyPasta;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.polysander.Links;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Links/Links-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -369,7 +371,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		74EEC7B0282FB41C0013CC3F /* Build configuration list for PBXProject "CopyPasta" */ = {
+		74EEC7B0282FB41C0013CC3F /* Build configuration list for PBXProject "Links" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				74EEC7C7282FB41D0013CC3F /* Debug */,
@@ -378,7 +380,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		74EEC7C9282FB41D0013CC3F /* Build configuration list for PBXNativeTarget "CopyPasta" */ = {
+		74EEC7C9282FB41D0013CC3F /* Build configuration list for PBXNativeTarget "Links" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				74EEC7CA282FB41D0013CC3F /* Debug */,
