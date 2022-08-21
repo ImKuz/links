@@ -55,7 +55,6 @@ final class LinkItemActionsHandlerImpl: LinkItemActionsHandler {
                 switch actionWithData.action {
                 case .open:
                     guard let urlString = item?.urlString else { return Self.failure("Unable to fetch item") }
-
                     return ref.urlOpener.open(urlString)
 
                 case .edit:

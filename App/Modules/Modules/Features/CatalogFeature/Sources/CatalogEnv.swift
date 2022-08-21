@@ -128,11 +128,7 @@ final class CatalogEnvImpl: CatalogEnv {
     // MARK: Routing
 
     func showEditLinkForm(item: LinkItem?) -> Effect<CatalogAction, AppError> {
-        let item: LinkItem = item ?? .init(
-            name: "Untitled link",
-            urlString: "",
-            isFavorite: false
-        )
+        let item: LinkItem = item ?? .init()
 
         let input = EditLinkFeatureInterface.Input(
             catalogSource: catalogSource,

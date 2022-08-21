@@ -5,6 +5,7 @@ final class MenuTableViewController: UITableViewController {
 
     private enum Spec {
         static let cellId = "cell"
+        static let font = UIFont.systemFont(ofSize: 16)
     }
 
     private var actions = [MenuAction]()
@@ -88,7 +89,7 @@ final class MenuTableViewController: UITableViewController {
         config.attributedText = NSAttributedString(
             string: item.name,
             attributes: [
-                .font: UIFont.systemFont(ofSize: 16),
+                .font: Spec.font,
                 .foregroundColor: color
             ]
         )
@@ -111,9 +112,7 @@ final class MenuTableViewController: UITableViewController {
 
         let stringWidth = NSAttributedString(
             string: longestActionName,
-            attributes: [
-                .font: UIFont.systemFont(ofSize: 16)
-            ]
+            attributes: [ .font: Spec.font ]
         ).width(withConstrainedHeight: 44)
 
         let width = stringWidth + 100

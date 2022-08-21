@@ -77,6 +77,12 @@ final class EditLinkEnvImpl: EditLinkEnv {
                         .modify(item: ref.map(state: state, isFavorites: persistedItem.isFavorite))
                         .eraseToAnyPublisher()
                 } else {
+                    let linkItem = ref.map(state: state, isFavorites: false)
+
+                    if linkItem.isEmpty {
+                        return Just(()).setFailureType(to: AppError.self).eraseToAnyPublisher()
+                    }
+
                     return ref.catalogSource
                         .add(item: ref.map(state: state, isFavorites: false))
                         .eraseToAnyPublisher()
