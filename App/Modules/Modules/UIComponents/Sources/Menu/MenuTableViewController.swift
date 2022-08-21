@@ -68,7 +68,7 @@ final class MenuTableViewController: UITableViewController {
     ) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Spec.cellId, for: indexPath)
         let item = actions[indexPath.row]
-        let color: UIColor = item.isDestructive ? .red : .black
+        let color: UIColor = item.isDestructive ? .red : .label
         var config = UIListContentConfiguration.cell()
 
         config.attributedText = NSAttributedString(
