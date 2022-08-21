@@ -36,9 +36,13 @@ extension LinkItemActionsServiceImpl: LinkItemActionsService {
                     actions.append(.edit)
                 }
 
+                let favoritesAction: LinkItemAction = isFavorite
+                    ? .removeFormFavorties
+                    : .addToFavorites
+
                 if isPersisted {
                     actions.append(contentsOf: [
-                        .setIsFavorite(!isFavorite),
+                        favoritesAction,
                         .delete
                     ])
                 }
@@ -77,10 +81,10 @@ extension LinkItemActionsServiceImpl: LinkItemActionsService {
                 isDestructive = true
             case .copy:
                 label = ("Copy", "doc.on.doc")
-            case .setIsFavorite(let isFavorite):
-                label = isFavorite
-                    ? ("Remove from favorites", "star.slash")
-                    : ("Add to favorites", "star")
+            case .addToFavorites:
+                label = ("Add to favorites", "star")
+            case .removeFormFavorties:
+                label = ("Remove from favorites", "star.slash")
             }
 
             return $0.withData(

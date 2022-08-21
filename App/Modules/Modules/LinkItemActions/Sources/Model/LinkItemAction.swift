@@ -1,6 +1,6 @@
 import Models
 
-public enum LinkItemAction: LinkItemActionRepresentable, Equatable {
+public enum LinkItemAction: String, LinkItemActionRepresentable, Equatable {
 
     public typealias Data = LinkItemActionData
     public typealias WithData = LinkItemActionWithData
@@ -9,7 +9,8 @@ public enum LinkItemAction: LinkItemActionRepresentable, Equatable {
     case open
     case edit
     case delete
-    case setIsFavorite(Bool)
+    case addToFavorites
+    case removeFormFavorties
 
     public var action: LinkItemAction {
         self

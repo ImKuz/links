@@ -5,15 +5,18 @@ import Models
 import Combine
 import Foundation
 import LinkItemActions
+import UIComponents
 
 final class CatalogViewController: UICollectionViewController {
 
     private let store: Store<CatalogState, CatalogAction>
     private let viewStore: ViewStore<CatalogState, CatalogAction>
     private let catalogUpdatePublisher: AnyPublisher<Void, Never>
+    private let menuViewController = MenuViewController()
 
     private var cancellables = [AnyCancellable]()
     private var currentItems = IdentifiedArrayOf<LinkItem>()
+    private var menuPresentedItem: LinkItem?
 
     var actionsProvider: ((LinkItem.ID) async -> [LinkItemAction.WithData])?
 
@@ -95,6 +98,26 @@ final class CatalogViewController: UICollectionViewController {
                 weakSelf?.setupRightButton(config)
             }
             .store(in: &cancellables)
+
+        menuViewController.onActionTap = { action in
+            guard
+                let linkItemAction = LinkItemAction(rawValue: action.id),
+                let itemId = weakSelf?.menuPresentedItem?.id
+            else {
+                return
+            }
+
+            let rowAction = CatalogRowAction.linkItemAction(linkItemAction)
+
+            weakSelf?.menuViewController.dismiss()
+            weakSelf?.viewStore.send(
+                .rowAction(id: itemId, action: rowAction)
+            )
+        }
+
+        menuViewController.onDismiss = {
+            weakSelf?.menuPresentedItem = nil
+        }
     }
 
     private func setupLeftButton(_ config: ButtonConfig?) {
@@ -191,15 +214,10 @@ final class CatalogViewController: UICollectionViewController {
             contentPreview: item.urlString
         )
 
-        cell.set(
-            linkItemActionsMenuView: .init(
-                itemId: item.id,
-                actionsProvider: actionsProvider,
-                onAction: { [weak viewStore] actionWithData in
-                    viewStore?.send(.rowAction(id: item.id, action: .linkItemAction(actionWithData.action)))
-                }
-            )
-        )
+        cell.onActionButtonTap = { [weak self, item] button in
+            self?.menuPresentedItem = item
+            self?.showMenu(onto: button, itemId: item.id)
+        }
 
         cell.set(
             store: store.scope(
@@ -212,14 +230,6 @@ final class CatalogViewController: UICollectionViewController {
     }
 
     // MARK: - UICollectionViewDelegate
-
-    override func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
-        let item = currentItems[indexPath.row]
-        viewStore.send(.rowAction(id: item.id, action: .tap))
-    }
 
     override func collectionView(
         _ collectionView: UICollectionView,
@@ -242,5 +252,29 @@ final class CatalogViewController: UICollectionViewController {
                 to: destinationIndexPath.row
             )
         )
+    }
+
+    // MARK: - Private methods
+
+    private func showMenu(onto view: UIView, itemId: LinkItem.ID) {
+        menuViewController.present(
+            onto: view,
+            initialActions: [
+                .init(id: "loader", name: "Loading", iconName: "rays")
+            ]
+        )
+
+        Task {
+            guard let actions = await actionsProvider?(itemId) else { return }
+            let menuActions = actions.map {
+                MenuAction(
+                    id: $0.action.rawValue,
+                    name: $0.data.label?.title ?? "",
+                    iconName: $0.data.label?.iconName ?? ""
+                )
+            }
+
+            menuViewController.updateMenuActions(menuActions)
+        }
     }
 }

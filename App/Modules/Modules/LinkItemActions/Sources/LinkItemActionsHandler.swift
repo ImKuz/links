@@ -86,9 +86,10 @@ final class LinkItemActionsHandlerImpl: LinkItemActionsHandler {
                         .setFailureType(to: AppError.self)
                         .eraseToAnyPublisher()
 
-                case .setIsFavorite(let isFavorite):
-                    return ref.catalogSource.setIsFavorite(id: itemId, isFavorite: isFavorite)
-
+                case .addToFavorites:
+                    return ref.catalogSource.setIsFavorite(id: itemId, isFavorite: true)
+                case .removeFormFavorties:
+                    return ref.catalogSource.setIsFavorite(id: itemId, isFavorite: false)
                 }
             }
             .map { actionWithData }

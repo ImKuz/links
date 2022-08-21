@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import UIKit
-import LinkItemActions
+import UIComponents
 
 protocol CatalogRowCellAsyncAcitonsProvider: AnyObject {
 
@@ -45,11 +45,15 @@ final class CatalogRowCell: UICollectionViewCell {
         return imageView
     }()
 
-    private var linkItemActionsMenuView: LinkItemActionsMenuView?
+    private let actionsButton = ActionsButton()
 
     // MARK: - Private properties
 
     private var viewStore: ViewStore<CatalogRowState, CatalogRowAction>?
+
+    // MARK: - Internal properties
+
+    var onActionButtonTap: ((ActionsButton) -> ())?
 
     // MARK: - Init
 
@@ -62,6 +66,11 @@ final class CatalogRowCell: UICollectionViewCell {
         contentView.addSubview(iconImageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(contentLabel)
+        contentView.addSubview(actionsButton)
+
+        actionsButton.onTap = { [unowned self] in
+            self.onActionButtonTap?(self.actionsButton)
+        }
     }
 
 
@@ -105,7 +114,7 @@ final class CatalogRowCell: UICollectionViewCell {
             ).height
         )
 
-        linkItemActionsMenuView?.frame = CGRect(
+        actionsButton.frame = CGRect(
             x: contentFrame.maxX - buttonSize.width,
             y: contentFrame.midY - buttonSize.height / 2,
             width: buttonSize.width,
@@ -114,15 +123,6 @@ final class CatalogRowCell: UICollectionViewCell {
     }
 
     // MARK: - State
-
-    func set(linkItemActionsMenuView: LinkItemActionsMenuView) {
-        defer { setNeedsLayout() }
-
-        self.linkItemActionsMenuView?.removeFromSuperview()
-        self.linkItemActionsMenuView = linkItemActionsMenuView
-        addSubview(linkItemActionsMenuView)
-        bringSubviewToFront(linkItemActionsMenuView)
-    }
 
     func set(store: Store<CatalogRowState, CatalogRowAction>) {
         self.viewStore = ViewStore(store)
