@@ -270,7 +270,8 @@ final class CatalogViewController: UICollectionViewController {
                 MenuAction(
                     id: $0.action.rawValue,
                     name: $0.data.label?.title ?? "",
-                    iconName: $0.data.label?.iconName ?? ""
+                    iconName: $0.data.label?.iconName ?? "",
+                    isDestructive: $0.data.isDestructive
                 )
             }
 

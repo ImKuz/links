@@ -68,16 +68,19 @@ final class MenuTableViewController: UITableViewController {
     ) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Spec.cellId, for: indexPath)
         let item = actions[indexPath.row]
+        let color: UIColor = item.isDestructive ? .red : .black
         var config = UIListContentConfiguration.cell()
 
         config.attributedText = NSAttributedString(
             string: item.name,
             attributes: [
-                .font: UIFont.systemFont(ofSize: 16)
+                .font: UIFont.systemFont(ofSize: 16),
+                .foregroundColor: color
             ]
         )
 
         config.image = UIImage(systemName: item.iconName ?? "")
+        config.imageProperties.tintColor = color
         
         cell.selectionStyle = .none
         cell.contentConfiguration = config

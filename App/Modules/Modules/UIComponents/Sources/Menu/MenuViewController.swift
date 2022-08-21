@@ -113,7 +113,7 @@ public final class MenuViewController: UIViewController {
         tableViewController.popoverPresentationController?.sourceView = snapshotView
         tableViewController.popoverPresentationController?.sourceRect = snapshotView?.bounds ?? .zero
         tableViewController.popoverPresentationController?.backgroundColor = UIColor.white.withAlphaComponent(0.9)
-
+        updateMenuActions(initialActions)
         present(tableViewController, animated: true)
     }
 }
