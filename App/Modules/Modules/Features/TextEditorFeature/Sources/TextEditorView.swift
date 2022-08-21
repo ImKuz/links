@@ -20,8 +20,9 @@ struct TextEditorView: View {
                         .padding(.top)
                 }
                 TextEditor(text: viewStore.binding(get: { $0.text }, send: { .updateText($0) }))
-                    .font(.system(size: 15, weight: .light, design: .monospaced))
-                    .background(Color.secondary)
+                    .font(.system(size: 15, weight: .regular, design: .monospaced))
+                    .foregroundColor(.white)
+                    .background(Color(.darkGray))
                     .cornerRadius(8)
                     .padding()
             }
