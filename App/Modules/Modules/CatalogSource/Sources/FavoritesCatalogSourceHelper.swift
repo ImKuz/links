@@ -4,7 +4,7 @@ import ToolKit
 import Combine
 
 protocol FavoritesCatalogSourceHelper {
-    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError>
+    func setIsFavorite(id: LinkItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError>
     func isItemFavorite(id: LinkItem.ID) -> AnyPublisher<Bool, AppError>
 }
 
@@ -16,21 +16,19 @@ final class FavoritesCatalogSourceHelperImpl: FavoritesCatalogSourceHelper {
         self.databaseService = databaseService
     }
 
-    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+    func setIsFavorite(id: LinkItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         databaseService
             .write { context in
                 let items = try context.read(
                     type: LinkItemEntity.self,
-                    request: .init(predicate: .init(format: "itemId == %@", item.id))
+                    request: .init(predicate: .init(format: "itemId == %@", id))
                 )
 
                 if let entity = items.first {
                     entity.isFavorite = isFavorite
                     try context.update(entity)
-                } else if isFavorite {
-                    let entity = item.convertToEntity(withIndex: 0)
-                    entity.isFavorite = true
-                    try context.create(entity)
+                } else {
+                    throw AppError.common(description: "")
                 }
 
                 try context.save()
@@ -46,7 +44,7 @@ final class FavoritesCatalogSourceHelperImpl: FavoritesCatalogSourceHelper {
                 request: .init(predicate: .init(format: "itemId == %@", id))
             )
             .mapError { _ in AppError.businessLogic("Unable to check item isFavorite status") }
-            .map { !$0.isEmpty }
+            .map { $0.first?.isFavorite == true }
             .eraseToAnyPublisher()
     }
 }

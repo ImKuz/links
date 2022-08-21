@@ -40,9 +40,8 @@ let editLinkReducer = EditLinkReducer { state, action, env in
         case let .success(actionWithData):
             switch actionWithData.action {
             case .delete:
-                return env
-                    .done(state: state)
-                    .fireAndForget()
+                env.close()
+                return .none
             default:
                 return .none
             }
@@ -56,7 +55,7 @@ let editLinkReducer = EditLinkReducer { state, action, env in
 
     case .done:
         return env
-            .done(state: state)
+            .save(state: state)
             .fireAndForget()
     }
 

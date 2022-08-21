@@ -21,6 +21,8 @@ final class LinkItemActionsHandlerImpl: LinkItemActionsHandler {
     private let router: Router
     private let featureResolver: FeatureResolver
 
+    private var cancellables = [AnyCancellable]()
+
     // MARK: - Init
 
     init(
@@ -59,22 +61,30 @@ final class LinkItemActionsHandlerImpl: LinkItemActionsHandler {
                 case .edit:
                     guard let item = item else { return Self.failure("Unable to fetch item") }
 
-                    DispatchQueue.main.async {
-                        let editLinkFeature = ref.featureResolver.resolve(
-                            feature: EditLinkFeatureInterface.self,
-                            input: .init(
-                                catalogSource: ref.catalogSource,
-                                item: item,
-                                router: ref.router
+                    return Future<Void, AppError> { [weak self] promise in
+                        guard let self = self else { return }
+
+                        DispatchQueue.main.async {
+                            let editLinkFeature = ref.featureResolver.resolve(
+                                feature: EditLinkFeatureInterface.self,
+                                input: .init(
+                                    catalogSource: ref.catalogSource,
+                                    item: item,
+                                    router: ref.router
+                                )
                             )
-                        )
 
-                        ref.router.presentView(view: editLinkFeature.view)
+                            ref.router.presentView(view: editLinkFeature.view)
+
+                            editLinkFeature
+                                .onFinishPublisher
+                                .sink {
+                                    promise(.success(()))
+                                }
+                                .store(in: &self.cancellables)
+                        }
                     }
-
-                    return Just(())
-                        .setFailureType(to: AppError.self)
-                        .eraseToAnyPublisher()
+                    .eraseToAnyPublisher()
 
                 case .delete:
                     return ref.catalogSource.delete(itemId: itemId)

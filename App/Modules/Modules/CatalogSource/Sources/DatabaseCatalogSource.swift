@@ -16,7 +16,7 @@ final class DatabaseCatalogSource: CatalogSource {
     private let topLevelPredicate: NSPredicate?
     private let favoritesCatalogSourceHelper: FavoritesCatalogSourceHelper
 
-    private var itemIdPredicate: (LinkItem.ID) -> NSPredicate = { itemId in
+    private static var itemIdPredicate: (LinkItem.ID) -> NSPredicate = { itemId in
         NSPredicate(format: "itemId == %@", itemId)
     }
 
@@ -106,9 +106,32 @@ final class DatabaseCatalogSource: CatalogSource {
             .eraseToAnyPublisher()
     }
 
-    func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
+    func modify(item: LinkItem) -> AnyPublisher<Void, AppError> {
+        databaseService
+            .write { [item] context in
+                let items = try context.read(
+                    type: LinkItemEntity.self,
+                    request: .init(predicate: Self.itemIdPredicate(item.id))
+                )
+
+                guard let storedItem = items.first else {
+                    throw AppError.businessLogic("The requested item not found for modification")
+                }
+
+                storedItem.urlString = item.urlString
+                storedItem.name = item.name
+                storedItem.isFavorite = item.isFavorite
+
+                try context.update(storedItem)
+                try context.save()
+            }
+            .mapError { _ in AppError.businessLogic("Unable to modify item") }
+            .eraseToAnyPublisher()
+    }
+
+    func setIsFavorite(id: LinkItem.ID, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         favoritesCatalogSourceHelper
-            .setIsFavorite(item: item, isFavorite: isFavorite)
+            .setIsFavorite(id: id, isFavorite: isFavorite)
     }
 
     func isItemFavorite(id: LinkItem.ID) -> AnyPublisher<Bool, AppError> {
@@ -119,7 +142,7 @@ final class DatabaseCatalogSource: CatalogSource {
         databaseService
             .fetch(
                 LinkItemEntity.self,
-                request: .init(predicate: itemIdPredicate(itemId))
+                request: .init(predicate: Self.itemIdPredicate(itemId))
             )
             .map { !$0.isEmpty }
             .mapError { _ in AppError.businessLogic("Unable to add item") }
@@ -130,7 +153,7 @@ final class DatabaseCatalogSource: CatalogSource {
         databaseService
             .fetch(
                 LinkItemEntity.self,
-                request: .init(predicate: itemIdPredicate(itemId))
+                request: .init(predicate: Self.itemIdPredicate(itemId))
             )
             .map { $0.first?.convertToModel() }
             .mapError { _ in AppError.businessLogic("Unable to fetch item") }

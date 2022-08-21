@@ -63,13 +63,25 @@ final class EditLinkEnvImpl: EditLinkEnv {
         return .none
     }
 
-    func done(state: EditLinkState) -> Effect<Void, AppError> {
+    func close() {
+        onFinishSubject.send()
+    }
+
+    func save(state: EditLinkState) -> Effect<Void, AppError> {
         catalogSource
-            .add(item: LinkItem(
-                id: UUID().uuidString,
-                name: state.name,
-                urlString: state.urlString
-            ))
+            .fetchItem(itemId: state.itemId)
+            .withUnretained(self)
+            .flatMap { ref, persistedItem -> AnyPublisher<Void, AppError>  in
+                if let persistedItem = persistedItem {
+                    return ref.catalogSource
+                        .modify(item: ref.map(state: state, isFavorites: persistedItem.isFavorite))
+                        .eraseToAnyPublisher()
+                } else {
+                    return ref.catalogSource
+                        .add(item: ref.map(state: state, isFavorites: false))
+                        .eraseToAnyPublisher()
+                }
+            }
             .handleEvents(receiveOutput: { [weak self] in
                 self?.onFinishSubject.send()
             })
@@ -94,12 +106,12 @@ final class EditLinkEnvImpl: EditLinkEnv {
         }
     }
 
-    private func map(state: EditLinkState) -> LinkItem {
+    private func map(state: EditLinkState, isFavorites: Bool) -> LinkItem {
         .init(
-            id: initialItem.id,
+            id: state.itemId,
             name: state.name,
             urlString: state.urlString,
-            isFavorite: initialItem.isFavorite
+            isFavorite: isFavorites
         )
     }
 }

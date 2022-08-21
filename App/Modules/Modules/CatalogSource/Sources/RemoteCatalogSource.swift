@@ -58,7 +58,7 @@ final class RemoteCatalogSource: CatalogSource, ConnectionObservable {
 
     func setIsFavorite(item: LinkItem, isFavorite: Bool) -> AnyPublisher<Void, AppError> {
         favoritesCatalogSourceHelper
-            .setIsFavorite(item: item, isFavorite: isFavorite)
+            .setIsFavorite(id: item.id, isFavorite: isFavorite)
             .handleEvents(receiveOutput: { [weak bus] _ in
                 bus?.synchronizeState()
             })

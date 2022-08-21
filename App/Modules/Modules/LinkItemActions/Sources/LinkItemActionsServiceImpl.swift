@@ -26,7 +26,7 @@ extension LinkItemActionsServiceImpl: LinkItemActionsService {
         try await Publishers
             .Zip(isItemPersisted(id: itemID), catalogSource.isItemFavorite(id: itemID))
             .map { args in
-                let (isFavorite, isPersisted) = args
+                let (isPersisted, isFavorite) = args
 
                 var actions: [LinkItemAction] = [
                     .copy, .open

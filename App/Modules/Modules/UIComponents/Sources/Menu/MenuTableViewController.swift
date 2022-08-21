@@ -12,6 +12,20 @@ final class MenuTableViewController: UITableViewController {
     var onActionTap: ((MenuAction) -> ())?
     var onDismiss: (() -> ())?
 
+    var longestActionName: String? {
+        var longestSoFar: String?
+
+        actions
+            .map(\.name)
+            .forEach {
+                if (longestSoFar ?? "").count < $0.count {
+                    longestSoFar = $0
+                }
+            }
+
+        return longestSoFar
+    }
+
     // MARK: - Public methods
 
     func configure(with actions: [MenuAction]) {
@@ -93,10 +107,10 @@ final class MenuTableViewController: UITableViewController {
     private func reloadMenu() {
         tableView.reloadData()
 
-        guard let longestTitleAction = actions.max(by: { $0.name < $1.name }) else { return }
+        guard let longestActionName = longestActionName else { return }
 
         let stringWidth = NSAttributedString(
-            string: longestTitleAction.name,
+            string: longestActionName,
             attributes: [
                 .font: UIFont.systemFont(ofSize: 16)
             ]

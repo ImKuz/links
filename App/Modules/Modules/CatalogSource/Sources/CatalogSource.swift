@@ -12,6 +12,7 @@ public protocol CatalogSource: AnyObject {
     func delete(itemId: LinkItem.ID) -> AnyPublisher<Void, AppError>
     func move(from: Int, to: Int) -> AnyPublisher<Void, AppError>
     func add(item: LinkItem) -> AnyPublisher<Void, AppError>
+    func modify(item: LinkItem) -> AnyPublisher<Void, AppError>
     func contains(itemId: LinkItem.ID) -> AnyPublisher<Bool, AppError>
     func fetchItem(itemId: LinkItem.ID) -> AnyPublisher<LinkItem?, AppError>
 
@@ -52,6 +53,15 @@ public extension CatalogSource {
 
     func add(item: LinkItem) -> AnyPublisher<Void, AppError> {
         guard permissions.contains(.add) else {
+            return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
+        }
+
+        assertionFailure("method \(#function) should be implemented in \(self) accoding to its permissions")
+        return Empty().eraseToAnyPublisher()
+    }
+
+    func modify(item: LinkItem) -> AnyPublisher<Void, AppError> {
+        guard permissions.contains(.modify) else {
             return Fail(error: AppError.businessLogic(message)).eraseToAnyPublisher()
         }
 

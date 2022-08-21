@@ -53,7 +53,8 @@ enum EditLinkAction: Equatable {
 protocol EditLinkEnv: AnyObject {
 
     func validateState(_ state: EditLinkState) -> Effect<Set<EditLinkState.ValidateableField>, Never>
-    func done(state: EditLinkState) -> Effect<Void, AppError>
+    func save(state: EditLinkState) -> Effect<Void, AppError>
+    func close()
     func followLink(state: EditLinkState) -> Effect<Void, AppError>
     func expandQueryItemValue(value: String) -> Effect<String, Never>
     func handle(action: LinkItemAction.WithData) -> Effect<LinkItemAction.WithData, AppError>

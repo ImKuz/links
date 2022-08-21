@@ -115,13 +115,19 @@ struct CatalogReducerFactory {
                     .catch { Effect(value: CatalogAction.handleError($0)) }
                     .eraseToEffect()
                 case let .handleActionCompletion(action):
-                    if
+                    guard
                         case let .rowAction(_, rowAction) = action,
-                        case let .linkItemAction(linkItemAction) = rowAction,
-                        case .copy = linkItemAction
-                    {
+                        case let .linkItemAction(linkItemAction) = rowAction
+                    else {
+                        return .none
+                    }
+
+                    switch linkItemAction {
+                    case .copy:
                         return Effect(value: .titleMessage(text: "Copied to clipboard!"))
-                    } else {
+                    case .edit:
+                        return Effect(value: .dismissAddItemForm)
+                    default:
                         return .none
                     }
                 case .handleError:
