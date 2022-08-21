@@ -9,7 +9,10 @@ public enum TextKind {
 
 public struct Text {
 
-    public let kind: TextKind
+    public typealias Kind = TextKind
+    public typealias Encoding = TextEncoding
+
+    public let kind: Kind
     public let string: String
 
     public init(kind: TextKind, string: String) {
@@ -20,4 +23,11 @@ public struct Text {
     public static func raw(_ string: String) -> Self {
         .init(kind: .raw, string: string)
     }
+}
+
+// MARK: - Helpers
+
+public extension Text {
+
+    var isEmpty: Bool { string.isEmpty }
 }

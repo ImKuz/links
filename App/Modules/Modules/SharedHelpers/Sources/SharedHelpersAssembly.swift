@@ -10,5 +10,13 @@ public struct SharedHelpersAssembly: Assembly {
         container.register(URLOpener.self) { _ in
             URLOpenerImpl()
         }
+
+        container.register(TextEncoder.self) { _ in
+            TextEncoderImpl()
+        }
+
+        container.register(TextDecoder.self) { _ in
+            TextDecoderImpl()
+        }
     }
 }
