@@ -22,6 +22,7 @@ let editLinkReducer = EditLinkReducer { state, action, env in
         return env
             .expandQueryItemValue(value: value)
             .receive(on: DispatchQueue.main)
+            .print()
             .eraseToEffect { EditLinkAction.changeQueryParamValue(value: $0, index: index) }
 
     case let .deleteQueryParam(index):

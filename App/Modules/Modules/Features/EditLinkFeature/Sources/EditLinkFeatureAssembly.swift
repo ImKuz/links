@@ -13,6 +13,10 @@ public struct EditLinkFeatureAssembly: Assembly {
     public func assemble(container: Container) {
 
         let factory: (Resolver, EditLinkFeatureInterface.Input) -> EditLinkFeatureInterface = { resolver, input in
+            let navigationController = UINavigationController()
+
+            let router = RouterImpl(navigationController: navigationController)
+
             let environment = EditLinkEnvImpl(
                 catalogSource: input.catalogSource,
                 initialItem: input.item,
@@ -20,7 +24,9 @@ public struct EditLinkFeatureAssembly: Assembly {
                     LinkItemActionsService.self,
                     arguments: input.catalogSource,
                     input.router
-                )!
+                )!,
+                featureResolver: resolver.resolve(FeatureResolver.self)!,
+                router: router
             )
 
             let store = Store<EditLinkState, EditLinkAction>(
@@ -43,8 +49,12 @@ public struct EditLinkFeatureAssembly: Assembly {
                 environment?.menuViewController
             }
 
+            router.pushToView(view: view)
+            let navigationHolder = UINavigationControllerHolder(navigationController: navigationController)
+            let anyView = AnyView(navigationHolder)
+
             return EditLinkFeatureInterface(
-                view: AnyView(view),
+                view: anyView,
                 onFinishPublisher: environment.onFinishSubject.eraseToAnyPublisher()
             )
         }

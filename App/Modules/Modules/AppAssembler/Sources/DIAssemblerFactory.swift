@@ -14,6 +14,8 @@ import CatalogFeature
 import EditLinkFeature
 import RemoteFeature
 import SettingsFeature
+import SwiftUI
+import TextEditorFeature
 
 public enum DIAssemblerFactory {
 
@@ -46,6 +48,7 @@ public enum DIAssemblerFactory {
             EditLinkFeatureAssembly(),
             RemoteFeatureAssembly(),
             SettingsFeatureAssembly(),
+            TextEditorFeatureAssembly(),
         ])
     }
 }

@@ -29,7 +29,7 @@ final class CatalogRowCell: UICollectionViewCell {
     private let contentLabel: UILabel = {
         let label = UILabel()
 
-        label.font = UIFont.systemFont(ofSize: 15, weight: .light)
+        label.font = UIFont.systemFont(ofSize: 15, weight: .light,)
         label.textColor = .placeholderText
         label.numberOfLines = 2
 

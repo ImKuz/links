@@ -6,12 +6,15 @@ import CatalogSource
 import UIKit
 import LinkItemActions
 import UIComponents
+import FeatureSupport
 
 final class EditLinkEnvImpl: EditLinkEnv {
 
     private let catalogSource: CatalogSource
     private let initialItem: LinkItem
     private let linkItemActionsService: LinkItemActionsService
+    private let featureResolver: FeatureResolver
+    private let router: Router
 
     let menuViewController = MenuViewController()
     let onFinishSubject = PassthroughSubject<Void, Never>()
@@ -19,11 +22,15 @@ final class EditLinkEnvImpl: EditLinkEnv {
     init(
         catalogSource: CatalogSource,
         initialItem: LinkItem,
-        linkItemActionsService: LinkItemActionsService
+        linkItemActionsService: LinkItemActionsService,
+        featureResolver: FeatureResolver,
+        router: Router
     ) {
         self.catalogSource = catalogSource
         self.initialItem = initialItem
         self.linkItemActionsService = linkItemActionsService
+        self.featureResolver = featureResolver
+        self.router = router
     }
 
     func validateState(_ state: EditLinkState) -> Effect<Set<EditLinkState.ValidateableField>, Never> {
@@ -60,11 +67,24 @@ final class EditLinkEnvImpl: EditLinkEnv {
     }
 
     func expandQueryItemValue(value: String) -> Effect<String, Never> {
-        return .none
+        let interface = featureResolver.resolve(feature: TextEditorFeatureInterface.self, input: value)
+
+        router.presentView(view: interface.view)
+
+        return interface
+            .onFinishPublisher
+            .handleEvents(receiveOutput: { [weak self] _ in
+                self?.dismissPresetnedView()
+            })
+            .eraseToEffect()
     }
 
     func close() {
         onFinishSubject.send()
+    }
+
+    func dismissPresetnedView() {
+        router.dismiss(isAnimated: true)
     }
 
     func save(state: EditLinkState) -> Effect<Void, AppError> {

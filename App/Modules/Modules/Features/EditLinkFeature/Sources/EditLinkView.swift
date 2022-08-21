@@ -34,6 +34,7 @@ struct EditLinkView: View {
             .padding(.top, 16)
             .background(Color(.secondarySystemBackground))
         }
+        .navigationBarHidden(true)
     }
 
     // MARK: - ViewBuilder
@@ -181,6 +182,7 @@ struct EditLinkView: View {
         text: Binding<String>
     ) -> some View {
         TextField(placeholder, text: text)
+            .font(.system(size: 15, weight: .regular, design: .monospaced))
             .textContentType(.URL)
             .textInputAutocapitalization(.never)
             .disableAutocorrection(true)

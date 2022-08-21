@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "74EEC7B4282FB41C0013CC3F"
-               BuildableName = "CopyPasta.app"
+               BuildableName = "Links.app"
                BlueprintName = "Links"
                ReferencedContainer = "container:Links.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "74EEC7B4282FB41C0013CC3F"
-            BuildableName = "CopyPasta.app"
+            BuildableName = "Links.app"
             BlueprintName = "Links"
             ReferencedContainer = "container:Links.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "74EEC7B4282FB41C0013CC3F"
-            BuildableName = "CopyPasta.app"
+            BuildableName = "Links.app"
             BlueprintName = "Links"
             ReferencedContainer = "container:Links.xcodeproj">
          </BuildableReference>

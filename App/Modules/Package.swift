@@ -25,6 +25,7 @@ enum Module: String, CaseIterable, Equatable, Hashable {
     case RemoteFeature
     case RootFeature
     case SettingsFeature
+    case TextEditorFeature
 }
 
 enum Dependency {
@@ -74,6 +75,7 @@ let dependencyMap: [Module: [Dependency]] = [
         .module(.Models),
         .module(.CatalogSource),
         .module(.FeatureSupport),
+        .module(.SharedHelpers),
     ],
     .FeatureSupport: [
         .module(.Models),
