@@ -18,6 +18,7 @@ enum Module: String, CaseIterable, Equatable, Hashable {
     case SharedHelpers
     case LinkItemActions
     case FeatureSupport
+    case UIComponents
     // Features
     case EditLinkFeature
     case CatalogFeature
@@ -112,6 +113,7 @@ let commonModuleDependencies: [Dependency] = [
 let commonFeatureDependencies: [Dependency] = [
     .module(.Models),
     .module(.FeatureSupport),
+    .module(.UIComponents),
     .external(.product(name: "ComposableArchitecture", package: "swift-composable-architecture")),
     .external(.product(name: "IdentifiedCollections", package: "swift-identified-collections")),
 ]
