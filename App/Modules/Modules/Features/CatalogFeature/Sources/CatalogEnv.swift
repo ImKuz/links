@@ -39,7 +39,7 @@ final class CatalogEnvImpl: CatalogEnv {
         switch settings.linkTapBehaviour {
         case "edit":
             return .linkItemAction(.edit)
-        case "follow":
+        case "open":
             return .linkItemAction(.open)
         default:
             return .linkItemAction(.edit)

@@ -13,7 +13,7 @@ struct EditLinkView: View {
     }
 
     private enum Images {
-        static let followLink = Image(systemName: "play.fill")
+        static let openLink = Image(systemName: "play.fill")
         static let actionsMenu = Image(systemName: "ellipsis")
         static let expandValue = Image(systemName: "arrow.up.backward.and.arrow.down.forward")
     }
@@ -50,7 +50,7 @@ struct EditLinkView: View {
                 Spacer()
 
                 Button(action: { viewStore.send(.open) }) {
-                    Images.followLink
+                    Images.openLink
                         .resizable()
                         .frame(width: 16, height: 16)
                 }

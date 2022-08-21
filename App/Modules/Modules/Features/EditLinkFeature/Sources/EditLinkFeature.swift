@@ -56,7 +56,7 @@ protocol EditLinkEnv: AnyObject {
     func save(state: EditLinkState) -> Effect<Void, AppError>
     func close()
     func dismissPresetnedView()
-    func followLink(state: EditLinkState) -> Effect<Void, AppError>
+    func openLink(state: EditLinkState) -> Effect<Void, AppError>
     func expandQueryItemValue(value: String) -> Effect<String, Never>
     func handle(action: LinkItemAction.WithData) -> Effect<LinkItemAction.WithData, AppError>
 }

@@ -57,7 +57,7 @@ final class EditLinkEnvImpl: EditLinkEnv {
         return Effect(value: invalidFields)
     }
 
-    func followLink(state: EditLinkState) -> Effect<Void, AppError> {
+    func openLink(state: EditLinkState) -> Effect<Void, AppError> {
         if let url = URL(string: state.urlString), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
             return Effect(value: ())

@@ -44,7 +44,7 @@ public struct SettingsFeatureAssembly: Assembly {
         ]
 
         let linkTapBehaviours: [SettingsOption] = [
-            .init(title: "Follow the link", tag: "follow"),
+            .init(title: "Open the link", tag: "open"),
             .init(title: "Copy the link", tag: "copy"),
         ]
 
