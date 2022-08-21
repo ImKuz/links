@@ -10,7 +10,7 @@ struct ServerView: View {
         .padding(.bottom, 4)
         .padding(.leading, 24)
 
-    var description: some View = Text("You may use another CopyPasta instance to browse your local snippet storage")
+    var description: some View = Text("You may use another Links instance to browse your local snippet storage")
         .padding(.bottom, 4)
         .padding(.leading, 24)
         .foregroundColor(Color.gray)
