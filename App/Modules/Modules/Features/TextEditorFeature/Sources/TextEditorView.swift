@@ -19,12 +19,28 @@ struct TextEditorView: View {
                         .padding(.trailing)
                         .padding(.top)
                 }
-                TextEditor(text: viewStore.binding(get: { $0.text }, send: { .updateText($0) }))
-                    .font(.system(size: 15, weight: .regular, design: .monospaced))
-                    .foregroundColor(.white)
-                    .background(Color(.darkGray))
-                    .cornerRadius(8)
-                    .padding()
+                Spacer(minLength: 16)
+                HStack {
+                    Toggle(
+                        "Use Base64 encoding",
+                        isOn: viewStore.binding(
+                            get: { $0.isBase64EncodingOn },
+                            send: { TextEditorAction.setBase64EncodingEnabled($0) }
+                        )
+                    )
+                    .padding(.horizontal)
+                }
+                TextEditor(
+                    text: viewStore.binding(
+                        get: { $0.text },
+                        send: { .updateText($0) }
+                    )
+                )
+                .font(.system(size: 15, weight: .regular, design: .monospaced))
+                .foregroundColor(.white)
+                .background(Color(.darkGray))
+                .cornerRadius(8)
+                .padding()
             }
         }
     }
