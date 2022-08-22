@@ -29,11 +29,14 @@ public struct EditLinkFeatureAssembly: Assembly {
                 router: router
             )
 
+            let urlString = input.item.urlString
+
             let store = Store<EditLinkState, EditLinkAction>(
                 initialState: EditLinkState(
                     itemId: input.item.id,
                     name: input.item.name,
-                    urlStringComponents: .deconstructed(from: input.item.urlString)
+                    urlString: urlString,
+                    urlStringComponents: .deconstructed(from: urlString)
                 ),
                 reducer: editLinkReducer,
                 environment: environment

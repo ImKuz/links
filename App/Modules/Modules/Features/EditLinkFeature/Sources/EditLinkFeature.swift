@@ -23,12 +23,12 @@ struct EditLinkState: Equatable {
 
     var itemId: String
     var name: String
-    var urlStringComponents: URLStringComponents?
+    var urlString: String
+    var urlStringComponents: URLStringComponents
     var invalidFields = Set<ValidateableField>()
 
     var isFormValid: Bool { invalidFields.isEmpty }
-    var queryParams: [QueryParam] { urlStringComponents?.queryParams ?? [] }
-    var urlString: String { urlStringComponents?.constructUrlString() ?? "" }
+    var queryParams: [QueryParam] { urlStringComponents.queryParams }
 }
 
 // MARK: - Action

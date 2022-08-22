@@ -8,28 +8,28 @@ let editLinkReducer = EditLinkReducer { state, action, env in
         state.name = name
 
     case let .changeUrlString(string):
+        state.urlString = string
         state.urlStringComponents = .deconstructed(from: string)
 
     case let .changeQueryParamKey(key, index):
-        state.urlStringComponents?.queryParams[index].key = key
+        state.urlStringComponents.queryParams[index].key = key
+        state.urlString = state.urlStringComponents.constructUrlString()
 
     case let .changeQueryParamValue(value, index):
-        state.urlStringComponents?.queryParams[index].value = value
+        state.urlStringComponents.queryParams[index].value = value
+        state.urlString = state.urlStringComponents.constructUrlString()
 
     case let .expandQueryParamValue(index):
-        guard let value = state.urlStringComponents?.queryParams[index].value else { return .none }
-
         return env
-            .expandQueryItemValue(value: value)
+            .expandQueryItemValue(value: state.urlStringComponents.queryParams[index].value)
             .receive(on: DispatchQueue.main)
-            .print()
             .eraseToEffect { EditLinkAction.changeQueryParamValue(value: $0, index: index) }
 
     case let .deleteQueryParam(index):
-        state.urlStringComponents?.queryParams.remove(at: index)
+        state.urlStringComponents.queryParams.remove(at: index)
 
     case .appendQueryParam:
-        state.urlStringComponents?.queryParams.append(.empty)
+        state.urlStringComponents.queryParams.append(.empty)
 
     case let .onLinkItemAction(action):
         return env
@@ -52,7 +52,9 @@ let editLinkReducer = EditLinkReducer { state, action, env in
         }
 
     case .open:
-        return .none
+        return env
+            .openLink(state: state)
+            .fireAndForget()
 
     case .done:
         return env
