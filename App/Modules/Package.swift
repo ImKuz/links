@@ -241,7 +241,7 @@ let packageContent: [(Product, [Target])] = {
 }()
 
 let package = Package(
-    name: "CopyPastaModules",
+    name: "LinksAppModules",
     platforms: [ .iOS(.v15) ],
     products: packageContent.map { $0.0 },
     dependencies: externalDependecies,

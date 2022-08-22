@@ -11,7 +11,7 @@ final class CoreDataStorage {
     private var isLoaded = false
 
     private let backgroundQueue = DispatchQueue(
-        label: "com.copy-pasta.db-back-q",
+        label: "com.links-app.db-back-q",
         qos: .background,
         attributes: .concurrent
     )

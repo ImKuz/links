@@ -7,7 +7,7 @@ public struct LoggerAssembly: Assembly {
 
     public func assemble(container: Container) {
         container.register(Logger.self) { _ in
-            let logger = Logging.Logger(label: "com.copy-pasta.app")
+            let logger = Logging.Logger(label: "com.links-app")
             return LoggerImpl(logger: logger, label: nil)
         }
     }
