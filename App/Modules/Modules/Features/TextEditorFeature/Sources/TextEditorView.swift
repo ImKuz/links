@@ -20,16 +20,6 @@ struct TextEditorView: View {
                         .padding(.top)
                 }
                 Spacer(minLength: 16)
-                HStack {
-                    Toggle(
-                        "Use Base64 encoding",
-                        isOn: viewStore.binding(
-                            get: { $0.isBase64EncodingOn },
-                            send: { TextEditorAction.setBase64EncodingEnabled($0) }
-                        )
-                    )
-                    .padding(.horizontal)
-                }
                 TextEditor(
                     text: viewStore.binding(
                         get: { $0.text },
