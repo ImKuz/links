@@ -1,6 +1,6 @@
 enum TabType: String {
     case favorites
-    case local
+    case snippets
     case remote
     case settings
 }

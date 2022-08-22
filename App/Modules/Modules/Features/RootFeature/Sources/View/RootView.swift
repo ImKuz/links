@@ -20,7 +20,7 @@ struct RootView: View {
                 ForEach(Array(viewStore.tabs.enumerated()), id: \.0) { index, tab in
                     tabViewsProvider
                         .view(for: tab.type)?
-                        .background(Color(UIColor.secondarySystemBackground))
+                        .background(Color(UIColor.systemGroupedBackground))
                         .tabItem { Label(tab.name, systemImage: tab.iconName) }
                         .tag(index)
                 }

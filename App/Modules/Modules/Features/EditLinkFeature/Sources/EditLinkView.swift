@@ -32,7 +32,7 @@ struct EditLinkView: View {
                 formView(viewStore: viewStore)
             }
             .padding(.top, 16)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(.systemGroupedBackground))
         }
         .navigationBarHidden(true)
     }

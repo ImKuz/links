@@ -1,9 +1,10 @@
 import ComposableArchitecture
+import Database
 import FeatureSupport
 import SharedHelpers
-import Swinject
-import Database
 import SwiftUI
+import Swinject
+import ToolKit
 
 public struct SettingsFeatureAssembly: Assembly {
 
@@ -13,6 +14,9 @@ public struct SettingsFeatureAssembly: Assembly {
         container.register(SettingsFeatureInterface.self) { resolver in
             let settingsHelper = resolver.resolve(SettingsHelper.self)!
             let database = resolver.resolve(DatabaseService.self)!
+
+            let navigationController = UINavigationController()
+            let router = RouterImpl(navigationController: navigationController)
 
             let env = SettingsEnvImpl(
                 settings: settingsHelper,
@@ -29,7 +33,11 @@ public struct SettingsFeatureAssembly: Assembly {
             )
 
             let view = SettingsView(store: store)
-            return SettingsFeatureInterface(view: AnyView(view))
+            router.pushToView(view: view, isAnimated: false)
+            let navigationHolder = UINavigationControllerHolder(navigationController: navigationController)
+            let anyView = AnyView(navigationHolder)
+
+            return SettingsFeatureInterface(view: anyView)
         }
     }
 
@@ -39,13 +47,14 @@ public struct SettingsFeatureAssembly: Assembly {
 
         let tabOptions: [SettingsOption] = [
             .init(title: "Favorites", tag: "favorites"),
-            .init(title: "Snippets", tag: "local"),
+            .init(title: "Snippets", tag: "snippets"),
             .init(title: "Network", tag: "remote"),
         ]
 
         let linkTapBehaviours: [SettingsOption] = [
-            .init(title: "Open the link", tag: "open"),
-            .init(title: "Copy the link", tag: "copy"),
+            .init(title: "Open link", tag: "open"),
+            .init(title: "Copy link", tag: "copy"),
+            .init(title: "Edit link", tag: "edit")
         ]
 
         let selectedTabOption = tabOptions

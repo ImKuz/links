@@ -44,7 +44,7 @@ struct RemoteView: View {
                 Spacer(minLength: 24)
             }
             .navigationTitle("Network")
-            .background(Color(.secondarySystemBackground))
+            .background(Color(.systemGroupedBackground))
         }
     }
 }

@@ -57,7 +57,7 @@ final class AppAssemblerImpl: AppAssembler {
     private func configureRootNavigationController() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .secondarySystemBackground
+        appearance.backgroundColor = .systemGroupedBackground
 
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance

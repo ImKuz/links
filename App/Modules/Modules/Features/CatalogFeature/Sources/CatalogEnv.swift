@@ -41,6 +41,8 @@ final class CatalogEnvImpl: CatalogEnv {
             return .linkItemAction(.edit)
         case "open":
             return .linkItemAction(.open)
+        case "copy":
+            return .linkItemAction(.copy)
         default:
             return .linkItemAction(.edit)
         }

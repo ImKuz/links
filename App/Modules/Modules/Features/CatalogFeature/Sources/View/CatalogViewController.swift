@@ -43,7 +43,7 @@ final class CatalogViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBinding()
-        collectionView.backgroundColor = .secondarySystemBackground
+        collectionView.backgroundColor = .systemGroupedBackground
         collectionView.register(
             CatalogRowCell.self,
             forCellWithReuseIdentifier: CatalogRowCell.reuseId
@@ -252,6 +252,14 @@ final class CatalogViewController: UICollectionViewController {
                 to: destinationIndexPath.row
             )
         )
+    }
+
+    override func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        let item = viewStore.items[indexPath.row]
+        viewStore.send(.rowAction(id: item.id, action: .tap))
     }
 
     // MARK: - Private methods

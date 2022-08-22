@@ -60,7 +60,7 @@ final class CatalogRowCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        backgroundColor = .systemBackground
+        backgroundColor = .white
         layer.cornerRadius = 8
 
         contentView.addSubview(iconImageView)
@@ -78,7 +78,13 @@ final class CatalogRowCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Layout
+    // MARK: - UIView
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        backgroundColor = traitCollection.userInterfaceStyle == .light
+            ? .white
+            : .secondarySystemBackground
+    }
 
     override func layoutSubviews() {
         super.layoutSubviews()

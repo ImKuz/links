@@ -63,6 +63,6 @@ struct SettingsView: View {
                 }
             )
         }
-        .background(Color(.secondarySystemBackground))
+        .navigationBarTitle("Settings")
     }
 }

@@ -34,14 +34,14 @@ final class RootTabViewsProviderImpl: RootTabViewsProvider {
                 title: "Favorites",
                 config: config
             )
-        case .local:
+        case .snippets:
             let config = CatalogSourceConfig(
                 permissionsOverride: nil,
                 typeConfig: .local(.init(topLevelPredicate: nil))
             )
 
             return makeLocalCatalog(
-                title: "Local",
+                title: "Snippets",
                 config: config
             )
         case .remote:

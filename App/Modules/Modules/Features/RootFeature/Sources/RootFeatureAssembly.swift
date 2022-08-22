@@ -12,7 +12,7 @@ public struct RootFeatureAssembly: Assembly {
     public func assemble(container: Container) {
         let tabs = [
             Tab(type: .favorites, name: "Favorites", iconName: "star"),
-            Tab(type: .local, name: "Snippets", iconName: "note.text"),
+            Tab(type: .snippets, name: "Snippets", iconName: "note.text"),
             Tab(type: .remote, name: "Network", iconName: "globe"),
             Tab(type: .settings, name: "Settings", iconName: "gearshape"),
         ]

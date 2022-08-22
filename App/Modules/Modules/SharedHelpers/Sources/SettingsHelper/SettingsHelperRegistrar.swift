@@ -15,7 +15,7 @@ enum SettingsHelperRegistrar {
     }
 
     private static func defineDefaultTabTag() -> String {
-        "favorites"
+        "snippets"
     }
 
     private static func defineDefaultLinkTapBehaviour() -> String {

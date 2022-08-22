@@ -86,7 +86,7 @@ struct ServerView: View {
                     .foregroundColor(Color.accentColor)
                     .frame(width: 22, height: 22, alignment: .center)
             )
-            .background(Color(.secondarySystemBackground))
+            .background(Color(.systemGroupedBackground))
         }
     }
 }
