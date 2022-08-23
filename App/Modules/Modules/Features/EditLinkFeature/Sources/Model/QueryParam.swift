@@ -8,7 +8,7 @@ struct QueryParam: Equatable {
 
     var asURLEncodedString: String? {
         guard !isEmpty else { return "" }
-        guard !value.isEmpty else { return "\(key)=" }
+        guard !value.isEmpty else { return "\(key)" }
 
         // According to RFC3986 | https://www.rfc-editor.org/rfc/rfc3986#section-2.3
         let encodedValue = value.addingPercentEncoding(
